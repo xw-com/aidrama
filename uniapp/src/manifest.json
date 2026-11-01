@@ -163,7 +163,6 @@
             "mode" : "history",
             "base" : "/h5/"
         },
-        // OAuth：H5/小程序/鸿蒙的 redirect_uri 是 {origin}/pages/login/callback，App 是 aidrama://oauth/callback，均需在 xworld 侧登记
         "devServer" : {
             "port" : 5175,
             "https" : false

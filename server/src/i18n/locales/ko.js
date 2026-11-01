@@ -68,7 +68,11 @@ export default {
   "auth.login_success": "로그인 성공",
   "auth.password_length": "비밀번호는 최소 6자 이상이어야 합니다",
   "auth.register_success": "가입 성공",
-  "auth.synced": "프로필이 동기화되었습니다",
+
+  "auth.username_invalid": "사용자 이름은 영문, 숫자, 밑줄, 점, 하이픈만 가능합니다 (2-64자)",
+  "auth.username_taken": "이미 사용 중인 사용자 이름입니다",
+  "auth.email_taken": "이미 등록된 이메일입니다",
+  "auth.password_changed": "비밀번호가 변경되었습니다",  "auth.synced": "프로필이 동기화되었습니다",
   "auth.user_not_found": "사용자가 존재하지 않습니다",
   "auth.wechat_code_missing": "위챗 인증 code가 없습니다",
   "auth.wechat_disabled": "위챗 로그인이 비활성화되어 있습니다",

@@ -266,7 +266,7 @@ export const VENDOR_MODELS_COLUMNS = {
   models: DataTypes.JSON,
 };
 
-/** User 新增字段：xworld 外部账号体系（external_id 关联 xworld user.id；phone/nickname 镜像档案） */
+/** User 新增字段：外部账号体系（external_id 关联外部身份；phone/nickname 档案字段） */
 export const USER_XWORLD_COLUMNS = {
   external_id: DataTypes.STRING(64),
   phone: DataTypes.STRING(32),

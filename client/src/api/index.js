@@ -1,16 +1,16 @@
 import http from './http.js';
-import xworld from './xworld.js';
 import router from '../router';
 import i18n from '../i18n';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 // ===== 鉴权 =====
-// 登录/注册/刷新/登出 → xworld OAuth2 授权码流程（见 api/oauth.js，授权中心托管登录页）
-// 本文件仅保留：改密（xworld /users/me，需 account scope）+ 本系统档案同步
+// 本地注册/登录/改密（账号密码 + 点选验证码）；令牌静默刷新在 http.js（/auth/oauth/refresh）
 export const authApi = {
-  changePassword: (data) => xworld.post('/users/me/password', { current_password: data.oldPassword, new_password: data.newPassword }),
-  // —— 本系统 ——
+  login: (data) => http.post('/auth/login', data, { _silent: true }),
+  register: (data) => http.post('/auth/register', data, { _silent: true }),
+  changePassword: (data) => http.post('/auth/password', { oldPassword: data.oldPassword, newPassword: data.newPassword }, { _silent: true }),
+  // —— 档案 ——
   me: (opts) => http.get('/auth/me', opts),
   sync: (profile) => http.post('/auth/sync', profile),
 };

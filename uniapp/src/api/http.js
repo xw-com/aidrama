@@ -1,7 +1,7 @@
 /**
  * HTTP 层（uni.request 版）：完整移植 client/src/api/http.js 的拦截语义 ——
  * - 统一 envelope { code, message, data }，code===0 → data
- * - 401：refresh_token 单飞静默续期（直连 /auth/refresh，平台 JWT 不轮换）+ 原请求重试一次，失败 bailSession
+ * - 401：refresh_token 单飞静默续期（/auth/oauth/refresh，自签 JWT 不轮换）+ 原请求重试一次，失败 bailSession
  * - 402：积分不足确认框 → 充值页（全局单例不叠框）
  * - 503 维护模式：专用提示 30s 限频，错误对象带 e.maintenance
  * - 隐私门禁：App 端同意《用户协议》《隐私政策》前所有请求挂起不发（utils/privacy）
@@ -14,7 +14,6 @@ import { getItem, setItem, removeItem, KEYS } from '../utils/storage';
 import { toast, confirm } from '../utils/ui';
 import { isIosApp } from '../utils/system';
 import { waitPrivacyAgreed } from '../utils/privacy';
-import { directRefresh } from './xworld';
 import { useAuthStore } from '../stores/auth';
 
 const t = (k, p) => i18n.global.t(k, p);
@@ -67,9 +66,9 @@ export function bailSession() {
 }
 
 // ===== 静默刷新（单飞） =====
-// 本地第三方登录（Apple/Google）的 axt_ 会话走本系统刷新端点；必须绕过 http.request 的
+// 本地会话（axt_ JWT）走本系统刷新端点；必须绕过 http.request 的
 // 401 重试层（原生 uni.request 直调），否则刷新自身 401 会重入 doRefresh 单飞 Promise 死等。
-// 刻意与 xworld.js 的 xpost 同构：成功信封 { code:0, data } / 失败 Error+.status
+// 成功信封 { code:0, data } / 失败 Error+.status
 function appTokenRefresh(refreshToken) {
   return new Promise((resolve, reject) => {
     uni.request({
@@ -93,11 +92,8 @@ function doRefresh() {
   if (refreshingPromise) return refreshingPromise;
   const refreshToken = getItem(KEYS.refresh);
   if (!refreshToken) return Promise.resolve(null);
-  // 令牌前缀即模式标志（docs/xworld-direct-auth-api.md §8.2）：
-  // axt_ = 本地第三方登录（Apple/Google，走 AIDrama /auth/oauth/refresh）；其余 = xworld 平台 JWT
-  const refreshing = refreshToken.startsWith('axt_')
-    ? appTokenRefresh(refreshToken)
-    : directRefresh(refreshToken);
+  // 会话统一为本系统自签 axt_ JWT（本地注册/登录与 Apple/Google 第三方登录一致），刷新端点也只有一个
+  const refreshing = appTokenRefresh(refreshToken);
   refreshingPromise = refreshing
     .then((data) => {
       // 两套 refresh 都不轮换：响应仅含新 access_token（原 refresh 继续用，勿清）

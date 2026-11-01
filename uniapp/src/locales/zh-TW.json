@@ -4,7 +4,7 @@
     "termsTitle": "User Agreement",
     "privacyTitle": "Privacy Policy",
     "effectiveDate": "Effective date: 2026-09-19",
-    "placeholderNote": "This User Agreement and Privacy Policy are generic templates for now (disclosure covers the XWorld account center, WeChat Pay and AI service providers); the final legally reviewed version will prevail before official launch.",
+    "placeholderNote": "本《使用者協議》與《隱私政策》當前為通用範本（披露對象含微信支付與 AI 技術服務商），正式上線前以法務定稿版本為準。",
     "agreePrefix": "I have read and agree to the",
     "agreeAnd": "and",
     "agreeRequired": "Please read and accept the User Agreement and Privacy Policy first",
@@ -15,7 +15,7 @@
       "serviceTitle": "Service Description",
       "serviceBody": "The App is an AI short-drama production tool offering script writing, storyboard generation, video synthesis, credit recharge and work showcase. Features are subject to what the App actually provides; as we keep iterating, some features may be adjusted or discontinued.",
       "accountTitle": "Account & Security",
-      "accountBody": "You register and sign in through the XWorld account center. Keep your credentials safe and take full responsibility for all activities under your account; do not transfer or lend your account, and report any unauthorized use to us immediately.",
+      "accountBody": "您可使用在本應用內註冊的帳號（使用者名稱/信箱/手機號碼 + 密碼）登入。請妥善保管帳號密碼，並對帳號下的全部行為負責；不得轉讓、出借帳號，發現被盜用應立即通知我們。",
       "creditsTitle": "Credits & Payment",
       "creditsBody": "AI generation features in the App are billed in credits. Credits are obtained via recharge and can only be used within the App; they are non-transferable and non-refundable (except where mandatory law applies or in special cases such as system failures). Please confirm the amount and package before paying.",
       "contentTitle": "Generated Content & Intellectual Property",
@@ -36,7 +36,7 @@
       "storageTitle": "Storage & Protection",
       "storageBody": "Your data is stored on our servers with security measures such as encryption in transit and at rest, and is kept only as long as necessary to deliver the features; after that we delete or anonymize it.",
       "thirdPartyTitle": "Third-Party Disclosure",
-      "thirdPartyBody": "We only share information with the following third parties when necessary to deliver the service: the XWorld account center (registration, sign-in and identity verification), WeChat Pay (recharge payments), AI service providers (text/image/audio/video generation, including your creative content as model input), and cloud/security vendors. Beyond this, we do not disclose information without your consent.",
+      "thirdPartyBody": "僅在為實現服務所必需時向以下第三方提供：微信支付（完成儲值支付）、AI 技術服務商（文字/圖片/音視訊生成，含將您的創作內容作為模型輸入）、雲服務與安全服務商。除此之外，未經您同意不對外提供。",
       "rightsTitle": "Your Rights",
       "rightsBody": "You may access, correct or delete your personal information, cancel your account, withdraw your consent, or raise opinions and complaints about our processing of personal information, via in-app \"Settings\" or by contacting customer support.",
       "minorsTitle": "Protection of Minors",
@@ -552,7 +552,8 @@
     "identity": "帳號",
     "phone": "手機號",
     "code": "驗證碼",
-    "newPassword": "新密碼"
+    "newPassword": "新密碼",
+    "username": "使用者名稱"
   },
   "genConfirm": {
     "addReferenceImage": "新增參考圖",
@@ -635,7 +636,6 @@
     "colName": "文件名"
   },
   "login": {
-    "demoTip": "示範帳號：demo / demo123（已預設 2000 點數）",
     "feat1": "三步式工作流程，所見即所得",
     "feat2": "大模型 / 圖像 / 影片設定自由匯入",
     "feat3": "點數計費透明，1 元 = 10 點數",
@@ -649,10 +649,8 @@
     "sub": "登入開始你的創作",
     "success": "登入成功",
     "welcome": "歡迎回來 👋",
-    "phIdentity": "郵箱 / 手機號",
+    "phIdentity": "使用者名稱 / 信箱 / 手機號碼",
     "forgot": "忘記密碼？",
-    "oauthButton": "使用 X-World 帳號登入",
-    "oauthHint": "將跳轉至 X-World 統一帳號中心完成登入",
     "action": "登入 / 註冊",
     "goLogin": "去登入",
     "needLogin": "請先登入後繼續",
@@ -1009,7 +1007,6 @@
     "nameLabel": "專案名稱"
   },
   "register": {
-    "emailLabel": "信箱（選填）",
     "feat1": "自動擷取角色 / 場景 / 道具",
     "feat2": "分鏡腳本 + 影片產生",
     "feat3": "ffmpeg 合成，淺色 / 深色 / 自動主題",
@@ -1018,21 +1015,14 @@
     "heroTitle1": "註冊帳號",
     "heroTitle2": "開啟 AI 短劇創作",
     "phConfirm": "再次輸入密碼",
-    "phEmail": "可用於找回密碼",
+    "phEmail": "選填，可用於登入與團隊邀請",
     "phPassword": "至少 6 位",
-    "signIn": "直接登入",
     "signUp": "註 冊",
     "sub": "幾秒鐘完成註冊",
     "success": "註冊成功，歡迎使用星網 XW.COM！",
     "title": "建立帳號 ✨",
-    "accountType": "註冊方式",
-    "byPhone": "手機號",
-    "byEmail": "郵箱",
-    "phPhone": "請輸入手機號",
-    "phCode": "請輸入驗證碼",
-    "sendCode": "發送驗證碼",
-    "resend": "{n}s 後重發",
-    "codeSent": "驗證碼已發送"
+    "phUsername": "2-64 位字母、數字、_.-",
+    "emailOptional": "選填"
   },
   "route": {
     "credits": "點數中心",
@@ -1597,6 +1587,8 @@
     "passwordMismatch": "兩次密碼不一致",
     "passwordRequired": "請輸入密碼",
     "identityRequired": "請輸入帳號",
+    "usernameRequired": "請輸入使用者名稱",
+    "usernameInvalid": "使用者名稱為 2-64 位字母、數字、點、底線或短橫線",
     "phoneRequired": "請輸入手機號",
     "phoneInvalid": "格式不正確",
     "emailInvalid": "格式不正確",
@@ -1721,13 +1713,10 @@
   },
   "forgot": {
     "title": "重置密碼",
-    "sub": "通過手機號或郵箱驗證碼重置密碼",
+    "sub": "自部署實例未設定簡訊/郵件服務，請聯絡管理員重設",
     "heroTitle": "找回密碼",
-    "heroDesc": "驗證身份後即可設定新密碼",
-    "phPassword": "至少 6 位",
-    "submit": "重置密碼",
-    "back": "返回登入",
-    "success": "密碼已重置，請使用新密碼登入"
+    "heroDesc": "請聯絡站點管理員，在管理後台「使用者管理」中為您重設密碼",
+    "back": "返回登入"
   },
   "changePassword": {
     "title": "修改密碼",
@@ -2294,7 +2283,7 @@
       "done": "已解封"
     },
     "loginConfig": {
-      "hint": "登入配置僅在伺服器 .env 中配置，修改後需重啟；目前帳號體系統一走 xworld 登入。",
+      "hint": "登入方式在伺服器端設定（如微信開放平台）；帳號體系為本地註冊登入（使用者名稱/信箱/手機號碼 + 密碼）。",
       "wechatLogin": "微信登入（開放平台）",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",

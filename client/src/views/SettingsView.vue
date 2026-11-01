@@ -31,7 +31,7 @@ const creditsText = computed(() => {
   return (Math.round(v * 100) / 100).toLocaleString(undefined, { maximumFractionDigits: 2 });
 });
 
-// 修改密码（走 xworld /users/me/password）
+// 修改密码（本系统 /auth/password，验证旧密码后更新）
 const pwdRef = ref();
 const pwdLoading = ref(false);
 const pwdForm = reactive({ oldPassword: '', newPassword: '', confirm: '' });

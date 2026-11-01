@@ -13,7 +13,7 @@ export const useAdminAuthStore = defineStore('admin-auth', {
   }),
   getters: {
     isLoggedIn: (s) => !!s.token,
-    // 展示名：优先昵称（xworld 晋级账号），本地账号多为 username
+    // 展示名：优先昵称，本地账号多为 username
     displayName: (s) => s.user?.nickname || s.user?.username || s.user?.email || '',
   },
   actions: {

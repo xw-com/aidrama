@@ -8,29 +8,24 @@
 import http, { bailSession } from './http.js';
 import { getItem, KEYS } from '../utils/storage';
 import {
-  xworldChangePassword,
-  directLogin,
-  directRegister,
-  directSendCode,
-  directResetPassword,
-  directLogout,
-} from './xworld';
+  localLogin,
+  localRegister,
+  localChangePassword,
+} from './auth';
 import i18n from '../i18n';
 import { confirm } from '../utils/ui';
 import { createSSE } from './sse';
 
 // ===== 鉴权 =====
-// 表单直连 xworld 账号中心（docs/xworld-direct-auth-api.md）；刷新在 http.js、档案同步走本系统 /api
+// 本地账号体系（用户名/邮箱/手机号 + 密码，注册过点选验证码）；刷新在 http.js、档案同步走本系统 /api
 export const authApi = {
-  login: (payload) => directLogin(payload),
-  register: (payload) => directRegister(payload),
-  sendCode: (payload) => directSendCode(payload),
-  resetPassword: (payload) => directResetPassword(payload),
-  // 本地第三方登录（Apple/Google）的 axt_ 令牌是 AIDrama 自签无状态 JWT，账号中心不认识：
-  // 无服务端会话可撤销，直接本地登出即可（封禁由服务端每请求重查兜底）
-  logout: (token) => (token && token.startsWith('axt_') ? Promise.resolve() : directLogout(token)),
-  changePassword: (data) => xworldChangePassword(data),
-  // 第三方一键登录：AIDrama 服务端持密代理换取（契约同直连 /auth/login 的 { user, tokens } 信封）。
+  login: (payload) => localLogin(payload),
+  register: (payload) => localRegister(payload),
+  // axt_ 会话为 AIDrama 自签无状态 JWT：无服务端会话可撤销，本地清令牌登出即可
+  // （封禁由服务端每请求重查兜底）
+  logout: () => Promise.resolve(),
+  changePassword: (data) => localChangePassword(data),
+  // 第三方一键登录：AIDrama 服务端持密代理换取（契约同 /auth/login 的 { user, tokens } 信封）。
   // provider: weixin | apple | huawei | google；payload 里 code / authResult 由各端 uni.login 取得
   oauthLogin: (provider, payload) => http.post(`/auth/oauth/${provider}`, payload),
   me: () => http.get('/auth/me'),

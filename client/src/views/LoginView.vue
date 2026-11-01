@@ -1,21 +1,41 @@
 <script setup>
-// 登录页：改为第三方登录 —— 点击后 302 跳 xworld 统一账号中心（OAuth2 授权码 + PKCE），
-// 账号密码/注册/找回密码均由授权中心托管页面处理，本站不接触用户凭据。
-import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+// 登录/注册页（本地账号体系）：用户名/邮箱/手机号 + 密码登录；注册需过点选文字验证码。
+// 注册成功即登录；忘记密码无自助通道（自部署无短信/邮件服务），提示联系站点管理员。
+import { computed, reactive, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { useAuthStore } from '../stores/auth';
-import { startLogin } from '../api/oauth';
+import CaptchaDialog from '../components/CaptchaDialog.vue';
 import ThemeSwitch from '../components/ThemeSwitch.vue';
 import LocaleSwitch from '../components/LocaleSwitch.vue';
 import SiteFooterBar from '../components/SiteFooterBar.vue';
 
 const route = useRoute();
+const router = useRouter();
 const auth = useAuthStore();
 const { t } = useI18n();
 // logo 徽标字符：取品牌名首字（各语言下均为「星」）
 const brandMark = computed(() => t('brand.name').charAt(0) || '星');
+
+// 模式：login 登录 / register 注册（顶栏「注册」入口经 ?mode=register 直达）
+const mode = ref(route.query.mode === 'register' ? 'register' : 'login');
+function switchMode(m) {
+  mode.value = m;
+  form.password = '';
+  if (m === 'login') form.confirm = '';
+}
+
+const form = reactive({
+  identity: '',
+  username: '',
+  email: '',
+  password: '',
+  confirm: '',
+});
+const showPassword = ref(false);
+const busy = ref(false);
+const captchaVisible = ref(false);
 
 // 协议勾选：勾选状态记 localStorage，勾过一次后续登录免再勾
 const AGREE_KEY = 'aidrama-legal-agreed';
@@ -29,17 +49,68 @@ function onAgreeChange(v) {
   } catch { /* ignore */ }
 }
 
-// 跳授权中心：未勾选协议先提示并阻止；带上路由守卫记录的原目标页（登录成功后回跳）
-function onLogin() {
-  if (!agreed.value) {
-    ElMessage.warning(t('login.agreeRequired'));
-    return;
-  }
-  startLogin(route.query.redirect);
+function requireAgreed() {
+  if (agreed.value) return true;
+  ElMessage.warning(t('login.agreeRequired'));
+  return false;
 }
-// 注册直接新开 xworld 官网注册页
-function onRegister() {
-  window.open('https://www.example.com/register', '_blank');
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// ===== 登录：identity + 密码，直接提交 =====
+async function onLogin() {
+  if (busy.value) return;
+  if (!form.identity.trim()) { ElMessage.warning(t('validation.identityRequired')); return; }
+  if (!form.password) { ElMessage.warning(t('validation.passwordRequired')); return; }
+  if (!requireAgreed()) return;
+  busy.value = true;
+  try {
+    await auth.login({ identity: form.identity.trim(), password: form.password });
+    ElMessage.success(t('login.success'));
+    router.push(String(route.query.redirect || '/projects'));
+  } catch (e) {
+    // _silent 请求：拦截器不弹窗，这里自行提示（message 已是服务端本地化文案）
+    ElMessage.error(e?.message || t('errors.requestFailed'));
+  } finally {
+    busy.value = false;
+  }
+}
+
+// ===== 注册：先过点选验证码，通过后携带 ticket 提交（成功即登录）=====
+function onRegisterClick() {
+  if (busy.value) return;
+  if (!form.username.trim()) { ElMessage.warning(t('login.usernameRequired')); return; }
+  if (form.email.trim() && !EMAIL_RE.test(form.email.trim())) { ElMessage.warning(t('validation.emailInvalid')); return; }
+  if (!form.password) { ElMessage.warning(t('validation.passwordRequired')); return; }
+  if (form.password.length < 6) { ElMessage.warning(t('validation.passwordLen')); return; }
+  if (!form.confirm) { ElMessage.warning(t('validation.confirmRequired')); return; }
+  if (form.confirm !== form.password) { ElMessage.warning(t('validation.passwordMismatch')); return; }
+  if (!requireAgreed()) return;
+  captchaVisible.value = true;
+}
+
+async function doRegister(captchaTicket) {
+  busy.value = true;
+  try {
+    await auth.register({
+      username: form.username.trim(),
+      password: form.password,
+      ...(form.email.trim() ? { email: form.email.trim() } : {}),
+      captcha_ticket: captchaTicket,
+    });
+    ElMessage.success(t('login.success'));
+    router.push(String(route.query.redirect || '/projects'));
+  } catch (e) {
+    ElMessage.error(e?.message || t('errors.requestFailed'));
+    captchaVisible.value = false; // ticket 一次性消费，失败后重开换新题
+  } finally {
+    busy.value = false;
+  }
+}
+
+// 忘记密码：自部署实例无短信/邮件通道，密码重置由管理员在「用户管理」完成
+function onForgot() {
+  ElMessageBox.alert(t('login.forgotHint'), t('login.forgot'), { confirmButtonText: t('common.confirm') }).catch(() => {});
 }
 </script>
 
@@ -70,31 +141,112 @@ function onRegister() {
           </div>
         </div>
         <div class="auth-top">
-          <span class="auth-title">{{ t('login.welcome') }}</span>
+          <el-segmented v-model="mode" :options="[{ label: t('auth.login'), value: 'login' }, { label: t('auth.register'), value: 'register' }]" @change="switchMode" />
           <div class="auth-switches">
             <LocaleSwitch />
             <ThemeSwitch />
           </div>
         </div>
-        <p class="auth-sub">{{ t('login.sub') }}</p>
-        <el-button type="primary" size="large" class="submit btn-brand" @click="onLogin">
-          <el-icon class="btn-icon"><User /></el-icon>
-          {{ t('login.oauthButton') }}
-        </el-button>
-        <!-- 登录前协议勾选：未勾选点击登录只提示不跳转；勾选状态记 localStorage -->
-        <el-checkbox v-model="agreed" class="agree" @change="onAgreeChange">
-          <span>{{ t('login.agreeLead') }}</span>
-          <router-link to="/terms" @click.stop>{{ t('login.agreeTerms') }}</router-link>
-          <span>{{ t('login.agreeAnd') }}</span>
-          <router-link to="/privacy" @click.stop>{{ t('login.agreePrivacy') }}</router-link>
-        </el-checkbox>
-        <p class="oauth-hint">{{ t('login.oauthHint') }}</p>
-        <div class="auth-foot">
-          {{ t('login.noAccount') }}<a href="javascript:void(0)" @click="onRegister">{{ t('login.register') }}</a>
-        </div>
+
+        <!-- 登录表单 -->
+        <template v-if="mode === 'login'">
+          <p class="auth-sub">{{ t('login.sub') }}</p>
+          <el-input
+            v-model="form.identity"
+            size="large"
+            :placeholder="t('login.phIdentity')"
+            :prefix-icon="'User'"
+            autocomplete="username"
+            @keyup.enter="onLogin"
+          />
+          <el-input
+            v-model="form.password"
+            size="large"
+            type="password"
+            show-password
+            :placeholder="t('login.phPassword')"
+            :prefix-icon="'Lock'"
+            autocomplete="current-password"
+            class="field-gap"
+            @keyup.enter="onLogin"
+          />
+          <div class="row-between">
+            <el-checkbox v-model="agreed" class="agree" @change="onAgreeChange">
+              <span>{{ t('login.agreeLead') }}</span>
+              <router-link to="/terms" @click.stop>{{ t('login.agreeTerms') }}</router-link>
+            </el-checkbox>
+            <a href="javascript:void(0)" class="forgot" @click="onForgot">{{ t('login.forgot') }}</a>
+          </div>
+          <el-button type="primary" size="large" class="submit btn-brand" :loading="busy" @click="onLogin">
+            <el-icon class="btn-icon"><User /></el-icon>
+            {{ t('login.signIn') }}
+          </el-button>
+          <div class="auth-foot">
+            {{ t('login.noAccount') }}<a href="javascript:void(0)" @click="switchMode('register')">{{ t('login.register') }}</a>
+          </div>
+        </template>
+
+        <!-- 注册表单：提交前先过点选验证码 -->
+        <template v-else>
+          <p class="auth-sub">{{ t('login.registerSub') }}</p>
+          <el-input
+            v-model="form.username"
+            size="large"
+            :placeholder="t('login.usernamePh')"
+            :prefix-icon="'User'"
+            autocomplete="username"
+          >
+            <template #append><span class="append-hint">{{ t('login.usernameRule') }}</span></template>
+          </el-input>
+          <el-input
+            v-model="form.email"
+            size="large"
+            :placeholder="t('login.emailPh')"
+            :prefix-icon="'Message'"
+            autocomplete="email"
+            class="field-gap"
+          />
+          <el-input
+            v-model="form.password"
+            size="large"
+            type="password"
+            show-password
+            :placeholder="t('login.phPassword')"
+            :prefix-icon="'Lock'"
+            autocomplete="new-password"
+            class="field-gap"
+          />
+          <el-input
+            v-model="form.confirm"
+            size="large"
+            type="password"
+            show-password
+            :placeholder="t('login.phConfirm')"
+            :prefix-icon="'Lock'"
+            autocomplete="new-password"
+            class="field-gap"
+            @keyup.enter="onRegisterClick"
+          />
+          <el-checkbox v-model="agreed" class="agree" @change="onAgreeChange">
+            <span>{{ t('login.agreeLead') }}</span>
+            <router-link to="/terms" @click.stop>{{ t('login.agreeTerms') }}</router-link>
+            <span>{{ t('login.agreeAnd') }}</span>
+            <router-link to="/privacy" @click.stop>{{ t('login.agreePrivacy') }}</router-link>
+          </el-checkbox>
+          <el-button type="primary" size="large" class="submit btn-brand" :loading="busy" @click="onRegisterClick">
+            <el-icon class="btn-icon"><Plus /></el-icon>
+            {{ t('login.signUp') }}
+          </el-button>
+          <div class="auth-foot">
+            {{ t('login.hasAccount') }}<a href="javascript:void(0)" @click="switchMode('login')">{{ t('auth.login') }}</a>
+          </div>
+        </template>
       </div>
       <SiteFooterBar class="auth-footer" />
     </div>
+
+    <!-- 点选文字验证码：注册提交前的人机校验，通过后携带 ticket 注册 -->
+    <CaptchaDialog v-model="captchaVisible" @success="doRegister" />
   </div>
 </template>
 
@@ -176,25 +328,30 @@ function onRegister() {
 .brand-text { min-width: 0; }
 .brand-name { font-family: var(--ad-font-display); font-size: 24px; font-weight: 800; color: var(--ad-text); letter-spacing: 0.2px; line-height: 1.2; }
 .brand-tag { font-size: 12px; font-weight: 600; color: var(--ad-text-muted); margin-top: 3px; letter-spacing: 0.5px; }
-.auth-top { display: flex; align-items: center; justify-content: space-between; }
+.auth-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
 .auth-switches { display: flex; align-items: center; gap: 8px; }
-.auth-title { font-family: var(--ad-font-display); font-size: 24px; font-weight: 800; color: var(--ad-text); }
-.auth-sub { color: var(--ad-text-soft); margin: 6px 0 28px; }
+.auth-sub { color: var(--ad-text-soft); margin: 0 0 18px; }
+.field-gap { margin-top: 14px; }
+.append-hint { font-size: 12px; opacity: 0.75; white-space: nowrap; }
+/* 协议 + 忘记密码行 */
+.row-between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-top: 12px; }
+.forgot { font-size: 12px; color: var(--ad-text-muted); text-decoration: none; flex-shrink: 0; line-height: 1.6; }
+.forgot:hover { color: var(--ad-brand); }
 /* 视觉规格交给全局 .btn-brand（金渐变礼宾键），这里只管布局尺寸 */
 .submit {
   width: 100%;
   height: 46px;
   font-size: 15px;
+  margin-top: 16px;
 }
 .btn-icon { margin-right: 6px; }
 /* 登录前协议勾选行：小字弱化，链接描金 */
 .agree {
   display: flex;
   align-items: flex-start;
-  width: 100%;
-  margin-top: 12px;
   font-size: 12px;
   line-height: 1.6;
+  margin-top: 0;
 }
 .agree :deep(.el-checkbox__label) {
   display: inline;
@@ -204,7 +361,6 @@ function onRegister() {
 }
 .agree a { color: var(--ad-brand); font-weight: 600; text-decoration: none; }
 .agree a:hover { text-decoration: underline; }
-.oauth-hint { text-align: center; color: var(--ad-text-muted); font-size: 12px; margin: 14px 0 0; }
 .auth-foot { text-align: center; margin-top: 20px; color: var(--ad-text-soft); font-size: 14px; }
 .auth-foot a { color: var(--ad-accent); text-decoration: none; font-weight: 600; }
 .auth-foot a:hover { text-decoration: underline; }

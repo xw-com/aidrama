@@ -68,7 +68,11 @@ export default {
   "auth.login_success": "Вход выполнен",
   "auth.password_length": "Пароль должен быть не короче 6 символов",
   "auth.register_success": "Регистрация успешна",
-  "auth.synced": "Профиль синхронизирован",
+
+  "auth.username_invalid": "Имя пользователя: только буквы, цифры, подчёркивание, точка и дефис (2-64 символа)",
+  "auth.username_taken": "Имя пользователя уже занято",
+  "auth.email_taken": "Этот email уже зарегистрирован",
+  "auth.password_changed": "Пароль успешно изменён",  "auth.synced": "Профиль синхронизирован",
   "auth.user_not_found": "Пользователь не найден",
   "auth.wechat_code_missing": "Отсутствует код авторизации WeChat",
   "auth.wechat_disabled": "Вход через WeChat отключён",

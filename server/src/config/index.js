@@ -23,11 +23,12 @@ const wxLoginAppSecret = (process.env.WECHAT_APP_SECRET || '').trim();
 const wxPayAppId = (process.env.WECHAT_PAY_APP_ID || '').trim() || wxLoginAppId;
 const wxPayPrivateKey = loadWxPayPrivateKey();
 
-// JWT 密钥：与 xworld 共享，用于验证令牌。生产环境必须显式配置——
-// 弱默认密钥一旦上生产，任何人都能本地签发有效令牌冒充任意用户，故缺配置直接拒绝启动。
+// JWT 密钥：本地签发/校验会话令牌（账号密码登录、第三方登录 axt_ 会话、管理台代登）。
+// 生产环境必须显式配置——弱默认密钥一旦上生产，任何人都能本地签发有效令牌冒充任意用户，
+// 故缺配置直接拒绝启动。
 const jwtSecret = (process.env.JWT_SECRET || '').trim();
 if (!jwtSecret && process.env.NODE_ENV === 'production') {
-  throw new Error('生产环境必须配置 JWT_SECRET（与 xworld 共享的令牌签名密钥），拒绝以开发默认密钥启动');
+  throw new Error('生产环境必须配置 JWT_SECRET（本地会话令牌签名密钥），拒绝以开发默认密钥启动');
 }
 
 // 生产启动自检：关键安全配置缺失直接拒绝启动（fail-fast），杜绝带着 dev 兜底值上线。
@@ -70,37 +71,13 @@ export const config = {
     expiresIn: process.env.ADMIN_TOKEN_TTL || '12h',
   },
 
-  // xworld OAuth2 授权服务器（统一账号中心）：客户端改走授权码流程后，access_token 为
-  // 不透明 xwat_ 令牌，本服务端无法本地验签，须经其 /oauth/userinfo 校验并取回用户标识。
-  xworldApi: {
-    apiBase: (process.env.XWORLD_API_BASE || 'https://auth.example.com/api/v1').replace(/\/+$/, ''),
-    // userinfo 校验结果的内存缓存时长（毫秒）：避免每请求回源；令牌自身过期前会提前失效
-    verifyCacheTtlMs: parseInt(process.env.XWORLD_VERIFY_CACHE_TTL_MS || '300000', 10),
-  },
-
-  // xworld OAuth2 客户端凭据（机密客户端，服务端代理令牌交换）：与上面的 JWT_SECRET 完全独立、
-  // 各司其职——JWT_SECRET 只用于本地验签 xworld 直连模式签发的平台 JWT；本节是本系统在授权
-  // 服务器登记的 OAuth2 客户端身份，clientSecret 仅存服务端（/api/oauth/* 代理时附加），
-  // 绝不入前端包、绝不下发响应。
-  // 本地开发可两者皆空：clientSecret 留空=代理按公开客户端直通（仅 PKCE，零影响）；
-  // clientId 留空=回退用请求体里的 client_id（本就是公开信息）
-  xworldOauth: {
-    clientId: (process.env.XWORLD_OAUTH2_CLIENT_ID || '').trim(),
-    clientSecret: (process.env.XWORLD_OAUTH2_CLIENT_SECRET || '').trim(),
-    // 桌面壳回调源：app:// 为非特 schemee（URL.origin 解析为 "null"），换码代理白名单按
-    // protocol//host 比对放行；默认与 client/desktop/main.js 的 APP_ORIGIN 逐字节一致，
-    // 壳侧改协议/主机名时同步改这里（或用本环境变量覆盖），逗号分隔
-    desktopOrigins: (process.env.XWORLD_OAUTH2_DESKTOP_ORIGINS || 'app://xw-client')
-      .split(',').map((s) => s.trim()).filter(Boolean),
-  },
-
-  // 点选文字验证码（登录/发码前人机校验）：内存态出题，无需建表
+  // 点选文字验证码（登录/注册前人机校验）：内存态出题，无需建表
   captcha: {
     ttlMs: parseInt(process.env.CAPTCHA_TTL_MS || '120000', 10),        // 题目有效期
     maxAttempts: parseInt(process.env.CAPTCHA_MAX_ATTEMPTS || '5', 10), // 单题最多提交次数
     tolerance: parseInt(process.env.CAPTCHA_TOLERANCE || '30', 10),     // 点击容差（viewBox 坐标 px）
     maxStore: parseInt(process.env.CAPTCHA_MAX_STORE || '5000', 10),    // 内存题目上限（防刷）
-    // 通过后签发的 ticket 密钥：默认复用与 xworld 共享的 JWT_SECRET，xworld 侧将来可直接验签
+    // 通过后签发的 ticket 密钥：留空复用 JWT_SECRET
     ticketSecret: (process.env.CAPTCHA_TICKET_SECRET || '').trim() || jwtSecret || 'dev-insecure-secret-change-me',
     ticketExpiresIn: process.env.CAPTCHA_TICKET_TTL || '5m',
   },
@@ -166,7 +143,7 @@ export const config = {
   },
 
   // App 端第三方原生登录（iOS Sign in with Apple / Android Google）：服务端验签配置。
-  // 与已下线的通用 OAuth2（浏览器跳转流）无关——原生登录不换 code，只验厂商 JWKS 签发的身份令牌。
+  // 原生登录不换 code，只验厂商 JWKS 签发的身份令牌。
   // Apple 只需 Bundle ID（identityToken 的 aud）；Google 需允许的 OAuth 客户端 ID 白名单。
   // 两家均留空 = 该登录方式未启用（登录端点返回 503，前端按钮仍展示但换取失败给提示）。
   oauthNative: {

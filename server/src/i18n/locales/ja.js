@@ -68,7 +68,11 @@ export default {
   "auth.login_success": "ログイン成功",
   "auth.password_length": "パスワードは6文字以上にしてください",
   "auth.register_success": "登録成功",
-  "auth.synced": "プロフィールを同期しました",
+
+  "auth.username_invalid": "ユーザー名は英数字・アンダースコア・ドット・ハイフンのみ（2〜64文字）使えます",
+  "auth.username_taken": "このユーザー名は既に登録されています",
+  "auth.email_taken": "このメールアドレスは既に登録されています",
+  "auth.password_changed": "パスワードを変更しました",  "auth.synced": "プロフィールを同期しました",
   "auth.user_not_found": "ユーザーが存在しません",
   "auth.wechat_code_missing": "WeChat認可コードがありません",
   "auth.wechat_disabled": "WeChatログインは無効です",

@@ -1,5 +1,5 @@
 // 通用内存滑动窗口限频中间件工厂。
-// 范式抽自 captcha.routes.js / adminAuth.routes.js / xworldOauth.routes.js / member.routes.js
+// 范式抽自 captcha.routes.js / adminAuth.routes.js / member.routes.js
 // 顶部的四份手写实现，收口为一个可复用工广；不引外部依赖（单进程部署，重启即清零）。
 import { ApiError } from './response.js';
 import { logger } from './logger.js';

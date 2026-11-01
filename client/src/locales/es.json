@@ -540,7 +540,6 @@
     "colName": "Archivo"
   },
   "login": {
-    "demoTip": "Cuenta demo: demo / demo123 (2000 créditos precargados)",
     "feat1": "Flujo de tres pasos, lo que ves es lo que obtienes",
     "feat2": "Importación libre de configuraciones LLM / imagen / video",
     "feat3": "Facturación transparente de créditos, 1 Yuan = 10 créditos",
@@ -554,15 +553,22 @@
     "sub": "Inicia sesión para empezar a crear",
     "success": "Inicio de sesión exitoso",
     "welcome": "Bienvenido de nuevo 👋",
-    "phIdentity": "Correo / Teléfono",
+    "phIdentity": "Usuario / Correo / Teléfono",
     "forgot": "¿Olvidaste tu contraseña?",
-    "oauthButton": "Iniciar sesión con X-World",
-    "oauthHint": "Serás redirigido al centro de cuentas unificado de X-World",
     "agreeLead": "He leído y acepto los",
     "agreeAnd": "y la",
     "agreeTerms": "Términos del Servicio",
     "agreePrivacy": "Política de Privacidad",
-    "agreeRequired": "Lee y acepta primero los Términos del Servicio y la Política de Privacidad"
+    "agreeRequired": "Lee y acepta primero los Términos del Servicio y la Política de Privacidad",
+    "registerSub": "Regístrate en segundos y empieza a crear",
+    "usernamePh": "Introduce un nombre de usuario",
+    "usernameRequired": "Introduce un nombre de usuario",
+    "usernameRule": "letras/números/_-.",
+    "emailPh": "Correo (opcional)",
+    "phConfirm": "Repite la contraseña",
+    "signUp": "Registrarse",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "forgotHint": "Las instancias autoalojadas no tienen servicio de SMS/correo. Pide al administrador que restablezca tu contraseña en Gestión de usuarios."
   },
   "maintenance": {
     "active": "En mantenimiento",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "Revisión de escaparate",
     "jobAdmin": "Gestión de tareas",
     "videoGenAdmin": "Registros de generación de vídeo"
-  },
-  "oauth": {
-    "signingIn": "Iniciando sesión, espera…",
-    "retry": "Reintentar",
-    "stateMismatch": "La verificación del estado de inicio de sesión falló, inténtalo de nuevo",
-    "failed": "Error al iniciar sesión"
   },
   "outline": {
     "aboutMinutes": "Aprox. {n} minutos",
@@ -2174,7 +2174,9 @@
       "admin_password": "Inicio en panel de administración",
       "login_as": "Inicio de sesión como (admin)",
       "apple": "Inicio con Apple",
-      "google": "Inicio con Google"
+      "google": "Inicio con Google",
+      "password": "Contraseña",
+      "profile_sync": "Sincronización de perfil"
     },
     "ban": {
       "ban": "Suspender",
@@ -2192,7 +2194,7 @@
       "done": "Sesión iniciada en el frontend como este usuario"
     },
     "loginConfig": {
-      "hint": "La configuración de inicio de sesión se define solo en el .env del servidor; requiere reinicio tras cambios. Las cuentas se unifican vía xworld.",
+      "hint": "Los métodos de inicio de sesión se configuran en el servidor (p. ej., WeChat Open Platform); las cuentas son locales (usuario/correo/teléfono + contraseña).",
       "wechatLogin": "Inicio WeChat (Open Platform)",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "Panel de administración",
     "backToSite": "Volver al sitio",
     "login": {
-      "sub": "Inicia sesión en la consola de administración con teléfono y contraseña",
-      "identityPh": "Número de teléfono",
+      "sub": "Accede a la consola de administración con tu cuenta y contraseña",
+      "identityPh": "Teléfono / Usuario / Correo",
       "passwordPh": "Contraseña",
       "submit": "Iniciar sesión",
       "submitting": "Iniciando…",
       "success": "Sesión iniciada",
-      "hint": "Las cuentas de administrador son las mismas del sitio (role=admin); primero establece una contraseña en Gestión de usuarios"
+      "hint": "En el primer inicio se crea el administrador admin / admin123. Tras entrar, cambia la contraseña en Gestión de usuarios"
     },
     "auth": {
       "missing_fields": "Introduce el número de teléfono, la contraseña y completa la verificación"

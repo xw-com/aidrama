@@ -1,6 +1,7 @@
 <script setup>
-// 管理后台专属登录页：手机号 + 密码 + 点选文字验证码 → admt_ 管理令牌。
-// 与前台 xworld OAuth 登录完全独立；管理员账号即 User.role='admin' 的既有账号。
+// 管理后台专属登录页：账号（手机号/用户名/邮箱）+ 密码 + 点选文字验证码 → admt_ 管理令牌。
+// 与前台登录相互独立（令牌分开存储，同一浏览器可同时登录两端）；管理员账号即 User.role='admin' 的既有账号，
+// 首次启动会自动创建初始管理员（见 server/src/seeders/seed.js）。
 import { computed, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

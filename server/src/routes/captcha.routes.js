@@ -16,7 +16,7 @@ router.post('/challenge', challengeLimiter, asyncHandler(async (req, res) => {
   return ok(res, createChallenge(req.locale), 'captcha.challenge_created');
 }));
 
-// 校验：通过则签发短期 ticket（前端随登录/发码请求体透传给 xworld 备将来强校验）
+// 校验：通过则签发短期 ticket（前端随登录/注册请求体透传，服务端 verifyTicket 验签消费）
 router.post('/verify', challengeLimiter, asyncHandler(async (req, res) => {
   const { ticket } = verifyChallenge(req.body?.id, req.body?.points);
   return ok(res, { verified: true, ticket }, 'captcha.verified');

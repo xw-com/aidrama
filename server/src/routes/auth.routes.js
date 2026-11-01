@@ -1,11 +1,14 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
+import { Op } from 'sequelize';
+import bcrypt from 'bcryptjs';
 import db from '../db/index.js';
 import { asyncHandler, ok } from '../utils/index.js';
-import { authRequired, createXworldUser, signAppTokens, APP_TOKEN_PREFIX } from '../middleware/auth.js';
+import { authRequired, createExternalUser, signAppTokens, APP_TOKEN_PREFIX } from '../middleware/auth.js';
 import { logger } from '../utils/logger.js';
 import { recordLoginLog } from '../services/loginLog.service.js';
 import { verifyAppleIdentityToken, verifyGoogleCredential } from '../services/oauthLogin.service.js';
+import { verifyTicket } from '../services/captcha.service.js';
 import { config } from '../config/index.js';
 import { ApiError, badRequest, forbidden, unauthorized } from '../utils/response.js';
 import { rateLimit } from '../utils/rateLimit.js';
@@ -13,16 +16,114 @@ import { rateLimit } from '../utils/rateLimit.js';
 const router = Router();
 const { User, UserOauth } = db;
 
-// 可镜像的 xworld 档案字段（身份展示用）；external_id 以令牌为准，积分/角色/会员服务端自有不被覆盖
+// 可镜像的第三方档案字段（身份展示用）；external_id 以令牌为准，积分/角色/会员服务端自有不被覆盖
 const PROFILE_FIELDS = ['email', 'phone', 'nickname', 'avatar'];
+
+// ===== 本地注册/登录（账号密码）=====
+// 与 /oauth/:provider（App 端第三方一键登录）共用同一套会话令牌（axt_）与 { user, tokens } 信封，
+// 前端 applyAuthResult 无差别落会话。本地账号 external_id = "local:<username>"。
+
+// 用户名规则：字母/数字/下划线/点/连字符，2-64 位（昵称可自定义中文，展示名优先昵称）
+const USERNAME_RE = /^[A-Za-z0-9_.-]{2,64}$/;
+const PASSWORD_MIN = 6;
+
+// 登录/注册限频：每 IP 10 次/分
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  keyFn: (req) => req.ip,
+  status: 429,
+  message: '登录尝试过于频繁，请稍后再试',
+});
+
+function validatePassword(password) {
+  if (!password || password.length < PASSWORD_MIN || password.length > 64) throw badRequest('auth.password_length');
+}
+
+// 注册：用户名 + 密码（邮箱选填）+ 点选验证码（防脚本批量注册）。
+// 成功即登录：建号（首登赠 66 积分）并直接签发会话令牌
+router.post('/register', authLimiter, asyncHandler(async (req, res) => {
+  const username = String(req.body?.username || '').trim();
+  const password = String(req.body?.password || '');
+  const email = String(req.body?.email || '').trim().toLowerCase();
+  if (!USERNAME_RE.test(username)) throw badRequest('auth.username_invalid');
+  validatePassword(password);
+  // 人机校验：注册必须过点选验证码（ticket 由 /captcha/verify 签发，服务端直接验签消费）
+  verifyTicket(req.body?.captcha_ticket);
+
+  if (await User.findOne({ where: { username }, attributes: ['id'] })) throw badRequest('auth.username_taken');
+  if (email) {
+    if (await User.findOne({ where: { email }, attributes: ['id'] })) throw badRequest('auth.email_taken');
+  }
+  const externalId = `local:${username}`;
+  if (await User.findOne({ where: { external_id: externalId }, attributes: ['id'] })) throw badRequest('auth.username_taken');
+
+  const user = await createExternalUser(externalId, {
+    username,
+    nickname: username,
+    ...(email ? { email } : {}),
+    password_hash: await bcrypt.hash(password, 10),
+  });
+
+  recordLoginLog({
+    userId: user.id,
+    method: 'password',
+    ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null,
+    userAgent: req.headers['user-agent'],
+  }).catch((e) => logger.warn(`登录日志写入失败: ${e?.message || e}`));
+
+  return ok(res, { user: publicUser(user), tokens: signAppTokens(user) }, 'auth.register_success');
+}));
+
+// 登录：identity = 用户名 / 邮箱 / 手机号 + 密码。验证码「提供才校验」（客户端可选前置点选验证码）
+router.post('/login', authLimiter, asyncHandler(async (req, res) => {
+  const identity = String(req.body?.identity || '').trim();
+  const password = String(req.body?.password || '');
+  if (!identity || !password) throw badRequest('auth.credentials_invalid');
+  if (req.body?.captcha_ticket) verifyTicket(req.body.captcha_ticket);
+
+  // 无唯一约束的字段（phone）可能有多个命中，按 id 升序取最早注册的账号，结果确定可复现
+  const user = await User.findOne({
+    where: { [Op.or]: [{ username: identity }, { email: identity.toLowerCase() }, { phone: identity }] },
+    order: [['id', 'ASC']],
+  });
+  // 占位哈希（第三方登录无本地密码）compare 必然失败，与账号不存在同口径，不区分防枚举
+  const passOk = user ? await bcrypt.compare(password, user.password_hash || '') : false;
+  if (!user || !passOk) throw unauthorized('auth.credentials_invalid');
+  if (user.status === 'banned') throw forbidden('auth.account_banned');
+
+  recordLoginLog({
+    userId: user.id,
+    method: 'password',
+    ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null,
+    userAgent: req.headers['user-agent'],
+  }).catch((e) => logger.warn(`登录日志写入失败: ${e?.message || e}`));
+
+  return ok(res, { user: publicUser(user), tokens: signAppTokens(user) }, 'auth.login_success');
+}));
+
+// 修改密码（登录态）：验旧密码后更新。第三方登录建号（无本地密码）的账号旧密码必然不符，
+// 如需设置密码请由管理员在「用户管理」重置
+router.post('/password', authRequired, asyncHandler(async (req, res) => {
+  const oldPassword = String(req.body?.oldPassword || '');
+  const newPassword = String(req.body?.newPassword || '');
+  validatePassword(newPassword);
+  const user = await User.findByPk(req.user.id);
+  if (!user) throw unauthorized('auth.login_expired');
+  const passOk = await bcrypt.compare(oldPassword, user.password_hash || '');
+  if (!passOk) throw badRequest('auth.credentials_invalid');
+  user.password_hash = await bcrypt.hash(newPassword, 10);
+  await user.save();
+  return ok(res, { id: user.id }, 'auth.password_changed');
+}));
 
 // ===== 第三方一键登录（App 端原生：iOS Sign in with Apple / Android Google）=====
 // 本路由为各 provider 共享：随机昵称兜底（建号时 + 复登空昵称回填）对所有 provider 生效，
 // 新接入 provider（如微信 code2session）在此登记即可继承，勿在别处自建号逻辑
-// 客户端 uni.login 取上游凭证 → 本端点验签 → 找/建本地账号 → 签发 axt_ 会话令牌（与直连
+// 客户端 uni.login 取上游凭证 → 本端点验签 → 找/建本地账号 → 签发 axt_ 会话令牌（与
 // /auth/login 的 { user, tokens } 信封同构，前端 applyAuthResult 无差别落会话）。
 // 账号映射落 user_oauth（provider + provider_user_id 唯一），external_id = "<provider>:<sub>"
-//（带前缀避免与 xworld 数字 id 撞车）。首次建号复用 createXworldUser：占位用户名 + 首登赠 66 积分。
+//（带前缀避免与本地 local:<username> 撞车）。首次建号复用 createExternalUser：占位用户名 + 首登赠 66 积分。
 const PROVIDERS = {
   apple: {
     // uni.login 的 authResult：{ identityToken, authorizationCode, user, fullName, email, ... }；
@@ -49,7 +150,7 @@ const NICK_ROLES = ['导演', '编剧', '监制', '摄影师', '剪辑师', '场
 const randomNickname = () => `${NICK_PREFIXES[Math.floor(Math.random() * NICK_PREFIXES.length)]}` +
   `${NICK_ROLES[Math.floor(Math.random() * NICK_ROLES.length)]}${1000 + Math.floor(Math.random() * 9000)}`;
 
-// 登录换取限频：每 IP 10 次/分（与 xworld 账号中心认证接口同档）
+// 第三方登录换取限频：每 IP 10 次/分
 const oauthLoginLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
@@ -92,7 +193,7 @@ router.post('/oauth/refresh', oauthRefreshLimiter, asyncHandler(async (req, res)
 }));
 
 // 邮箱回填：第三方身份带邮箱时补写本地档案（email 全局唯一，撞车即跳过——
-// 不阻断登录主体；Apple 私信转发地址天然不撞，Google 邮箱可能与既有 xworld 账号同邮箱）
+// 不阻断登录主体；Apple 私信转发地址天然不撞，Google 邮箱可能与既有本地账号同邮箱）
 async function backfillEmail(user, email) {
   if (!email || user.email === email) return;
   try {
@@ -135,7 +236,7 @@ router.post('/oauth/:provider', oauthLoginLimiter, asyncHandler(async (req, res)
     user = await User.findOne({ where: { external_id: externalId } });
     if (!user) {
       const nickname = identity.name || def.displayName(ar) || randomNickname();
-      user = await createXworldUser(externalId, {
+      user = await createExternalUser(externalId, {
         username: `${provider === 'apple' ? 'apl' : 'ggl'}_${providerUserId}`,
         nickname,
         ...(identity.picture ? { avatar: identity.picture } : {}),
@@ -175,7 +276,7 @@ router.get('/me', authRequired, asyncHandler(async (req, res) => {
 }));
 
 /**
- * 登录/注册后由前端立即调用：把 xworld 档案镜像到本地 User。
+ * 登录/注册后由前端立即调用：把第三方档案镜像到本地 User。
  * external_id 取自令牌（不信 body 的 id）；仅镜像展示字段，绝不覆盖积分/角色/会员。
  */
 router.post('/sync', authRequired, asyncHandler(async (req, res) => {
@@ -198,11 +299,11 @@ router.post('/sync', authRequired, asyncHandler(async (req, res) => {
   if (Object.keys(patch).length) await user.update(patch);
 
   const fresh = await User.findByPk(user.id);
-  // 登录日志：前端在 xworld 登录/注册成功后调 /sync（改昵称也会走 sync，同属档案同步事件）
+  // 登录日志：前端在登录/注册成功后调 /sync（改昵称也会走 sync，同属档案同步事件）
   // fire-and-forget，绝不影响登录主流程
   recordLoginLog({
     userId: user.id,
-    method: 'xworld_sync',
+    method: 'profile_sync',
     ip: String(req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || null,
     userAgent: req.headers['user-agent'],
   }).catch((e) => logger.warn(`登录日志写入失败: ${e?.message || e}`));

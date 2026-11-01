@@ -1,8 +1,9 @@
-// 管理后台专属登录（/admin 管理台）：手机号 + 密码 + 点选验证码
-// → 签发 admt_ 前缀管理令牌（config.adminAuth，独立于 xworld 用户令牌体系）。
-// 管理员账号即 User.role='admin' 的既有账号，不另设账号体系；
-// 经 xworld 晋级的 admin 本地密码为随机占位，须先在「用户管理」重置密码后方可登录。
+// 管理后台专属登录（/admin 管理台）：账号（手机号/用户名/邮箱）+ 密码 + 点选验证码
+// → 签发 admt_ 前缀管理令牌（config.adminAuth，独立于前台用户令牌体系）。
+// 管理员账号即 User.role='admin' 的既有账号，不另设账号体系；首次启动 seed 会自动创建
+// 初始管理员（见 seeders/seed.js），密码遗忘可在「用户管理」重置或跑 scripts/setAdminPassword.js。
 import { Router } from 'express';
+import { Op } from 'sequelize';
 import bcrypt from 'bcryptjs';
 import db from '../db/index.js';
 import { asyncHandler, ok, badRequest, unauthorized, forbidden } from '../utils/index.js';
@@ -21,19 +22,22 @@ const { User } = db;
 // 文案口径（管理台按该文案提示「尝试过多」），状态码不另改避免前端回归。
 const loginLimiter = rateLimit({ windowMs: 60 * 1000, max: 10, status: 400, message: 'captcha.rate_limited' });
 
-// 管理台登录（手机号 + 密码）。失败口径统一 401/403 文案，不区分「账号不存在/密码错误」防枚举
+// 管理台登录（账号 + 密码）。失败口径统一 401/403 文案，不区分「账号不存在/密码错误」防枚举
 router.post('/login', loginLimiter, asyncHandler(async (req, res) => {
-  const phone = String(req.body?.phone || '').trim();
+  const identity = String(req.body?.phone || '').trim(); // 字段名沿用 phone，兼容旧前端；实为「账号」
   const password = String(req.body?.password || '');
   const captchaTicket = req.body?.captcha_ticket;
-  if (!phone || !password || !captchaTicket) throw badRequest('admin.auth.missing_fields');
+  if (!identity || !password || !captchaTicket) throw badRequest('admin.auth.missing_fields');
 
   // 人机校验：验证码 ticket（verifyChallenge 签发，5 分钟内有效）由本服务端直接验签消费
   verifyTicket(captchaTicket);
 
   // phone 无唯一约束，按 id 升序取最早注册的同号账号，命中结果确定可复现
-  const user = await User.findOne({ where: { phone }, order: [['id', 'ASC']] });
-  // 占位哈希（xworld 用户）compare 必然失败，与账号不存在同口径
+  const user = await User.findOne({
+    where: { [Op.or]: [{ phone: identity }, { username: identity }, { email: identity.toLowerCase() }] },
+    order: [['id', 'ASC']],
+  });
+  // 占位哈希（第三方登录无本地密码）compare 必然失败，与账号不存在同口径
   const passOk = user ? await bcrypt.compare(password, user.password_hash || '') : false;
   if (!user || !passOk) throw unauthorized('auth.credentials_invalid');
   if (user.role !== 'admin') throw forbidden('admin.auth.not_admin');

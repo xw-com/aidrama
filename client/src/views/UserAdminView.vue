@@ -93,7 +93,7 @@ async function loginAs(row) {
   }
 }
 
-// ===== 设置/重置登录密码（管理台密码登录用；xworld 晋级 admin 本地密码为随机占位） =====
+// ===== 设置/重置登录密码（管理台密码登录用；第三方登录建号无本地密码，须先设置） =====
 const pwdVisible = ref(false);
 const pwdSaving = ref(false);
 const pwdForm = reactive({ user_id: null, name: '', password: '' });
@@ -177,7 +177,7 @@ const logUserId = ref(null);
 const logMethod = ref('');
 const logRange = ref(null);
 
-const methodTag = (m) => ({ xworld_sync: 'primary', admin_password: 'warning', weapp: 'success', weapp_exchange: 'success', login_as: 'danger', apple: 'success', google: 'primary' }[m] || 'info');
+const methodTag = (m) => ({ password: 'primary', profile_sync: 'info', xworld_sync: 'info', admin_password: 'warning', weapp: 'success', weapp_exchange: 'success', login_as: 'danger', apple: 'success', google: 'primary' }[m] || 'info');
 
 async function loadLogs() {
   logsLoading.value = true;
@@ -313,6 +313,8 @@ onMounted(() => {
             <div class="ua-filters">
               <el-input-number v-model="logUserId" :min="1" :controls="false" :placeholder="t('userAdmin.f.userId')" style="width: 120px;" @keyup.enter="searchLogs" @change="searchLogs" />
               <el-select v-model="logMethod" clearable :placeholder="t('userAdmin.f.method')" style="width: 160px;" @change="searchLogs">
+                <el-option value="password" :label="t('userAdmin.method.password')" />
+                <el-option value="profile_sync" :label="t('userAdmin.method.profile_sync')" />
                 <el-option value="xworld_sync" :label="t('userAdmin.method.xworld_sync')" />
                 <el-option value="admin_password" :label="t('userAdmin.method.admin_password')" />
                 <el-option value="weapp" :label="t('userAdmin.method.weapp')" />

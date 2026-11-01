@@ -1,8 +1,15 @@
+import bcrypt from 'bcryptjs';
 import db from '../db/index.js';
 import { clearPricingCache } from '../services/pricing.service.js';
 import { ART_STYLES, getStyleCategory } from '../services/artSkills.service.js';
+import { createExternalUser } from '../middleware/auth.js';
+import { logger } from '../utils/logger.js';
 
-const { Pricing, ModelVendor, ArtStyle } = db;
+const { Pricing, ModelVendor, ArtStyle, User } = db;
+
+// 首次启动自动创建的初始管理员（可用环境变量覆盖；仅「系统尚无任何 admin 账号」时创建）
+const INIT_ADMIN_USERNAME = (process.env.ADMIN_INIT_USERNAME || 'admin').trim();
+const INIT_ADMIN_PASSWORD = (process.env.ADMIN_INIT_PASSWORD || 'admin123').trim();
 
 // 默认定价（与产品文案一致：分镜脚本100字=2积分，分镜视频每秒=11积分）
 const DEFAULT_PRICING = [
@@ -38,10 +45,34 @@ export async function runSeed() {
   // 3. 美术风格注册表（从 ART_STYLES 常量幂等导入；已存在的 key 不动，尊重 admin 改名/重排）
   await ensureArtStyles();
 
-  // 模型配置由用户在「大模型配置」界面自行添加，不再从 .env 种子写入全局默认配置
-  // 预设音色不再种子导入，由「声音库」界面 admin 手工维护
+  // 4. 初始管理员账号（首次启动创建，供 /admin 管理台登录；幂等：已有任何 admin 则跳过）
+  await ensureInitialAdmin();
+
+  // 模型配置（LLM 供应商 base_url/api_key/model）全部由 admin 在管理后台「模型配置」添加，
+  // 不再从 .env 种子写入全局默认配置；预设音色由「声音库」界面 admin 手工维护
 
   return { vendors: DEFAULT_VENDORS.length, artStyles: ART_STYLES.length };
+}
+
+// 初始管理员：系统内没有任何 role='admin' 账号时，按 INIT_ADMIN_USERNAME/PASSWORD 创建一个
+// （external_id = local:<username>，与管理台「账号」登录口径一致）。已有 admin（哪怕被改名）
+// 绝不重复创建——管理员是人为决定，不该被重启悄悄复活。
+async function ensureInitialAdmin() {
+  const hasAdmin = await User.findOne({ where: { role: 'admin' }, attributes: ['id'] });
+  if (hasAdmin) return false;
+  if (await User.findOne({ where: { username: INIT_ADMIN_USERNAME }, attributes: ['id'] })) {
+    logger.warn(`系统尚无管理员，但用户名 ${INIT_ADMIN_USERNAME} 已被占用，跳过初始管理员创建（可在管理台注册后于「用户管理」晋级）`);
+    return false;
+  }
+  const admin = await createExternalUser(`local:${INIT_ADMIN_USERNAME}`, {
+    username: INIT_ADMIN_USERNAME,
+    nickname: '管理员',
+    password_hash: await bcrypt.hash(INIT_ADMIN_PASSWORD, 10),
+  });
+  admin.role = 'admin';
+  await admin.save();
+  logger.info(`已创建初始管理员账号：${INIT_ADMIN_USERNAME} / ${INIT_ADMIN_PASSWORD}（请尽快登录 /admin 管理台修改密码）`);
+  return true;
 }
 
 // 美术风格种子：遍历 ART_STYLES 常量，按数组顺序 sort_order=index，

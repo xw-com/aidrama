@@ -540,7 +540,6 @@
     "colName": "ファイル名"
   },
   "login": {
-    "demoTip": "デモアカウント：demo / demo123（2000 クレジット付込済み）",
     "feat1": "3ステップのワークフロー、WYSIWYG",
     "feat2": "LLM / 画像 / 動画モデルの自由なインポート",
     "feat3": "クレジット課金は透明、1 元 = 10 クレジット",
@@ -554,15 +553,22 @@
     "sub": "ログインして創作を始めましょう",
     "success": "ログインしました",
     "welcome": "おかえりなさい 👋",
-    "phIdentity": "メール / 電話番号",
+    "phIdentity": "ユーザー名 / メール / 電話番号",
     "forgot": "パスワードをお忘れですか？",
-    "oauthButton": "X-World アカウントでログイン",
-    "oauthHint": "X-World 統一アカウントセンターへ移動してログインします",
     "agreeLead": "以下に同意します",
     "agreeAnd": "および",
     "agreeTerms": "利用規約",
     "agreePrivacy": "プライバシーポリシー",
-    "agreeRequired": "先に利用規約とプライバシーポリシーに同意してください"
+    "agreeRequired": "先に利用規約とプライバシーポリシーに同意してください",
+    "registerSub": "数秒で登録して創作を始めましょう",
+    "usernamePh": "ユーザー名を入力",
+    "usernameRequired": "ユーザー名を入力してください",
+    "usernameRule": "英数字/_-.",
+    "emailPh": "メールアドレス（任意）",
+    "phConfirm": "パスワードを再入力",
+    "signUp": "登 録",
+    "hasAccount": "アカウントをお持ちですか？",
+    "forgotHint": "セルフホスト環境では SMS／メールサービスを利用できません。サイト管理者に「ユーザー管理」でのパスワード再設定を依頼してください。"
   },
   "maintenance": {
     "active": "メンテナンス中",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "ショーケース審査",
     "jobAdmin": "タスク管理",
     "videoGenAdmin": "動画生成記録"
-  },
-  "oauth": {
-    "signingIn": "ログイン中です。しばらくお待ちください…",
-    "retry": "再試行",
-    "stateMismatch": "ログイン状態の検証に失敗しました。もう一度お試しください",
-    "failed": "ログインに失敗しました"
   },
   "outline": {
     "aboutMinutes": "約 {n} 分",
@@ -2174,7 +2174,9 @@
       "admin_password": "管理コンソールログイン",
       "login_as": "管理コンソール代理ログイン",
       "apple": "Appleログイン",
-      "google": "Googleログイン"
+      "google": "Googleログイン",
+      "password": "パスワード",
+      "profile_sync": "プロフィール同期"
     },
     "ban": {
       "ban": "停止",
@@ -2192,7 +2194,7 @@
       "done": "このユーザーとしてフロントにログインしました"
     },
     "loginConfig": {
-      "hint": "ログイン設定はサーバーの .env でのみ設定します。変更後は再起動が必要です。現在のアカウントは xworld ログインに統一されています。",
+      "hint": "ログイン方式はサーバー側で設定します（例：WeChatオープンプラットフォーム）。アカウントはローカル登録・ログイン（ユーザー名/メール/電話番号＋パスワード）です。",
       "wechatLogin": "WeChat ログイン（オープンプラットフォーム）",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "管理コンソール",
     "backToSite": "サイトへ戻る",
     "login": {
-      "sub": "電話番号とパスワードで管理コンソールにログイン",
-      "identityPh": "電話番号",
+      "sub": "アカウントとパスワードで管理コンソールにログイン",
+      "identityPh": "電話番号 / ユーザー名 / メール",
       "passwordPh": "パスワード",
       "submit": "ログイン",
       "submitting": "ログイン中…",
       "success": "ログインしました",
-      "hint": "管理者アカウントはサイトアカウントと共通（role=admin）。パスワードは「ユーザー管理」で先に設定してください"
+      "hint": "初回起動時に管理者 admin / admin123 を自動作成します。ログイン後「ユーザー管理」でパスワードを変更してください"
     },
     "auth": {
       "missing_fields": "電話番号・パスワードを入力し、認証を完了してください"

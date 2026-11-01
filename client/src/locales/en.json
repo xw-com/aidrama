@@ -540,7 +540,6 @@
     "colName": "File"
   },
   "login": {
-    "demoTip": "Demo account: demo / demo123 (2000 credits pre-loaded)",
     "feat1": "Three-step workflow, what you see is what you get",
     "feat2": "Free import of LLM / image / video configurations",
     "feat3": "Transparent credit billing, 1 Yuan = 10 credits",
@@ -554,15 +553,22 @@
     "sub": "Sign in to start creating",
     "success": "Sign-in Successful",
     "welcome": "Welcome back 👋",
-    "phIdentity": "Email / Phone",
+    "phIdentity": "Username / Email / Phone",
     "forgot": "Forgot password?",
-    "oauthButton": "Sign in with X-World",
-    "oauthHint": "You'll be redirected to the X-World account center to sign in",
     "agreeLead": "I have read and agree to the",
     "agreeAnd": "and the",
     "agreeTerms": "Terms of Service",
     "agreePrivacy": "Privacy Policy",
-    "agreeRequired": "Please read and accept the Terms of Service and Privacy Policy first"
+    "agreeRequired": "Please read and accept the Terms of Service and Privacy Policy first",
+    "registerSub": "Sign up in seconds and start creating",
+    "usernamePh": "Enter a username",
+    "usernameRequired": "Please enter a username",
+    "usernameRule": "a-z 0-9 _-.",
+    "emailPh": "Email (optional)",
+    "phConfirm": "Confirm password",
+    "signUp": "Sign Up",
+    "hasAccount": "Already have an account?",
+    "forgotHint": "Self-hosted instances have no SMS/email service. Please ask the site administrator to reset your password in User Management."
   },
   "maintenance": {
     "active": "Under Maintenance",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "Showcase Review",
     "jobAdmin": "Task Management",
     "videoGenAdmin": "Video Generation Records"
-  },
-  "oauth": {
-    "signingIn": "Signing in, please wait…",
-    "retry": "Try again",
-    "stateMismatch": "Sign-in state verification failed, please try again",
-    "failed": "Sign-in failed"
   },
   "outline": {
     "aboutMinutes": "Approx. {n} minutes",
@@ -2174,7 +2174,9 @@
       "admin_password": "Admin console login",
       "login_as": "Admin sign-in as",
       "apple": "Apple sign-in",
-      "google": "Google sign-in"
+      "google": "Google sign-in",
+      "password": "Password",
+      "profile_sync": "Profile sync"
     },
     "ban": {
       "ban": "Ban",
@@ -2192,7 +2194,7 @@
       "done": "Now logged in as this user on the frontend"
     },
     "loginConfig": {
-      "hint": "Login settings are configured only in the server .env; a restart is required after changes. Accounts are unified via xworld login.",
+      "hint": "Sign-in providers are configured on the server (e.g. WeChat Open Platform); accounts are local (username/email/phone + password).",
       "wechatLogin": "WeChat login (Open Platform)",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "Admin Console",
     "backToSite": "Back to site",
     "login": {
-      "sub": "Sign in to the admin console with phone number and password",
-      "identityPh": "Phone number",
+      "sub": "Sign in to the admin console with your account and password",
+      "identityPh": "Phone / Username / Email",
       "passwordPh": "Password",
       "submit": "Sign in",
       "submitting": "Signing in…",
       "success": "Signed in successfully",
-      "hint": "Admin accounts are the same site accounts (role=admin); set a password in User Management first"
+      "hint": "An initial admin (admin / admin123) is created on first startup. Change the password in User Management after signing in."
     },
     "auth": {
       "missing_fields": "Please provide the phone number, password and complete the captcha"

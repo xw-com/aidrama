@@ -1,4 +1,4 @@
-// 登录日志：记录每次登录事件（当前仅 xworld 同步），admin 用户管理页查询。
+// 登录日志：记录每次登录事件（密码/第三方/管理台等），admin 用户管理页查询。
 // 刻意不在 resolveUserByToken（每请求）写 —— 只记"登录动作"，token 解析不是登录。
 import db from '../db/index.js';
 import { Op } from 'sequelize';

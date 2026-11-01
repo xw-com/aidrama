@@ -4,7 +4,7 @@
     "termsTitle": "User Agreement",
     "privacyTitle": "Privacy Policy",
     "effectiveDate": "Effective date: 2026-09-19",
-    "placeholderNote": "This User Agreement and Privacy Policy are generic templates for now (disclosure covers the XWorld account center, WeChat Pay and AI service providers); the final legally reviewed version will prevail before official launch.",
+    "placeholderNote": "This User Agreement and Privacy Policy are generic templates for now (disclosure covers WeChat Pay and AI service providers); the final legally reviewed version will prevail before official launch.",
     "agreePrefix": "I have read and agree to the",
     "agreeAnd": "and",
     "agreeRequired": "Please read and accept the User Agreement and Privacy Policy first",
@@ -15,7 +15,7 @@
       "serviceTitle": "Service Description",
       "serviceBody": "The App is an AI short-drama production tool offering script writing, storyboard generation, video synthesis, credit recharge and work showcase. Features are subject to what the App actually provides; as we keep iterating, some features may be adjusted or discontinued.",
       "accountTitle": "Account & Security",
-      "accountBody": "You register and sign in through the XWorld account center. Keep your credentials safe and take full responsibility for all activities under your account; do not transfer or lend your account, and report any unauthorized use to us immediately.",
+      "accountBody": "You register and sign in with an account created directly in the App (username/email/phone and password). Keep your credentials safe and take full responsibility for all activities under your account; do not transfer or lend your account, and report any unauthorized use to us immediately.",
       "creditsTitle": "Credits & Payment",
       "creditsBody": "AI generation features in the App are billed in credits. Credits are obtained via recharge and can only be used within the App; they are non-transferable and non-refundable (except where mandatory law applies or in special cases such as system failures). Please confirm the amount and package before paying.",
       "contentTitle": "Generated Content & Intellectual Property",
@@ -36,7 +36,7 @@
       "storageTitle": "Storage & Protection",
       "storageBody": "Your data is stored on our servers with security measures such as encryption in transit and at rest, and is kept only as long as necessary to deliver the features; after that we delete or anonymize it.",
       "thirdPartyTitle": "Third-Party Disclosure",
-      "thirdPartyBody": "We only share information with the following third parties when necessary to deliver the service: the XWorld account center (registration, sign-in and identity verification), WeChat Pay (recharge payments), AI service providers (text/image/audio/video generation, including your creative content as model input), and cloud/security vendors. Beyond this, we do not disclose information without your consent.",
+      "thirdPartyBody": "We only share information with the following third parties when necessary to deliver the service: WeChat Pay (recharge payments), AI service providers (text/image/audio/video generation, including your creative content as model input), and cloud/security vendors. Beyond this, we do not disclose information without your consent.",
       "rightsTitle": "Your Rights",
       "rightsBody": "You may access, correct or delete your personal information, cancel your account, withdraw your consent, or raise opinions and complaints about our processing of personal information, via in-app \"Settings\" or by contacting customer support.",
       "minorsTitle": "Protection of Minors",
@@ -552,7 +552,8 @@
     "identity": "Account",
     "phone": "Phone",
     "code": "Code",
-    "newPassword": "New password"
+    "newPassword": "New password",
+    "username": "Username"
   },
   "genConfirm": {
     "addReferenceImage": "Add Reference Image",
@@ -635,7 +636,6 @@
     "colName": "File"
   },
   "login": {
-    "demoTip": "Demo account: demo / demo123 (2000 credits pre-loaded)",
     "feat1": "Three-step workflow, what you see is what you get",
     "feat2": "Free import of LLM / image / video configurations",
     "feat3": "Transparent credit billing, 1 Yuan = 10 credits",
@@ -649,10 +649,8 @@
     "sub": "Sign in to start creating",
     "success": "Sign-in Successful",
     "welcome": "Welcome back 👋",
-    "phIdentity": "Email / Phone",
+    "phIdentity": "Username / email / phone",
     "forgot": "Forgot password?",
-    "oauthButton": "Sign in with X-World",
-    "oauthHint": "You'll be redirected to the X-World account center to sign in",
     "action": "Sign in / Sign up",
     "goLogin": "Sign in",
     "needLogin": "Please sign in to continue",
@@ -1009,7 +1007,6 @@
     "nameLabel": "Project name"
   },
   "register": {
-    "emailLabel": "Email (Optional)",
     "feat1": "Auto-extract characters / scenes / props",
     "feat2": "Storyboard script + video generation",
     "feat3": "ffmpeg composition, light / dark / auto theme",
@@ -1018,21 +1015,14 @@
     "heroTitle1": "Register an Account",
     "heroTitle2": "Start Creating AI Short Dramas",
     "phConfirm": "Enter your password again",
-    "phEmail": "Can be used to recover password",
+    "phEmail": "Optional, for login and team invites",
     "phPassword": "At least 6 characters",
-    "signIn": "Sign In",
     "signUp": "Sign Up",
     "sub": "Sign up in seconds",
     "success": "Registration successful. Welcome to 星网 XW.COM!",
     "title": "Create Account ✨",
-    "accountType": "Sign up with",
-    "byPhone": "Phone",
-    "byEmail": "Email",
-    "phPhone": "Enter your phone number",
-    "phCode": "Enter verification code",
-    "sendCode": "Send code",
-    "resend": "Resend in {n}s",
-    "codeSent": "Verification code sent"
+    "phUsername": "2-64 chars: letters, digits, _ . -",
+    "emailOptional": "optional"
   },
   "route": {
     "credits": "Credits Center",
@@ -1597,6 +1587,8 @@
     "passwordMismatch": "Passwords do not match",
     "passwordRequired": "Please enter the password",
     "identityRequired": "Please enter your account",
+    "usernameRequired": "Please enter a username",
+    "usernameInvalid": "Username must be 2-64 characters: letters, digits, dot, underscore or hyphen",
     "phoneRequired": "Please enter your phone number",
     "phoneInvalid": "Invalid format",
     "emailInvalid": "Invalid format",
@@ -1721,13 +1713,10 @@
   },
   "forgot": {
     "title": "Reset password",
-    "sub": "Reset your password via phone or email verification code",
+    "sub": "Self-hosted instances have no SMS/email service. Please contact the administrator to reset your password.",
     "heroTitle": "Recover password",
-    "heroDesc": "Verify your identity to set a new password",
-    "phPassword": "At least 6 characters",
-    "submit": "Reset password",
-    "back": "Back to login",
-    "success": "Password reset. Please log in with the new password."
+    "heroDesc": "Please contact the site administrator to reset your password in the admin console (User Management).",
+    "back": "Back to login"
   },
   "changePassword": {
     "title": "Change password",
@@ -2294,7 +2283,7 @@
       "done": "Unbanned"
     },
     "loginConfig": {
-      "hint": "Login settings are configured only in the server .env; a restart is required after changes. Accounts are unified via xworld login.",
+      "hint": "Sign-in providers are configured on the server (e.g. WeChat Open Platform); accounts are local (username/email/phone + password).",
       "wechatLogin": "WeChat login (Open Platform)",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",

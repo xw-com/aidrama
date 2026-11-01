@@ -540,7 +540,6 @@
     "colName": "Fichier"
   },
   "login": {
-    "demoTip": "Compte démo : demo / demo123 (2000 crédits préchargés)",
     "feat1": "Workflow en trois étapes, wysiwyg",
     "feat2": "Import gratuit des configurations LLM / image / vidéo",
     "feat3": "Facturation transparente des crédits, 1 Yuan = 10 crédits",
@@ -554,15 +553,22 @@
     "sub": "Connectez-vous pour commencer à créer",
     "success": "Connexion réussie",
     "welcome": "Bon retour 👋",
-    "phIdentity": "E-mail / Téléphone",
+    "phIdentity": "Nom d'utilisateur / E-mail / Téléphone",
     "forgot": "Mot de passe oublié ?",
-    "oauthButton": "Se connecter avec X-World",
-    "oauthHint": "Vous serez redirigé vers le centre de comptes unifié X-World",
     "agreeLead": "J'ai lu et j'accepte les",
     "agreeAnd": "et la",
     "agreeTerms": "Conditions d'utilisation",
     "agreePrivacy": "Politique de confidentialité",
-    "agreeRequired": "Veuillez d'abord lire et accepter les Conditions d'utilisation et la Politique de confidentialité"
+    "agreeRequired": "Veuillez d'abord lire et accepter les Conditions d'utilisation et la Politique de confidentialité",
+    "registerSub": "Inscrivez-vous en quelques secondes et commencez à créer",
+    "usernamePh": "Entrez un nom d'utilisateur",
+    "usernameRequired": "Veuillez saisir un nom d'utilisateur",
+    "usernameRule": "lettres/chiffres/_-.",
+    "emailPh": "E-mail (facultatif)",
+    "phConfirm": "Confirmez le mot de passe",
+    "signUp": "S'inscrire",
+    "hasAccount": "Vous avez déjà un compte ?",
+    "forgotHint": "Les instances auto-hébergées n'ont pas de service SMS/e-mail. Demandez à l'administrateur de réinitialiser votre mot de passe dans la Gestion des utilisateurs."
   },
   "maintenance": {
     "active": "En maintenance",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "Validation de la vitrine",
     "jobAdmin": "Gestion des tâches",
     "videoGenAdmin": "Enregistrements de génération vidéo"
-  },
-  "oauth": {
-    "signingIn": "Connexion en cours, veuillez patienter…",
-    "retry": "Réessayer",
-    "stateMismatch": "La vérification de l'état de connexion a échoué, veuillez réessayer",
-    "failed": "Échec de la connexion"
   },
   "outline": {
     "aboutMinutes": "Environ {n} minutes",
@@ -2174,7 +2174,9 @@
       "admin_password": "Connexion console admin",
       "login_as": "Connexion en tant que (admin)",
       "apple": "Connexion Apple",
-      "google": "Connexion Google"
+      "google": "Connexion Google",
+      "password": "Mot de passe",
+      "profile_sync": "Synchro du profil"
     },
     "ban": {
       "ban": "Bannir",
@@ -2192,7 +2194,7 @@
       "done": "Connecté au frontend en tant que cet utilisateur"
     },
     "loginConfig": {
-      "hint": "Les paramètres de connexion sont définis uniquement dans le .env du serveur ; un redémarrage est requis après modification. Les comptes sont unifiés via la connexion xworld.",
+      "hint": "Les modes de connexion sont configurés côté serveur (ex. WeChat Open Platform) ; les comptes sont locaux (nom d'utilisateur/e-mail/téléphone + mot de passe).",
       "wechatLogin": "Connexion WeChat (Open Platform)",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "Console d'administration",
     "backToSite": "Retour au site",
     "login": {
-      "sub": "Connectez-vous à la console d'administration avec le téléphone et le mot de passe",
-      "identityPh": "Numéro de téléphone",
+      "sub": "Connectez-vous à la console d'administration avec votre compte et mot de passe",
+      "identityPh": "Téléphone / Utilisateur / E-mail",
       "passwordPh": "Mot de passe",
       "submit": "Se connecter",
       "submitting": "Connexion…",
       "success": "Connexion réussie",
-      "hint": "Les comptes admin sont les comptes du site (role=admin) ; définissez d'abord un mot de passe dans Gestion des utilisateurs"
+      "hint": "Un administrateur initial (admin / admin123) est créé au premier démarrage. Changez le mot de passe dans la Gestion des utilisateurs après connexion"
     },
     "auth": {
       "missing_fields": "Renseignez le numéro de téléphone, le mot de passe et terminez la vérification"

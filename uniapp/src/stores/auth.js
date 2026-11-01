@@ -13,8 +13,8 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (s) => !!s.token,
     // 是否管理员（与 client 一致：admin 功能入口/接口均由服务端兜底把关）
     isAdmin: (s) => s.user?.role === 'admin',
-    // 展示名：xworld 用户无用户名，优先取昵称 / 邮箱 / 手机号，避免显示内部占位账号
-    displayName: (s) => s.user?.nickname || s.user?.email || s.user?.phone || '',
+    // 展示名：优先昵称，退回用户名 / 邮箱 / 手机号（本地注册默认昵称=用户名）
+    displayName: (s) => s.user?.nickname || s.user?.username || s.user?.email || s.user?.phone || '',
   },
   actions: {
     setToken(token) {
@@ -37,7 +37,7 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       this.credits = null;
     },
-    // xworld 登录/注册成功后：存令牌 + 同步本地档案（取回积分）
+    // 登录/注册成功后：存令牌 + 同步本地档案（取回积分）
     async _applyAuth({ tokens, user }) {
       this.setTokens(tokens.access_token, tokens.refresh_token);
       let local = null;
@@ -52,13 +52,13 @@ export const useAuthStore = defineStore('auth', {
         // 同步失败不阻塞：兜底用 /me 取本地档案
         try { local = await authApi.me(); } catch { local = null; }
       }
-      // 合并：xworld 身份档案 + 本系统业务字段（credits 等）
+      // 合并：登录返回的档案 + 本系统业务字段（credits 等）
       this.user = { ...user, ...(local || {}) };
       this.credits = this.user.credits ?? null;
       return this.user;
     },
-    // 直连登录/注册成功后建立本系统会话：归一账号中心档案字段（只透传展示字段，
-    // 不带 xworld 侧 id/status，避免与本地档案混淆）+ 同步本地档案
+    // 登录/注册成功后建立本系统会话：归一档案字段（只透传展示字段，
+    // 不带服务端 id/status，避免与本地档案混淆）+ 同步本地档案
     async applyAuthResult({ tokens, user }) {
       return this._applyAuth({
         tokens,
@@ -71,7 +71,7 @@ export const useAuthStore = defineStore('auth', {
         },
       });
     },
-    // 账号密码登录（identity：手机号/邮箱/用户名）+ 验证码注册（成功即登录）
+    // 账号密码登录（identity：用户名/邮箱/手机号）+ 验证码注册（成功即登录）
     async login(payload) {
       return this.applyAuthResult(await authApi.login(payload));
     },
@@ -82,11 +82,8 @@ export const useAuthStore = defineStore('auth', {
     async loginWithProvider(provider, payload) {
       return this.applyAuthResult(await authApi.oauthLogin(provider, payload));
     },
-    // 发送验证码 / 忘记密码重置：纯透传，不影响会话状态
-    sendCode(payload) { return authApi.sendCode(payload); },
-    resetPassword(payload) { return authApi.resetPassword(payload); },
     changePassword(payload) { return authApi.changePassword(payload); },
-    // 修改昵称（仅本地镜像：/auth/sync 会更新本地 User.nickname；xworld 侧档案下次同步可能覆盖）
+    // 修改昵称（仅本地镜像：/auth/sync 会更新本地 User.nickname）
     async updateNickname(nickname) {
       const local = await authApi.sync({ nickname });
       this.user = { ...(this.user || {}), ...(local || {}), nickname };
@@ -113,12 +110,10 @@ export const useAuthStore = defineStore('auth', {
       } catch { return this.credits; }
     },
     logout() {
-      const token = this.token;
-      // 立即清除本地会话（同步）
+      // 立即清除本地会话（同步）。axt_ 会话为无状态 JWT，无服务端会话可撤销，
+      // 清本地令牌即可（封禁由服务端每请求重查兜底）
       this._clearLocal();
-      // best-effort 撤销账号中心会话（auth_sessions，平台 JWT 令牌即废）：
-      // 用捕获到的令牌显式调用，避免本地已清除的竞态；失败不阻塞本地登出
-      if (token) authApi.logout(token);
+      authApi.logout();
       // 鸿蒙端：reLaunch 视图切换不绘制（生命周期跑、屏幕不翻页），用 redirectTo
       uni.redirectTo({ url: '/pages/login/index' });
     },

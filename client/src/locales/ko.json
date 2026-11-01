@@ -540,7 +540,6 @@
     "colName": "파일명"
   },
   "login": {
-    "demoTip": "데모 계정: demo / demo123(2000 크레딧이 미리 제공됨)",
     "feat1": "3단계 워크플로, WYSIWYG",
     "feat2": "대형 모델 / 이미지 / 영상 구성 자유롭게 가져오기",
     "feat3": "크레딧 과금 투명, 1위안 = 10크레딧",
@@ -554,15 +553,22 @@
     "sub": "로그인하여 창작을 시작하세요",
     "success": "로그인 성공",
     "welcome": "다시 오신 것을 환영합니다 👋",
-    "phIdentity": "이메일 / 전화번호",
+    "phIdentity": "사용자 이름 / 이메일 / 전화번호",
     "forgot": "비밀번호를 잊으셨나요?",
-    "oauthButton": "X-World 계정으로 로그인",
-    "oauthHint": "X-World 통합 계정 센터로 이동하여 로그인합니다",
     "agreeLead": "다음에 동의합니다",
     "agreeAnd": "및",
     "agreeTerms": "이용약관",
     "agreePrivacy": "개인정보 처리방침",
-    "agreeRequired": "먼저 이용약관과 개인정보 처리방침에 동의해 주세요"
+    "agreeRequired": "먼저 이용약관과 개인정보 처리방침에 동의해 주세요",
+    "registerSub": "몇 초 만에 가입하고 창작을 시작하세요",
+    "usernamePh": "사용자 이름 입력",
+    "usernameRequired": "사용자 이름을 입력하세요",
+    "usernameRule": "영문/숫자/_-.",
+    "emailPh": "이메일 (선택)",
+    "phConfirm": "비밀번호 재입력",
+    "signUp": "가 입",
+    "hasAccount": "이미 계정이 있으신가요?",
+    "forgotHint": "자체 호스팅 인스턴스에는 SMS/메일 서비스가 없습니다. 사이트 관리자에게 사용자 관리에서 비밀번호 재설정을 요청하세요."
   },
   "maintenance": {
     "active": "점검 중",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "쇼케이스 검토",
     "jobAdmin": "작업 관리",
     "videoGenAdmin": "동영상 생성 기록"
-  },
-  "oauth": {
-    "signingIn": "로그인 중입니다. 잠시만 기다려 주세요…",
-    "retry": "다시 시도",
-    "stateMismatch": "로그인 상태 검증에 실패했습니다. 다시 시도해 주세요",
-    "failed": "로그인에 실패했습니다"
   },
   "outline": {
     "aboutMinutes": "약 {n}분",
@@ -2174,7 +2174,9 @@
       "admin_password": "관리 콘솔 로그인",
       "login_as": "관리 콘솔 대리 로그인",
       "apple": "Apple 로그인",
-      "google": "Google 로그인"
+      "google": "Google 로그인",
+      "password": "비밀번호",
+      "profile_sync": "프로필 동기화"
     },
     "ban": {
       "ban": "정지",
@@ -2192,7 +2194,7 @@
       "done": "해당 사용자 명의로 프런트에 로그인했습니다"
     },
     "loginConfig": {
-      "hint": "로그인 설정은 서버 .env에만 설정합니다. 변경 후 재시작이 필요합니다. 현재 계정 체계는 xworld 로그인으로 통일되어 있습니다.",
+      "hint": "로그인 방식은 서버에서 설정하며(예: 위챗 오픈 플랫폼), 계정은 로컬 등록/로그인(사용자명/이메일/전화번호 + 비밀번호)입니다.",
       "wechatLogin": "WeChat 로그인 (오픈 플랫폼)",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "관리 콘솔",
     "backToSite": "사이트로 이동",
     "login": {
-      "sub": "전화번호와 비밀번호로 관리 콘솔에 로그인",
-      "identityPh": "전화번호",
+      "sub": "계정과 비밀번호로 관리 콘솔에 로그인",
+      "identityPh": "전화번호 / 사용자 이름 / 이메일",
       "passwordPh": "비밀번호",
       "submit": "로그인",
       "submitting": "로그인 중…",
       "success": "로그인되었습니다",
-      "hint": "관리자 계정은 사이트 계정과 동일합니다(role=admin). 비밀번호는「사용자 관리」에서 먼저 설정하세요"
+      "hint": "첫 실행 시 관리자 admin / admin123 계정이 자동 생성됩니다. 로그인 후 사용자 관리에서 비밀번호를 변경하세요"
     },
     "auth": {
       "missing_fields": "전화번호와 비밀번호를 입력하고 보안 인증을 완료해 주세요"

@@ -1,7 +1,7 @@
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    // xworld 账号服务返回的 user.id（令牌内用户 id 据此关联本地账号）
+    // 外部身份标识：本地注册 local:<username>、第三方登录 <provider>:<sub>（令牌内 sub 据此关联本地账号）
     external_id: { type: DataTypes.STRING(64), allowNull: true, unique: true },
     username: { type: DataTypes.STRING(64), allowNull: false, unique: true, validate: { len: [2, 64] } },
     email: { type: DataTypes.STRING(128), allowNull: true, unique: true, validate: { isEmail: true } },

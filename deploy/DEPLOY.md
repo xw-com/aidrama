@@ -42,9 +42,9 @@
 | 变量 | 说明 |
 |---|---|
 | `NODE_ENV=production` | **必须显式设 production**。`JWT_SECRET` 只在 production 下强制校验；不设则开发兜底密钥（`dev-insecure-secret-change-me`）生效，任何人可本地签发有效令牌冒充任意用户。production 且 `JWT_SECRET` 留空会直接拒绝启动 |
-| `JWT_SECRET` | 与 xworld 账号服务（auth.example.com）共享的 HS256 验签密钥，长随机串 |
+| `JWT_SECRET` | 本系统自签/校验用户会话令牌（`axt_` JWT）的 HS256 密钥，长随机串 |
 | `FILE_SIGN_SECRET` | `/files` 视频/音频 secure_link 时效签名密钥，**必须与 nginx.conf 里的 `REPLACE_WITH_FILE_SIGN_SECRET` 一致**。留空 = 出口不签名，nginx 防盗链块无法上线 |
-| `PUBLIC_BASE_URL` | 对外基础地址（如 `https://your-domain.com`）：微信支付回调、OAuth 回调、分享链接都从它派生 |
+| `PUBLIC_BASE_URL` | 对外基础地址（如 `https://your-domain.com`）：微信支付回调、分享链接都从它派生 |
 | `CLIENT_ORIGIN` | CORS 允许的前端地址（逗号分隔多个） |
 
 ### 数据库
@@ -55,14 +55,15 @@
 | `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASSWORD` | mysql 模式必填；建库：`CREATE DATABASE aidrama DEFAULT CHARACTER SET utf8mb4;` |
 | `DB_STORAGE` | sqlite 模式的库文件路径 |
 
-### xworld 账号体系
+### 账号体系（本地注册/登录）
 
 | 变量 | 说明 |
 |---|---|
-| `XWORLD_API_BASE` | xworld userinfo 回源校验地址（默认 `https://auth.example.com/api/v1`） |
-| `XWORLD_OAUTH2_CLIENT_ID` / `XWORLD_OAUTH2_CLIENT_SECRET` | 本系统在 xworld 登记的机密客户端凭据，服务端代理换码用 |
-| `XWORLD_OAUTH2_DESKTOP_ORIGINS` | 桌面壳 `app://` 回调 origin 白名单（默认 `app://xw-client`，改壳侧协议时同步） |
 | `ADMIN_JWT_SECRET` | 管理台独立令牌密钥（留空回退 `JWT_SECRET`，生产建议独立随机长钥） |
+| `ADMIN_INIT_USERNAME` / `ADMIN_INIT_PASSWORD` | 首次启动 seed 的初始管理员（默认 `admin` / `admin123`，已有管理员时跳过）。**上线后立即用 `node scripts/setAdminPassword.js` 改密** |
+| `CAPTCHA_TICKET_SECRET` | 点选验证码 ticket 签名密钥（留空复用 `JWT_SECRET`） |
+
+> 注册/登录/改密全部走本服务端 `/api/auth/*`；LLM 等业务配置在管理后台维护，`.env` 不含任何模型密钥。
 
 ### App 端第三方一键登录（可选；申请与部署详见 docs/Apple登录申请与部署.md、docs/Google登录申请与部署.md）
 
@@ -78,9 +79,9 @@
 
 ### 常用可选
 
-`PORT`（默认 3000）、`UPLOAD_DIR`/`OUTPUT_DIR`（生成产物目录）、`FFMPEG_PATH`、`STATIC_IMAGE_VERSION`（风格图缓存破除，+1 递增）、`CAPTCHA_TICKET_SECRET`（验证码 ticket 密钥，留空复用 `JWT_SECRET`）、`ASR_LANGUAGE`（字幕语音识别语种）、`DEFAULT_TEXT/IMAGE/VIDEO/TTS_*`（首启 seed 的共享模型，也可之后在 admin 后台配）。
+`PORT`（默认 3000）、`UPLOAD_DIR`/`OUTPUT_DIR`（生成产物目录）、`FFMPEG_PATH`、`STATIC_IMAGE_VERSION`（风格图缓存破除，+1 递增）、`ASR_LANGUAGE`（字幕语音识别语种）。文本/图像/视频/TTS 模型接入**全部在管理后台「模型配置」维护**（`.env` 无默认模型配置）。
 
-> 可选调优：`AIGC_LABEL`（AIGC 显式标识总开关，默认开，'0'/'false' 关）、`AI_RATE_LIMIT_PER_MIN`（AI 生成入口每用户每分钟上限，默认 30）。此外各路由内置进程内滑动窗口（管理台登录 10 次/分、验证码 120 次/分、令牌代理 60 次/分、客户端日志 30 次/分/IP），无需环境变量。
+> 可选调优：`AIGC_LABEL`（AIGC 显式标识总开关，默认开，'0'/'false' 关）、`AI_RATE_LIMIT_PER_MIN`（AI 生成入口每用户每分钟上限，默认 30）。此外各路由内置进程内滑动窗口（注册/登录 10 次/分/IP、管理台登录 10 次/分、验证码 120 次/分、客户端日志 30 次/分/IP），无需环境变量。
 
 ---
 

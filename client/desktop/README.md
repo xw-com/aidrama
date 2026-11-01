@@ -16,7 +16,7 @@ Electron 壳 + 本地构建产物 + 壳内反向代理。前端代码零改动�
 
 | 文件 | 作用 |
 |---|---|
-| `main.js` | 主进程：协议服务/代理、OAuth 授权窗、窗口与下载管理、自动更新、崩溃落盘 |
+| `main.js` | 主进程：协议服务/代理、窗口与下载管理、自动更新、崩溃落盘 |
 | `prepare-dist.js` | 打包前把 `../dist` 同步进本目录（跨平台） |
 | `config.json` | 运行时配置，随包放在 Resources 下，**发布前可手工改** |
 | `build/icon.png` | 应用图标源（≥512，electron-builder 自动生成 icns/ico） |
@@ -28,8 +28,7 @@ Electron 壳 + 本地构建产物 + 壳内反向代理。前端代码零改动�
 | 键 | 环境变量 | 默认 | 说明 |
 |---|---|---|---|
 | `apiBase` | `XW_DESKTOP_API` | `http://localhost:3000` | 远端服务地址，`/api /files /skills` 转发目标 |
-| `authHosts` | `XW_DESKTOP_AUTH_HOSTS`（逗号分隔） | `["auth.example.com"]` | xworld 授权中心主机，命中即开授权窗 |
-| `siteUrl` | `XW_DESKTOP_SITE` | 空 | **非空 = 薄壳模式**：直接加载该站点，不做协议/代理/OAuth 接管 |
+| `siteUrl` | `XW_DESKTOP_SITE` | 空 | **非空 = 薄壳模式**：直接加载该站点，不做协议/代理接管 |
 | `autoUpdateUrl` | — | 空 | 自动更新源（generic 静态目录，格式 `<base>/`）。**留空 = 完全跳过更新检查，不发任何网络请求**，详见下文「自动更新与发版流程」 |
 
 > `config.json` 是严格 JSON，不能写注释；`autoUpdateUrl` 的取值格式为
@@ -82,23 +81,10 @@ export ELECTRON_BUILDER_BINARIES_MIRROR="https://npmmirror.com/mirrors/electron-
 ⚠️ 注意 `ELECTRON_RUN_AS_NODE=1` 环境变量会让 Electron 退化成纯 Node
 （VSCode 终端可能带此变量），调试时先 `env -u ELECTRON_RUN_AS_NODE`。
 
-## OAuth 登录（关键集成点）
+## 登录
 
-前端 `redirectUri()` = `window.location.origin + '/oauth/callback'`，桌面壳下即：
-
-```
-app://xw-client/oauth/callback
-```
-
-**该回调地址须在 xworld 授权中心登记（逐字节一致）**，桌面端才能登录。
-自定义 scheme 回调有先例：uniapp App 端当年登记过 `aidrama://oauth/callback`。
-若 xworld 只收 https 回调，退路有二：
-1. 环回回调（RFC 8252 §7.3）：登记 `http://127.0.0.1:<port>/oauth/callback`，壳内起小 HTTP 服务接码；
-2. 薄壳模式（`siteUrl` 指向线上站）：登录流程原样工作，无需任何登记。
-
-登录流程中壳的行为：主窗口整页跳转 xworld 授权页 → 拦截并开独立「授权窗」；
-授权完成后 302 回 `app://xw-client/oauth/callback` 时截获，交回主窗口加载，
-由前端既有 `OAuthCallbackView` 完成 state 校验与换令牌（零改动）。
+登录走系统本地账号体系（账号密码 + 点选验证码），全部在应用内页面完成，
+无需任何外部回调登记。桌面壳把 `/api` 反代到远端服务，登录请求与浏览器端完全同构。
 
 ## 签名与分发（对外发布需要）
 

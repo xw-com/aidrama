@@ -2,7 +2,6 @@ import axios from 'axios';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import router from '../router';
 import i18n from '../i18n';
-import { refreshAccessToken as oauthRefresh } from './oauth.js';
 import { useAuthStore } from '../stores/auth';
 import { isAdminArea, tokenKey, CLIENT_TOKEN_KEY, CLIENT_REFRESH_KEY, ADMIN_TOKEN_KEY } from '../utils/authContext';
 
@@ -21,8 +20,11 @@ http.interceptors.request.use((config) => {
   return config;
 });
 
-// 静默刷新 access_token（单飞：并发 401 只刷新一次，其余请求排队等待结果）
-// OAuth2 刷新令牌轮换：每次返回全新 access + refresh，旧 refresh 立即失效
+// 刷新令牌请求：刻意不走 http 实例——其 401 拦截器会再调 refreshAccessToken，须直来直去避免递归
+const refreshHttp = axios.create({ baseURL, timeout: 15000 });
+
+// 静默刷新 access_token（单飞：并发 401 只刷新一次，其余请求排队等待结果）。
+// 本地会话 refresh 不轮换：响应返回原 refresh_token，继续持有即可
 let refreshingPromise = null;
 function refreshAccessToken() {
   // 管理端令牌不可刷新（无 refresh 机制，到期重新登录）：401 直接走 bailSession
@@ -30,13 +32,13 @@ function refreshAccessToken() {
   if (refreshingPromise) return refreshingPromise;
   const refreshToken = localStorage.getItem(CLIENT_REFRESH_KEY);
   if (!refreshToken) return Promise.resolve(null);
-  refreshingPromise = oauthRefresh(refreshToken)
-    .then((data) => {
-      if (data && data.access_token) {
-        localStorage.setItem(CLIENT_TOKEN_KEY, data.access_token);
-        // 轮换出的新 refresh_token 一并落盘（旧 refresh 已作废，继续用会触发重用检测、整族吊销）
-        if (data.refresh_token) localStorage.setItem(CLIENT_REFRESH_KEY, data.refresh_token);
-        return data.access_token;
+  refreshingPromise = refreshHttp.post('/auth/oauth/refresh', { refresh_token: refreshToken })
+    .then(({ data }) => {
+      if (data && data.code === 0 && data.data?.access_token) {
+        localStorage.setItem(CLIENT_TOKEN_KEY, data.data.access_token);
+        // refresh 不轮换：响应原样返回 refresh_token，落盘与否等价（保守起见同步一份）
+        if (data.data.refresh_token) localStorage.setItem(CLIENT_REFRESH_KEY, data.data.refresh_token);
+        return data.data.access_token;
       }
       return null;
     })

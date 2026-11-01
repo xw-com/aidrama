@@ -13,8 +13,8 @@ const USER_ATTRS = ['id', 'external_id', 'username', 'role', 'credits', 'status'
 const WELCOME_CREDITS = 66;
 
 /**
- * 从 xworld 签发的 JWT payload 中稳健提取用户 id。
- * xworld 令牌通常把用户 id 放在 sub；同时兼容 user_id / uid / userId / id 等常见 claim。
+ * 从签发的 JWT payload 中稳健提取用户 id。
+ * 令牌通常把用户 id 放在 sub；同时兼容 user_id / uid / userId / id 等常见 claim（旧令牌兼容）。
  */
 export const extractExternalId = (payload) => {
   if (!payload) return null;
@@ -22,45 +22,8 @@ export const extractExternalId = (payload) => {
   return v === undefined || v === null ? null : String(v);
 };
 
-// ===== xworld OAuth2 不透明令牌（xwat_ 前缀）校验 =====
-// 客户端登录已改为 xworld OAuth2 授权码流程：access_token 为不透明令牌，库中只存哈希、
-// 本地无法验签，只能回源授权服务器 /oauth/userinfo 校验并取用户标识（sub）。
-// 校验结果按令牌哈希做内存缓存（TTL 内不回源），避免每个请求一次跨服务调用。
-const oauthVerifyCache = new Map(); // sha256(token) -> { externalId, expiresAt }
-const OAUTH_VERIFY_CACHE_MAX = 10000;
-
-async function verifyOauthToken(token) {
-  const cacheKey = crypto.createHash('sha256').update(token).digest('hex');
-  const cached = oauthVerifyCache.get(cacheKey);
-  if (cached) {
-    if (cached.expiresAt > Date.now()) return cached.externalId;
-    oauthVerifyCache.delete(cacheKey);
-  }
-
-  let sub = null;
-  try {
-    const resp = await fetch(`${config.xworldApi.apiBase}/oauth/userinfo`, {
-      headers: { Authorization: `Bearer ${token}` },
-      signal: AbortSignal.timeout(5000),
-    });
-    // 200 且含 sub 才算有效（401/403 = 令牌无效/过期/吊销；5xx 视为校验失败，宁可拒绝）
-    if (resp.ok) {
-      const info = await resp.json();
-      if (info && info.sub !== undefined && info.sub !== null) sub = String(info.sub);
-    }
-  } catch { /* 网络异常/超时：按校验失败处理 */ }
-  if (!sub) return null;
-
-  oauthVerifyCache.set(cacheKey, { externalId: sub, expiresAt: Date.now() + config.xworldApi.verifyCacheTtlMs });
-  // 简单防膨胀：超上限时按插入序淘汰最早写入的条目（Map 遍历即插入序）
-  while (oauthVerifyCache.size > OAUTH_VERIFY_CACHE_MAX) {
-    oauthVerifyCache.delete(oauthVerifyCache.keys().next().value);
-  }
-  return sub;
-}
-
 // ===== 管理后台专用令牌（admt_ 前缀 + typ:'admin'，独立密钥 config.adminAuth.secret）=====
-// 管理台（/admin）经专属登录页（账号密码 + 验证码）换取本令牌；与 xworld 用户令牌完全隔离，
+// 管理台（/admin）经专属登录页（账号密码 + 验证码）换取本令牌；与前台用户令牌完全隔离，
 // 同一浏览器两端可各自持有会话（前端 aidrama-token / 管理端 aidrama-admin-token）。
 
 // 签发管理令牌：uid 存本地 User 主键（管理账号按本地行直查，不走 external_id 懒创建）。
@@ -81,7 +44,7 @@ export async function resolveAdminByToken(token) {
   return User.findByPk(payload.uid, { attributes: USER_ATTRS });
 }
 
-// 管理台专用鉴权：只接受 admt_ 管理令牌。xworld 用户令牌直达管理台 API 属越权而非登录过期，
+// 管理台专用鉴权：只接受 admt_ 管理令牌。前台用户令牌直达管理台 API 属越权而非登录过期，
 // 显式 403（若返回 401，前端会当成「登录过期」走刷新/兜底循环）。须在路由级单独使用（替代
 // authRequired+requireAdmin 组合），不能叠在 authRequired 之后。
 export const adminAuthRequired = async (req, res, next) => {
@@ -104,9 +67,9 @@ export const adminAuthRequired = async (req, res, next) => {
  * 解析令牌并解析出本地 User：
  * 1) admt_ 前缀 → 管理台令牌，按本地主键直查（管理台以本人身份调用共享用户端点：
  *    GET /model-configs、GET /voices、/jobs 轮询等）；
- * 2) xwat_ 前缀 → 回源 xworld OAuth2 授权服务器校验；axt_ 前缀 → 本地第三方登录（Apple/Google）
- *    会话令牌，本地验签且 typ 必须为 access（refresh 令牌不得当 access 用）；
- *    其余按共享密钥验证 xworld 签发的 JWT（兼容旧客户端）；
+ * 2) axt_ 前缀 → 本地会话令牌（账号密码登录/注册、第三方登录 Apple/Google 共用），
+ *    本地验签且 typ 必须为 access（refresh 令牌不得当 access 用）；
+ *    其余按本系统密钥验证签发的 JWT（兼容旧客户端/管理台代登令牌）；
  * 3) 按用户 id（external_id）查本地 User；
  * 4) 未找到则懒创建（占位用户名 xw_<id>，赠送 WELCOME_CREDITS 积分），保证后续业务数据可挂载。
  *
@@ -118,9 +81,7 @@ export const resolveUserByToken = async (token) => {
     return resolveAdminByToken(token);
   }
   let externalId;
-  if (token.startsWith('xwat_')) {
-    externalId = await verifyOauthToken(token);
-  } else if (token.startsWith('axt_')) {
+  if (token.startsWith('axt_')) {
     try {
       const payload = jwt.verify(token.slice(4), config.jwt.secret);
       if (payload?.typ !== 'access') return null; // 本地签发的 refresh 令牌只能走 /auth/oauth/refresh 换新
@@ -138,17 +99,17 @@ export const resolveUserByToken = async (token) => {
   if (!externalId) return null;
 
   let user = await User.findOne({ where: { external_id: externalId }, attributes: USER_ATTRS });
-  if (!user) user = await createXworldUser(externalId);
+  if (!user) user = await createExternalUser(externalId);
   return user;
 };
 
 /**
- * 懒同步：为外部身份用户建本地账号（external_id 唯一，占位用户名据此生成，避免冲突），
- * 并落首登赠送积分流水。xworld 登录用户与外部身份登录同待遇。
+ * 懒创建：为外部身份（第三方登录等）建本地账号（external_id 唯一，占位用户名据此生成，避免冲突），
+ * 并落首登赠送积分流水。本地注册的账号在注册时已建好，不经过本函数。
  * 并发首登（两请求同时查不到用户、同时 create）时其一会撞唯一索引：
  * 捕获唯一约束冲突后改为查询既有用户幂等返回——赠送积分由先建成功的一方落账，不重复发。
  */
-export async function createXworldUser(externalId, extra = {}) {
+export async function createExternalUser(externalId, extra = {}) {
   const { username: extraUsername, ...rest } = extra;
   const base = extraUsername || `xw_${externalId}`;
   let username = base.slice(0, 64);
@@ -160,9 +121,10 @@ export async function createXworldUser(externalId, extra = {}) {
       external_id: externalId,
       username,
       ...rest,
-      email: null,
-      // password_hash 在旧库可能为 NOT NULL；xworld 用户无本地密码，写入随机占位以满足约束（鉴权已由 xworld 令牌承担）
-      password_hash: crypto.randomBytes(24).toString('hex'),
+      // 注册显式携带 email 时入库；懒创建（无注册档案）保持为空（email 全局唯一，占位值会撞库）
+      email: rest.email || null,
+      // password_hash 在旧库可能为 NOT NULL；无本地密码的账号写入随机占位以满足约束（compare 必然失败）
+      password_hash: rest.password_hash || crypto.randomBytes(24).toString('hex'),
       credits: WELCOME_CREDITS,
     });
     // 首次登录赠送积分，同步落一条流水（type 沿用 recharge，remark 标注赠送来源）
@@ -225,15 +187,14 @@ export const requireAdmin = (req, res, next) => {
   next(forbidden('common.forbidden'));
 };
 
-// 签发 xworld 用户 JWT：sub 取 external_id（resolveUserByToken 按它回查用户）。
-// expiresIn 可覆盖默认有效期（管理台「一键登录用户前端」签短时效代登令牌用；
-// 通用 OAuth2 登录已下线，signToken 不再被 oauth2.service 引用）
+// 签发用户 JWT（管理台「一键登录用户前端」代登等残留场景）：sub 取 external_id
+// （resolveUserByToken 按它回查用户）。常规登录/注册一律走下方 signAppTokens（axt_ 会话）。
 export const signToken = (user, expiresIn) =>
   jwt.sign({ sub: user.external_id ?? String(user.id), role: user.role }, config.jwt.secret, { expiresIn: expiresIn || config.jwt.expiresIn });
 
-// ===== 本地第三方登录（App 端 Apple/Google）会话令牌：axt_ 前缀 + typ claim =====
-// 与 resolveUserByToken 的 axt_ 分支及 POST /auth/oauth/refresh 配套。refresh 不轮换
-// （与直连平台 JWT 同语义），access 过期由客户端携 refresh 静默换新（http.js 按前缀分流）。
+// ===== 本地会话令牌（账号密码登录/注册 + 第三方登录 Apple/Google 共用）：axt_ 前缀 + typ claim =====
+// 与 resolveUserByToken 的 axt_ 分支及 POST /auth/oauth/refresh 配套。refresh 不轮换，
+// access 过期由客户端携 refresh 静默换新（http.js 按前缀分流）。
 export const APP_TOKEN_PREFIX = 'axt_';
 
 export const signAppTokens = (user) => {

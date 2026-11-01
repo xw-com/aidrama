@@ -1,7 +1,7 @@
 <script setup>
 /**
- * 登录页（移动端单列）：直连 xworld 账号中心表单认证（docs/xworld-direct-auth-api.md）。
- * 提交前过点选验证码（ticket 随登录请求透传，服务端当前「提供才校验」）；
+ * 登录页（移动端单列）：本地账号密码登录（用户名/邮箱/手机号任一）。
+ * 提交前过点选验证码（ticket 随登录请求透传，服务端「提供才校验」）；
  * 原目标页经 ?redirect 带入（登录成功后回跳）。
  */
 import { ref } from 'vue';
@@ -62,7 +62,7 @@ async function doLogin(ticket) {
     // 鸿蒙端：reLaunch 不绘制，用 redirectTo（栈内残留游客页，返回时由各页未登录态兜底）
     uni.redirectTo({ url: redirectPath || '/pages/projects/index' });
   } catch (e) {
-    toastError(e); // 直连 xworld 路径不经 http 拦截层，需就地提示（401 凭证错误 / 429 限频等）
+    toastError(e); // _silent 请求不经 http 拦截层弹窗，需就地提示（401 凭证错误 / 429 限频等）
   } finally {
     busy.value = false;
   }

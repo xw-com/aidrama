@@ -5,12 +5,9 @@
 //   - 静态资源由壳内协议 handler 提供（含 SPA history 回退，路由直接刷新可用）
 //   - /api、/files、/skills 经 net.fetch 反向代理到远端服务（apiBase）
 //     —— 前端保持「同源相对路径」假设零改动；/files 的 Range 请求原样透传，视频可拖进度条
-//   - OAuth：登录整页跳转 xworld 授权页时由壳接管，开独立「授权窗」；授权完成后授权中心
-//     302 回 app://xw-client/oauth/callback，壳截获并交回主窗口加载，由前端既有
-//     OAuthCallbackView 完成 state 校验与换令牌（该回调地址须在 xworld 后台逐字节登记，见 README）
 //   - 其余 https 外链一律走系统浏览器；window.open 开应用内子窗口（视频剪辑器等具名窗口）
 // 薄壳模式（联调）：siteUrl（XW_DESKTOP_SITE）非空时直接加载远端站点，
-//   不做协议注册/代理/OAuth 接管——远端站点原生同源语义，登录支付全部照常。
+//   不做协议注册/代理——远端站点原生同源语义，登录支付全部照常。
 // 自动更新：config.json 的 autoUpdateUrl 非空时接入 electron-updater（generic 静态源）；
 //   为空 = 完全跳过更新检查，零网络请求。全程 try/catch 静默失败。
 // 崩溃收集：本地方案（无 Sentry 账号）——主进程未捕获异常/Promise 拒绝、渲染进程崩溃
@@ -24,8 +21,6 @@ const url = require('url');
 
 const SCHEME = 'app';
 const APP_HOST = 'xw-client';
-// 与前端 redirectUri()（client/src/api/oauth.js：origin + '/oauth/callback'）拼出的地址逐字节一致，
-// 该串须登记到 xworld 授权中心作为桌面端回调
 const APP_ORIGIN = `${SCHEME}://${APP_HOST}`;
 // 需要转发到远端服务的路径前缀（与 vite dev proxy、nginx 的转发口径一致）
 const PROXY_PREFIXES = ['/api', '/files', '/skills'];
@@ -101,7 +96,6 @@ app.on('web-contents-created', (_event, wc) => {
 function loadConfig() {
   const cfg = {
     apiBase: 'http://localhost:3000', // 远端 AIDrama 服务地址
-    authHosts: ['auth.example.com'], // xworld 授权中心主机（命中即开授权窗而非系统浏览器）
     siteUrl: '', // 非空 = 薄壳模式：直接加载该站点
     // 自动更新源（generic provider）：指向静态托管 latest*.yml 与安装包的目录，格式 <base>/
     // 如 https://dl.example.com/aidrama-desktop/ 。留空 = 完全跳过更新检查，不发任何网络请求
@@ -113,7 +107,6 @@ function loadConfig() {
   } catch (e) { /* 无配置文件用默认值 */ }
   if (process.env.XW_DESKTOP_API) cfg.apiBase = process.env.XW_DESKTOP_API;
   if (process.env.XW_DESKTOP_SITE) cfg.siteUrl = process.env.XW_DESKTOP_SITE;
-  if (process.env.XW_DESKTOP_AUTH_HOSTS) cfg.authHosts = process.env.XW_DESKTOP_AUTH_HOSTS.split(',').map((s) => s.trim()).filter(Boolean);
   if (cfg.siteUrl) cfg.siteUrl = cfg.siteUrl.replace(/\/+$/, '');
   if (cfg.apiBase) cfg.apiBase = cfg.apiBase.replace(/\/+$/, '');
   return cfg;
@@ -122,7 +115,6 @@ const CFG = loadConfig();
 const BASE_ORIGIN = CFG.siteUrl || APP_ORIGIN; // 导航放行的「站内」origin
 
 let mainWindow = null;
-let authWin = null;
 
 // ---------------------------------------------------------------------------
 // app:// 协议：standard+secure 才有正常的 origin/localStorage/history API；
@@ -170,15 +162,7 @@ async function serveStatic(u) {
 }
 
 // ---------------------------------------------------------------------------
-// 导航接管：站内 origin 放行；xworld 授权主机 → 授权窗；其余 https 外链 → 系统浏览器
-function isAuthHost(u) {
-  try {
-    return CFG.authHosts.includes(new URL(u).hostname);
-  } catch (e) {
-    return false;
-  }
-}
-
+// 导航接管：站内 origin 放行；其余 https 外链 → 系统浏览器
 function attachNavigation(win) {
   const wc = win.webContents;
   // window.open（视频剪辑器具名窗口等）：站内开应用内子窗口，同 session 共享 localStorage 会话
@@ -187,18 +171,13 @@ function attachNavigation(win) {
       createWindow(target, { width: 1280, height: 800 });
       return { action: 'deny' };
     }
-    if (isAuthHost(target)) {
-      openAuthWindow(target);
-      return { action: 'deny' };
-    }
     if (/^https?:/i.test(target)) shell.openExternal(target);
     return { action: 'deny' };
   });
   wc.on('will-navigate', (e, target) => {
     if (target.startsWith(BASE_ORIGIN)) return; // 站内放行
     e.preventDefault();
-    if (isAuthHost(target)) openAuthWindow(target); // OAuth 整页跳转 → 授权窗
-    else if (/^https?:/i.test(target)) shell.openExternal(target);
+    if (/^https?:/i.test(target)) shell.openExternal(target);
   });
   attachDevTools(wc);
 }
@@ -209,57 +188,6 @@ function attachDevTools(wc) {
       wc.toggleDevTools();
     }
   });
-}
-
-// ---------------------------------------------------------------------------
-// 授权窗：xworld 托管登录/注册页。授权完成 302 回 app://.../oauth/callback 时截获，
-// 交回主窗口加载——code/state 兑换逻辑全在前端 OAuthCallbackView，零改动
-function openAuthWindow(startUrl) {
-  if (authWin && !authWin.isDestroyed()) {
-    authWin.focus();
-    authWin.loadURL(startUrl);
-    return;
-  }
-  authWin = new BrowserWindow({
-    width: 1080,
-    height: 760,
-    minWidth: 720,
-    minHeight: 560,
-    show: false,
-    autoHideMenuBar: true,
-    title: 'XWorld 账号',
-    backgroundColor: BG_COLOR,
-    webPreferences: { sandbox: true, contextIsolation: true },
-  });
-  authWin.once('ready-to-show', () => authWin.show());
-
-  const captureCallback = (target) => target.startsWith(`${BASE_ORIGIN}/oauth/callback`);
-
-  authWin.webContents.on('will-navigate', (e, target) => {
-    if (captureCallback(target)) {
-      e.preventDefault();
-      authWin.close();
-      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadURL(target);
-      return;
-    }
-    if (target.startsWith(BASE_ORIGIN)) { e.preventDefault(); return; }
-    // 授权中心内部跳转（登录/注册页互跳）放行；第三方外链交给系统浏览器
-  });
-  authWin.webContents.on('will-redirect', (e, target) => {
-    // 302 回调走 will-redirect 而非 will-navigate，两个都要截
-    if (captureCallback(target)) {
-      e.preventDefault();
-      authWin.close();
-      if (mainWindow && !mainWindow.isDestroyed()) mainWindow.loadURL(target);
-    }
-  });
-  authWin.webContents.setWindowOpenHandler(({ url: target }) => {
-    if (/^https?:/i.test(target)) shell.openExternal(target);
-    return { action: 'deny' };
-  });
-  attachDevTools(authWin.webContents);
-  authWin.on('closed', () => { authWin = null; });
-  authWin.loadURL(startUrl);
 }
 
 // ---------------------------------------------------------------------------
@@ -377,7 +305,7 @@ if (!gotLock) {
     setupAutoUpdate(); // autoUpdateUrl 为空时内部直接返回（零网络请求）
 
     if (CFG.siteUrl) {
-      // 薄壳模式：远端站点原生同源，无需协议与 OAuth 接管
+      // 薄壳模式：远端站点原生同源，无需协议与代理接管
       mainWindow = createWindow(CFG.siteUrl);
     } else {
       if (!fs.existsSync(path.join(DIST_DIR, 'index.html'))) {

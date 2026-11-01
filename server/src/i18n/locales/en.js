@@ -68,7 +68,11 @@ export default {
   "auth.login_success": "Logged in successfully",
   "auth.password_length": "Password must be at least 6 characters",
   "auth.register_success": "Registered successfully",
-  "auth.synced": "Profile synced",
+
+  "auth.username_invalid": "Username may only contain letters, digits, underscore, dot and hyphen (2-64 chars)",
+  "auth.username_taken": "Username already taken",
+  "auth.email_taken": "Email already registered",
+  "auth.password_changed": "Password changed successfully",  "auth.synced": "Profile synced",
   "auth.user_not_found": "User does not exist",
   "auth.wechat_code_missing": "Missing WeChat authorization code",
   "auth.wechat_disabled": "WeChat login is not enabled",

@@ -3,8 +3,6 @@ import { useAuthStore } from '../stores/auth';
 
 const routes = [
   { path: '/login', name: 'login', component: () => import('../views/LoginView.vue'), meta: { guest: true } },
-  // OAuth2 回调页：xworld 授权中心发码 302 回跳（注册/找回密码均在授权中心托管页完成，不再有本地页）
-  { path: '/oauth/callback', name: 'oauth-callback', component: () => import('../views/OAuthCallbackView.vue') },
   // 法务文档页：公开免登录（页脚/登录页协议勾选的链接入口；独立全屏版式，不挂 DefaultLayout）
   { path: '/terms', name: 'terms', component: () => import('../views/TermsView.vue'), meta: { auth: false, titleKey: 'route.terms' } },
   { path: '/privacy', name: 'privacy', component: () => import('../views/PrivacyView.vue'), meta: { auth: false, titleKey: 'route.privacy' } },

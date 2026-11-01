@@ -1,8 +1,8 @@
 // 点选文字验证码：出题 / 校验 / 一次性消费
 // 内存态存储（同 maintenance.service 范式，重启即清，无需建表）；
 // 图片由后端拼 SVG（dataURL）下发、浏览器端字体渲染——不依赖服务器 CJK 字体。
-// 通过后签发短期 JWT ticket，前端随登录/发码请求体透传给 xworld（captcha_ticket），
-// 默认复用与 xworld 共享的 JWT_SECRET 签发，xworld 侧将来可直接验签启用强校验。
+// 通过后签发短期 JWT ticket，前端随登录/注册请求体透传给服务端（captcha_ticket），
+// 默认复用 JWT_SECRET 签发，服务端 verifyTicket 验签消费。
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import config from '../config/index.js';

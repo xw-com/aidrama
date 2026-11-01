@@ -68,7 +68,11 @@ export default {
   "auth.login_success": "登入成功",
   "auth.password_length": "密碼長度至少 6 位",
   "auth.register_success": "註冊成功",
-  "auth.synced": "檔案已同步",
+
+  "auth.username_invalid": "使用者名稱只能包含字母、數字、底線、點與連字符（2-64 位）",
+  "auth.username_taken": "使用者名稱已被註冊",
+  "auth.email_taken": "該信箱已被註冊",
+  "auth.password_changed": "密碼修改成功",  "auth.synced": "檔案已同步",
   "auth.user_not_found": "用戶不存在",
   "auth.wechat_code_missing": "缺少微信授權 code",
   "auth.wechat_disabled": "微信登入未啟用",

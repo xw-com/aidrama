@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia';
 import { authApi, creditApi } from '../api';
-import { revokeToken, endSessionUrl } from '../api/oauth';
 
 const TOKEN_KEY = 'aidrama-token';
 const REFRESH_KEY = 'aidrama-refresh-token';
@@ -18,8 +17,8 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: (s) => !!s.token,
     // 是否管理员（侧栏 admin 专属页与路由守卫共用）
     isAdmin: (s) => s.user?.role === 'admin',
-    // 展示名：xworld 用户无用户名，优先取昵称 / 邮箱 / 手机号，避免显示内部占位账号
-    displayName: (s) => s.user?.nickname || s.user?.email || s.user?.phone || '',
+    // 展示名：优先取昵称 / 用户名 / 邮箱 / 手机号
+    displayName: (s) => s.user?.nickname || s.user?.username || s.user?.email || s.user?.phone || '',
     // 当前是否企业池计费上下文（顶栏积分徽章/充值页据此显示池余额）
   },
   actions: {
@@ -43,37 +42,18 @@ export const useAuthStore = defineStore('auth', {
       this.user = null;
       this.credits = null;
     },
-    // xworld 登录/注册成功后：存令牌 + 同步本地档案（取回积分/会员）
-    async _applyAuth({ tokens, user }) {
+    // 本地登录/注册成功：响应即含本地档案与令牌，直接落会话
+    async applyAuthResult({ user, tokens }) {
       this.setTokens(tokens.access_token, tokens.refresh_token);
-      let local = null;
-      try {
-        local = await authApi.sync({
-          email: user.email,
-          phone: user.phone,
-          nickname: user.nickname,
-          avatar: user.avatar,
-        });
-      } catch {
-        // 同步失败不阻塞：兜底用 /me 取本地档案
-        try { local = await authApi.me(); } catch { local = null; }
-      }
-      // 合并：xworld 身份档案 + 本系统业务字段（credits/会员等）
-      this.user = { ...user, ...(local || {}) };
-      this.credits = this.user.credits ?? null;
+      this.user = user;
+      this.credits = user?.credits ?? null;
       return this.user;
     },
-    // OAuth2 回调成功后建立本系统会话：userinfo 档案映射 + 同步本地档案（取回积分/会员）
-    async applyOauth({ tokens, user }) {
-      return this._applyAuth({
-        tokens,
-        user: {
-          email: user.email,
-          phone: user.phone,
-          nickname: user.nickname,
-          avatar: user.avatar_url,
-        },
-      });
+    async login(payload) {
+      return this.applyAuthResult(await authApi.login(payload));
+    },
+    async register(payload) {
+      return this.applyAuthResult(await authApi.register(payload));
     },
     changePassword(payload) { return authApi.changePassword(payload); },
     // 管理台「一键登录用户前端」：落地管理台代签的前台令牌（本地 JWT，无刷新令牌）。
@@ -85,7 +65,7 @@ export const useAuthStore = defineStore('auth', {
       this.credits = null;
       return this.fetchMe();
     },
-    // 修改昵称（仅本地镜像：/auth/sync 会更新本地 User.nickname；xworld 侧档案下次同步可能覆盖）
+    // 修改昵称（/auth/sync 更新本地档案）
     async updateNickname(nickname) {
       const local = await authApi.sync({ nickname });
       this.user = { ...(this.user || {}), ...(local || {}), nickname };
@@ -113,17 +93,11 @@ export const useAuthStore = defineStore('auth', {
       } catch { return this.credits; }
     },
     logout() {
-      const token = this.token;
-      const refreshToken = this.refreshToken;
-      // 立即清除本地会话（同步），保证路由守卫即时把已登出用户导向 /login
+      // 立即清除本地会话（同步），保证路由守卫即时把已登出用户导向 /login。
+      // axt_ 会话为无状态 JWT，无服务端会话可吊销；封禁由服务端每请求重查兜底。
+      // 整页跳转：清掉布局内已启动的轮询等运行态
       this._clearLocal();
-      // best-effort 吊销 xworld OAuth 令牌（RFC 7009，传 refresh 连同派生 access 一起吊销；
-      // keepalive 保证下面的整页跳转不掐断请求），用捕获到的令牌显式调用，避免本地已清除的竞态
-      if (refreshToken) revokeToken(refreshToken);
-      else if (token) revokeToken(token);
-      // 同时退出 OAuth2 登录连接：整页跳授权中心 /oauth/logout 清 SSO 会话 Cookie，
-      // 成功后 302 回本站登录页（下次登录需重新输入凭据）
-      window.location.assign(endSessionUrl());
+      window.location.assign('/login');
     },
   },
 });

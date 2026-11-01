@@ -2,7 +2,6 @@ import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import adminAuthRoutes from './adminAuth.routes.js';
 import captchaRoutes from './captcha.routes.js';
-import xworldOauthRoutes from './xworldOauth.routes.js';
 import appRoutes from './app.routes.js';
 import projectRoutes from './project.routes.js';
 import scriptRoutes from './script.routes.js';
@@ -34,10 +33,9 @@ import jobAdminRoutes from './jobAdmin.routes.js';
 import videoGenAdminRoutes from './videoGenAdmin.routes.js';
 import { rateLimit } from '../utils/rateLimit.js';
 import { resolveUserByToken } from '../middleware/auth.js';
-// 注：通用 OAuth2 与微信扫码登录已下线，账号体系统一走 xworld（auth.example.com）。
-// oauth2.routes.js 与 services/oauth2 因存在未挂载死代码（含账号接管级缺陷）已整体删除；
-// services/wechat 仍在用（微信支付）。/oauth/* 是 xworld OAuth2 的服务端令牌代理
-// （机密客户端，client_secret 只在服务端），与已删的通用 OAuth2 无关。
+// 注：通用 OAuth2 与微信扫码登录已下线；账号体系为本地注册/登录（/auth/register|login，
+// 账号密码 + 点选验证码）。/auth/oauth/* 仅剩 App 端第三方一键登录（Apple/Google）与本地
+// 会话刷新。services/wechat 仍在用（微信支付）。
 
 const router = Router();
 
@@ -45,7 +43,7 @@ const router = Router();
 // 只拦「会调 job.service.createJob 的用户侧 POST 端点」（白名单正则，键为登录用户 id）；
 // admin 路由（/admin/*，含风格示例图/角色选项示例图的 admin AI 生成）与读取类 GET 一律不拦。
 // 挂载点在本文件（各 AI 路由 router 前置）：鉴权在路由级 authRequired 完成，此处按令牌
-// resolveUserByToken 取用户 id（xwat_ 不透明令牌有进程内缓存，JWT 本地验签，开销可忽略）。
+// resolveUserByToken 取用户 id（本地 JWT 验签，开销可忽略）。
 const AI_RATE_PER_MIN = Math.max(1, parseInt(process.env.AI_RATE_LIMIT_PER_MIN, 10) || 30);
 const AI_JOB_POST_RE = new RegExp([
   '^/projects/[^/]+/script/(import|parse-js)$',
@@ -83,7 +81,6 @@ const aiJobRateLimit = (req, res, next) => {
 router.use('/auth', authRoutes);
 router.use('/admin/auth', adminAuthRoutes); // /admin/auth/login 管理台专属登录（公开，限频+验证码）
 router.use('/captcha', captchaRoutes); // /captcha/challenge|verify 点选验证码（公开）
-router.use('/oauth', xworldOauthRoutes); // /oauth/token|refresh|revoke 令牌代理（公开，限频）
 router.use('/', appRoutes); // /app/check-update 版本检查 + /client-log 客户端日志上报（均公开）
 
 // AI 生成入口限频（见上方说明）：置于公开路由之后、业务/AI 路由之前

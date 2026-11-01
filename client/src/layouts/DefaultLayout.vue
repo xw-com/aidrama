@@ -71,9 +71,9 @@ onUnmounted(() => {
 function goLogin() {
   router.push({ name: 'login', query: { redirect: route.fullPath } });
 }
-// 注册直接新开 xworld 官网注册页
+// 注册走登录页注册模式（本地注册）
 function goRegister() {
-  window.open('https://www.example.com/register', '_blank');
+  router.push({ name: 'login', query: { redirect: route.fullPath, mode: 'register' } });
 }
 
 // 用户中心菜单：手机版（uniapp H5，当前窗口跳转）+ 创作台（新窗口）

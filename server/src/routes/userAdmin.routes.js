@@ -54,7 +54,7 @@ router.put('/:id/status', adminAuthRequired, asyncHandler(async (req, res) => {
   return ok(res, { id: target.id, status: target.status }, status === 'banned' ? 'admin.users.ban_done' : 'admin.users.unban_done');
 }));
 
-// 设置/重置登录密码（管理台密码登录用）。经 xworld 晋级的 admin 本地密码为随机占位，
+// 设置/重置登录密码（管理台密码登录用）。第三方登录建号的 admin 本地密码为随机占位，
 // 须经此设置后才能登录管理台；可对自己或他人操作（admin 之间互设属预期管理能力）
 router.put('/:id/password', adminAuthRequired, asyncHandler(async (req, res) => {
   const password = String(req.body?.password || '');
@@ -92,7 +92,7 @@ router.get('/login-logs', adminAuthRequired, asyncHandler(async (req, res) => {
   return ok(res, await listLoginLogs(req.query));
 }));
 
-// 登录配置（脱敏只读）：当前账号体系统一走 xworld，微信登录通道仅剩 env 配置残留（扫码登录已下线未挂载）。
+// 登录配置（脱敏只读）：账号体系为本地注册/登录，微信登录通道仅剩 env 配置残留（扫码登录已下线未挂载）。
 // 展示 config.wechat.login（WECHAT_APP_ID/SECRET）健康状态 + 用户/管理令牌有效期，供 admin 核对配置面。
 router.get('/login-config', adminAuthRequired, asyncHandler(async (req, res) => {
   const login = config.wechat.login;

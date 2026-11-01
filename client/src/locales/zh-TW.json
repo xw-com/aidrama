@@ -540,7 +540,6 @@
     "colName": "文件名"
   },
   "login": {
-    "demoTip": "示範帳號：demo / demo123（已預設 2000 點數）",
     "feat1": "三步式工作流程，所見即所得",
     "feat2": "大模型 / 圖像 / 影片設定自由匯入",
     "feat3": "點數計費透明，1 元 = 10 點數",
@@ -554,15 +553,22 @@
     "sub": "登入開始你的創作",
     "success": "登入成功",
     "welcome": "歡迎回來 👋",
-    "phIdentity": "郵箱 / 手機號",
+    "phIdentity": "使用者名稱 / 信箱 / 手機號",
     "forgot": "忘記密碼？",
-    "oauthButton": "使用 X-World 帳號登入",
-    "oauthHint": "將跳轉至 X-World 統一帳號中心完成登入",
     "agreeLead": "已閱讀並同意",
     "agreeAnd": "與",
     "agreeTerms": "《使用者協議》",
     "agreePrivacy": "《隱私權政策》",
-    "agreeRequired": "請先閱讀並同意《使用者協議》與《隱私權政策》"
+    "agreeRequired": "請先閱讀並同意《使用者協議》與《隱私權政策》",
+    "registerSub": "幾秒鐘完成註冊，即刻開始創作",
+    "usernamePh": "請輸入使用者名稱",
+    "usernameRequired": "請輸入使用者名稱",
+    "usernameRule": "字母/數字/_-.",
+    "emailPh": "信箱（選填）",
+    "phConfirm": "再次輸入密碼",
+    "signUp": "註 冊",
+    "hasAccount": "已有帳號？",
+    "forgotHint": "自部署實例未配置簡訊/郵件服務，請聯絡站點管理員在「使用者管理」中重設密碼。"
   },
   "maintenance": {
     "active": "維護中",
@@ -775,12 +781,6 @@
     "showcaseAdmin": "展示審核",
     "jobAdmin": "任務管理",
     "videoGenAdmin": "影片生成留檔"
-  },
-  "oauth": {
-    "signingIn": "正在登入，請稍候…",
-    "retry": "重新登入",
-    "stateMismatch": "登入狀態校驗失敗，請重新登入",
-    "failed": "登入失敗"
   },
   "outline": {
     "aboutMinutes": "約 {n} 分鐘",
@@ -2174,7 +2174,9 @@
       "admin_password": "管理台登入",
       "login_as": "管理台代登",
       "apple": "Apple 登入",
-      "google": "Google 登入"
+      "google": "Google 登入",
+      "password": "帳號密碼",
+      "profile_sync": "檔案同步"
     },
     "ban": {
       "ban": "封鎖",
@@ -2192,7 +2194,7 @@
       "done": "已登入該用戶前端"
     },
     "loginConfig": {
-      "hint": "登入配置僅在伺服器 .env 中配置，修改後需重啟；目前帳號體系統一走 xworld 登入。",
+      "hint": "登入方式在伺服器端設定（如微信開放平台）；帳號體系為本地註冊登入（使用者名稱/信箱/手機號碼 + 密碼）。",
       "wechatLogin": "微信登入（開放平台）",
       "wechatAppId": "AppID",
       "wechatSecret": "AppSecret",
@@ -2311,13 +2313,13 @@
     "title": "管理後台",
     "backToSite": "返回前台",
     "login": {
-      "sub": "使用手機號與密碼登入管理後台",
-      "identityPh": "手機號",
+      "sub": "使用帳號與密碼登入管理後台",
+      "identityPh": "手機號 / 使用者名稱 / 信箱",
       "passwordPh": "密碼",
       "submit": "登 入",
       "submitting": "登入中…",
       "success": "登入成功，歡迎回來",
-      "hint": "管理員帳號與前台帳號一致（role=admin），密碼須先於「使用者管理」中設定"
+      "hint": "首次啟動自動建立管理員 admin / admin123，登入後請盡快在「使用者管理」修改密碼"
     },
     "auth": {
       "missing_fields": "請填寫手機號、密碼並完成人機驗證"

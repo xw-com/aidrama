@@ -1,6 +1,5 @@
 {
   "apiBase": "https://your-domain.com",
-  "authHosts": ["auth.example.com"],
   "siteUrl": "",
   "autoUpdateUrl": ""
 }

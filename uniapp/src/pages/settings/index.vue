@@ -89,7 +89,7 @@ async function onChangePassword() {
     pwdForm.oldPassword = pwdForm.newPassword = pwdForm.confirm = '';
     pwdOpen.value = false;
   } catch (e) {
-    toastError(e); // 直连 xworld 路径不经 http 拦截层，需就地提示（401 当前密码错误 / 422 校验失败等）
+    toastError(e); // _silent 请求不经 http 拦截层弹窗，需就地提示（400 当前密码错误 / 422 校验失败等）
   }
   finally { pwdLoading.value = false; }
 }
