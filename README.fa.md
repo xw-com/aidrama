@@ -14,6 +14,7 @@
 ## 🌐 دموی آنلاین و ارتباط
 
 - **آدرس دمو**: <https://aiwork.xw.com>
+- **راهنمای کاربر**: [PC](docs/pc-user-manual.md) · [موبایل](docs/mobile-user-manual.md)
 - **گزارش مشکل / همکاری**: <kevin@xw.com>
 
 ---

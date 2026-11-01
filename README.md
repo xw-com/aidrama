@@ -12,6 +12,7 @@
 ## 🌐 在线演示 & 交流
 
 - **演示地址**：<https://aiwork.xw.com>
+- **用户手册**：[PC 端](docs/pc-user-manual.md)　·　[移动端](docs/mobile-user-manual.md)
 - **问题反馈 / 合作**：<kevin@xw.com>
 
 ---

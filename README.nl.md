@@ -12,6 +12,7 @@ De serverzijde draait op **Node.js + MySQL (met SQLite als fallback)**, de front
 ## 🌐 Online demo & community
 
 - **Demo-adres**: <https://aiwork.xw.com>
+- **Gebruikershandleiding**: [PC](docs/pc-user-manual.md) · [Mobiel](docs/mobile-user-manual.md)
 - **Problemen melden / samenwerken**: <kevin@xw.com>
 
 ---

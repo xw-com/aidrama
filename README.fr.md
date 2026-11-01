@@ -12,6 +12,7 @@ Le serveur utilise **Node.js + MySQL (avec repli SQLite)**, et il existe deux fr
 ## 🌐 Démo en ligne & Communauté
 
 - **Adresse de la démo** : <https://aiwork.xw.com>
+- **Manuel utilisateur** : [PC](docs/pc-user-manual.md) · [Mobile](docs/mobile-user-manual.md)
 - **Signalement de problèmes / Partenariats** : <kevin@xw.com>
 
 ---

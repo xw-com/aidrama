@@ -12,6 +12,7 @@ Il backend è **Node.js + MySQL (con fallback SQLite)**, il frontend **Vue 3 + E
 ## 🌐 Demo online & community
 
 - **Indirizzo della demo**: <https://aiwork.xw.com>
+- **Manuale utente**: [PC](docs/pc-user-manual.md) · [Mobile](docs/mobile-user-manual.md)
 - **Segnalazione problemi / collaborazioni**: <kevin@xw.com>
 
 ---

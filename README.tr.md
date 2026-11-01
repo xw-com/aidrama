@@ -12,6 +12,7 @@ Sunucu tarafı **Node.js + MySQL (/ SQLite yedek)**, ön yüz **Vue 3 + Element 
 ## 🌐 Çevrimiçi Demo & İletişim
 
 - **Demo adresi**: <https://aiwork.xw.com>
+- **Kullanıcı kılavuzu**: [PC](docs/pc-user-manual.md) · [Mobil](docs/mobile-user-manual.md)
 - **Sorun bildirimi / iş birliği**: <kevin@xw.com>
 
 ---

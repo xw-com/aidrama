@@ -12,6 +12,7 @@ AI ショートドラマ制作システム一式：**台本インポート → �
 ## 🌐 オンラインデモ & コミュニティ
 
 - **デモ URL**：<https://aiwork.xw.com>
+- **ユーザーマニュアル**：[PC 版](docs/pc-user-manual.md)　·　[モバイル版](docs/mobile-user-manual.md)
 - **不具合報告 / 提携**：<kevin@xw.com>
 
 ---

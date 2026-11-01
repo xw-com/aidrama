@@ -14,6 +14,7 @@
 ## 🌐 النسخة التجريبية والتواصل
 
 - **رابط التجربة**: <https://aiwork.xw.com>
+- **دليل المستخدم**: [PC](docs/pc-user-manual.md) · [الجوال](docs/mobile-user-manual.md)
 - **الإبلاغ عن المشكلات / التعاون**: <kevin@xw.com>
 
 ---

@@ -12,6 +12,7 @@ Der Server basiert auf **Node.js + MySQL (mit SQLite-Fallback)**; es gibt zwei F
 ## 🌐 Online-Demo & Austausch
 
 - **Demo-Adresse**: <https://aiwork.xw.com>
+- **Benutzerhandbuch**: [PC](docs/pc-user-manual.md) · [Mobil](docs/mobile-user-manual.md)
 - **Fehlermeldungen / Kooperation**: <kevin@xw.com>
 
 ---

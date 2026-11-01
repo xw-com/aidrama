@@ -12,6 +12,7 @@ El servidor usa **Node.js + MySQL (con fallback a SQLite)**, y hay dos clientes 
 ## 🌐 Demostración en línea & Comunidad
 
 - **URL de la demostración**: <https://aiwork.xw.com>
+- **Manual de usuario**: [PC](docs/pc-user-manual.md) · [Móvil](docs/mobile-user-manual.md)
 - **Reporte de problemas / Colaboración**: <kevin@xw.com>
 
 ---

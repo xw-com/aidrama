@@ -12,6 +12,7 @@ AI 숏드라마 제작 시스템 한 벌: **대본 가져오기 → 캐릭터/�
 ## 🌐 온라인 데모 & 교류
 
 - **데모 주소**: <https://aiwork.xw.com>
+- **사용자 매뉴얼**: [PC](docs/pc-user-manual.md) · [모바일](docs/mobile-user-manual.md)
 - **버그 신고 / 협업**: <kevin@xw.com>
 
 ---

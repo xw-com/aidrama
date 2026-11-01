@@ -12,6 +12,7 @@ Sisi server menggunakan **Node.js + MySQL (fallback SQLite)**, frontend terdiri 
 ## 🌐 Demo online & komunitas
 
 - **Alamat demo**: <https://aiwork.xw.com>
+- **Panduan pengguna**: [PC](docs/pc-user-manual.md) · [Ponsel](docs/mobile-user-manual.md)
 - **Lapor masalah / kerja sama**: <kevin@xw.com>
 
 ---

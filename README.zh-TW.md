@@ -12,6 +12,7 @@
 ## 🌐 線上展示 & 交流
 
 - **展示網址**：<https://aiwork.xw.com>
+- **使用手冊**：[PC 端](docs/pc-user-manual.md)　·　[行動端](docs/mobile-user-manual.md)
 - **問題回報 / 合作**：<kevin@xw.com>
 
 ---

@@ -12,6 +12,7 @@ AI से शॉर्ट-ड्रामा बनाने की एक स�
 ## 🌐 ऑनलाइन डेमो और संवाद
 
 - **डेमो पता**: <https://aiwork.xw.com>
+- **उपयोगकर्ता मैनुअल**: [PC](docs/pc-user-manual.md) · [मोबाइल](docs/mobile-user-manual.md)
 - **समस्या रिपोर्ट / सहयोग**: <kevin@xw.com>
 
 ---

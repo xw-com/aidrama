@@ -12,6 +12,7 @@ O servidor usa **Node.js + MySQL (com fallback para SQLite)**, e há dois fronte
 ## 🌐 Demonstração online & Comunidade
 
 - **Endereço da demonstração**: <https://aiwork.xw.com>
+- **Manual do usuário**: [PC](docs/pc-user-manual.md) · [Celular](docs/mobile-user-manual.md)
 - **Reportar problemas / Parcerias**: <kevin@xw.com>
 
 ---

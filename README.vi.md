@@ -12,6 +12,7 @@ Phía server là **Node.js + MySQL (hoặc SQLite fallback)**, frontend gồm ha
 ## 🌐 Demo trực tuyến & cộng đồng
 
 - **Địa chỉ demo**: <https://aiwork.xw.com>
+- **Hướng dẫn sử dụng**: [PC](docs/pc-user-manual.md) · [Di động](docs/mobile-user-manual.md)
 - **Báo lỗi / hợp tác**: <kevin@xw.com>
 
 ---

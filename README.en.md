@@ -12,6 +12,7 @@ The server runs on **Node.js + MySQL (with SQLite fallback)**, and the frontend 
 ## 🌐 Online Demo & Community
 
 - **Demo URL**: <https://aiwork.xw.com>
+- **User manual**: [PC](docs/pc-user-manual.md) · [Mobile](docs/mobile-user-manual.md)
 - **Issues / partnership**: <kevin@xw.com>
 
 ---

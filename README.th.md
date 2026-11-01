@@ -12,6 +12,7 @@
 ## 🌐 เดโมออนไลน์ & ชุมชน
 
 - **ลิงก์เดโม**: <https://aiwork.xw.com>
+- **คู่มือการใช้งาน**: [PC](docs/pc-user-manual.md) · [มือถือ](docs/mobile-user-manual.md)
 - **แจ้งปัญหา / ร่วมมือ**: <kevin@xw.com>
 
 ---
