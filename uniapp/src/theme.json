@@ -1,0 +1,12 @@
+{
+  "light": {
+    "adNavBg": "#f6f4ee",
+    "adNavTxt": "black",
+    "adBg": "#f6f4ee"
+  },
+  "dark": {
+    "adNavBg": "#0a0a0f",
+    "adNavTxt": "white",
+    "adBg": "#0a0a0f"
+  }
+}

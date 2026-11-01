@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/oned/ZXCode128Reader.h

@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/core/ZXWriter.h

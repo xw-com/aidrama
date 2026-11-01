@@ -1,0 +1,15 @@
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
+EXCLUDED_ARCHS[sdk=iphonesimulator*] = arm64
+FRAMEWORK_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/../../SDK/Libs" "${PODS_XCFRAMEWORKS_BUILD_DIR}/uniapp/Core" "${PODS_XCFRAMEWORKS_BUILD_DIR}/uniapp/Oauth-Google" "${PODS_XCFRAMEWORKS_BUILD_DIR}/uniapp/Oauth-Univerify"
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/uniapp" $(inherited) "${PODS_ROOT}/Headers/Public/uniapp" "${PODS_ROOT}/Headers/Public/uniapp/**"
+LD_RUNPATH_SEARCH_PATHS = $(inherited) '@executable_path/Frameworks' '@loader_path/Frameworks'
+LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/../../SDK/Libs"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"AppleOauth" -l"DCUniCanvas" -l"DCUniVideo" -l"GoogleOauth" -l"WXOauth" -l"WeChatSDK" -l"bz2" -l"c++" -l"iconv" -l"libBeacon" -l"libCache" -l"libCamera" -l"libContacts" -l"libFingerprint" -l"libGeolocation" -l"libIO" -l"libLog" -l"libMedia" -l"libMessage" -l"libNativeObj" -l"libNativeUI" -l"libNavigator" -l"libOauth" -l"libOrientation" -l"libPGInvocation" -l"libPGProximity" -l"libPayment" -l"libPush" -l"libSqlite" -l"libStorage" -l"libUI" -l"libVideo" -l"libXHR" -l"libZip" -l"mp3lame" -l"opencore-amrnb" -l"sqlite3.0" -l"z" -framework "AVFoundation" -framework "Accelerate" -framework "AdSupport" -framework "AddressBook" -framework "AddressBookUI" -framework "AppAuth" -framework "AssetsLibrary" -framework "AudioToolbox" -framework "CFNetwork" -framework "CoreBluetooth" -framework "CoreFoundation" -framework "CoreGraphics" -framework "CoreLocation" -framework "CoreMedia" -framework "CoreMotion" -framework "CoreTelephony" -framework "CoreText" -framework "CoreVideo" -framework "DCUniBase" -framework "DCUniRecord" -framework "DCUniVideoPublic" -framework "DCloudUTSExtAPI" -framework "DCloudUTSFoundation" -framework "Foundation" -framework "GLKit" -framework "GTCommonSDK" -framework "GTMAppAuth" -framework "GTMSessionFetcher" -framework "GeYanSdk" -framework "GoogleSignIn" -framework "IJKMediaFrameworkWithSSL" -framework "JavaScriptCore" -framework "LocalAuthentication" -framework "Masonry" -framework "MediaPlayer" -framework "MessageUI" -framework "MetalKit" -framework "MobileCoreServices" -framework "OpenGLES" -framework "Photos" -framework "QuartzCore" -framework "QuickLook" -framework "SafariServices" -framework "Security" -framework "SystemConfiguration" -framework "TencentLBS" -framework "UIKit" -framework "UniVerify" -framework "UserNotifications" -framework "VideoToolbox" -framework "WebKit" -framework "uniGetLocationTencentUni1" -weak_framework "AuthenticationServices"
+OTHER_MODULE_VERIFIER_FLAGS = $(inherited) "-F${PODS_CONFIGURATION_BUILD_DIR}/uniapp"
+PODS_BUILD_DIR = ${BUILD_DIR}
+PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
+PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
+PODS_ROOT = ${SRCROOT}/Pods
+PODS_XCFRAMEWORKS_BUILD_DIR = $(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates
+USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES

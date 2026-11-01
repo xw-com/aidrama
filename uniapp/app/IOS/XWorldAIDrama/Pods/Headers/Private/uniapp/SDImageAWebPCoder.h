@@ -1,0 +1,1 @@
+../../../../../SDK/inc/SDWebImage/Core/SDImageAWebPCoder.h

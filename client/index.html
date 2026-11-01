@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- SEO 基建：描述/抓取/OpenGraph；description 占位符由 Vite 构建期从 .env 的 VITE_SITE_DESCRIPTION 注入 -->
+    <meta name="description" content="%VITE_SITE_DESCRIPTION%" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="星网 XW.COM · AI 短剧制作平台" />
+    <meta property="og:description" content="%VITE_SITE_DESCRIPTION%" />
+    <meta property="og:type" content="website" />
+    <title>星网 XW.COM · AI 短剧制作平台</title>
+    <script>
+      // 防主题闪烁：应用加载前按存档偏好挂 html.dark（默认旗舰深色，与 stores/theme.js 口径一致）
+      try {
+        var m = localStorage.getItem('aidrama-theme');
+        var dark = m ? (m === 'dark' || (m === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches)) : true;
+        if (dark) document.documentElement.classList.add('dark');
+      } catch (e) { /* 隐私模式等场景忽略 */ }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

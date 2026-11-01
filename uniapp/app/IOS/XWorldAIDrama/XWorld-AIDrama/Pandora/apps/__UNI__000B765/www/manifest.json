@@ -1,0 +1,184 @@
+{
+  "@platforms": [
+    "android",
+    "iPhone",
+    "iPad"
+  ],
+  "id": "__UNI__000B765",
+  "name": "XWorld-AI短剧工坊",
+  "version": {
+    "name": "1.0.0",
+    "code": "100"
+  },
+  "description": "XWorld 掌上制片厂 · 一部手机就是一个剧组",
+  "developer": {
+    "name": "",
+    "email": "",
+    "url": ""
+  },
+  "permissions": {
+    "VideoPlayer": {},
+    "OAuth": {},
+    "UniNView": {
+      "description": "UniNView原生渲染"
+    }
+  },
+  "plus": {
+    "useragent": {
+      "value": "uni-app",
+      "concatenate": true
+    },
+    "splashscreen": {
+      "target": "id:1",
+      "autoclose": true,
+      "waiting": true,
+      "delay": 0
+    },
+    "popGesture": "close",
+    "launchwebview": {
+      "render": "always",
+      "id": "1",
+      "kernel": "WKWebview"
+    },
+    "darkmode": true,
+    "themeLocation": "theme.json",
+    "usingComponents": true,
+    "nvueStyleCompiler": "uni-app",
+    "compilerVersion": 3,
+    "distribute": {
+      "icons": {
+        "android": {
+          "hdpi": "unpackage/res/icons/72x72.png",
+          "xhdpi": "unpackage/res/icons/96x96.png",
+          "xxhdpi": "unpackage/res/icons/144x144.png",
+          "xxxhdpi": "unpackage/res/icons/192x192.png"
+        },
+        "ios": {
+          "appstore": "unpackage/res/icons/1024x1024.png",
+          "ipad": {
+            "app": "unpackage/res/icons/76x76.png",
+            "app@2x": "unpackage/res/icons/152x152.png",
+            "notification": "unpackage/res/icons/20x20.png",
+            "notification@2x": "unpackage/res/icons/40x40.png",
+            "proapp@2x": "unpackage/res/icons/167x167.png",
+            "settings": "unpackage/res/icons/29x29.png",
+            "settings@2x": "unpackage/res/icons/58x58.png",
+            "spotlight": "unpackage/res/icons/40x40.png",
+            "spotlight@2x": "unpackage/res/icons/80x80.png"
+          },
+          "iphone": {
+            "app@2x": "unpackage/res/icons/120x120.png",
+            "app@3x": "unpackage/res/icons/180x180.png",
+            "notification@2x": "unpackage/res/icons/40x40.png",
+            "notification@3x": "unpackage/res/icons/60x60.png",
+            "settings@2x": "unpackage/res/icons/58x58.png",
+            "settings@3x": "unpackage/res/icons/87x87.png",
+            "spotlight@2x": "unpackage/res/icons/80x80.png",
+            "spotlight@3x": "unpackage/res/icons/120x120.png"
+          }
+        }
+      },
+      "google": {
+        "minSdkVersion": 23,
+        "targetSdkVersion": 35,
+        "schemes": "aidrama",
+        "abiFilters": [
+          "armeabi-v7a",
+          "arm64-v8a"
+        ],
+        "screenOrientation": [
+          "portrait-primary"
+        ],
+        "permissions": [
+          "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+          "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+          "<uses-permission android:name=\"android.permission.READ_MEDIA_IMAGES\"/>",
+          "<uses-permission android:name=\"android.permission.READ_MEDIA_VIDEO\"/>",
+          "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" android:maxSdkVersion=\"32\"/>",
+          "<uses-permission android:name=\"android.permission.CAMERA\"/>"
+        ],
+        "defaultNightMode": "auto"
+      },
+      "apple": {
+        "privacyDescription": {
+          "NSCameraUsageDescription": "用于拍摄照片/视频并上传为创作素材",
+          "NSPhotoLibraryUsageDescription": "用于从相册选择图片/视频并上传为创作素材",
+          "NSPhotoLibraryAddUsageDescription": "用于将生成的视频/图片保存到相册"
+        },
+        "idfa": false,
+        "UIFileSharingEnabled": true,
+        "urltypes": "aidrama",
+        "deploymentTarget": "15.0",
+        "dSYMs": true,
+        "UIUserInterfaceStyle": "Automatic"
+      },
+      "plugins": {
+        "oauth": {
+          "apple": {},
+          "google": {
+            "clientid": "TODO-REPLACE-WITH-GOOGLE-ANDROID-CLIENT-ID.apps.googleusercontent.com"
+          }
+        },
+        "audio": {
+          "mp3": {
+            "description": "Android平台录音支持MP3格式文件"
+          }
+        }
+      }
+    },
+    "statusbar": {
+      "immersed": "supportedDevice",
+      "style": "light",
+      "background": "#0a0a0f"
+    },
+    "allowsInlineMediaPlayback": true,
+    "uni-app": {
+      "control": "uni-v3",
+      "vueVersion": "3",
+      "compilerVersion": "5.26",
+      "nvueCompiler": "uni-app",
+      "renderer": "auto",
+      "nvue": {
+        "flex-direction": "column"
+      },
+      "nvueLaunchMode": "normal",
+      "webView": {
+        "minUserAgentVersion": "49.0"
+      }
+    }
+  },
+  "app-harmony": {
+    "useragent": {
+      "value": "uni-app",
+      "concatenate": true
+    },
+    "darkmode": true,
+    "themeLocation": "theme.json",
+    "bundleName": "com.example.aidrama",
+    "distribute": {
+      "bundleName": "com.example.aidrama",
+      "signingConfigs": {
+        "default": {
+          "certpath": "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1775436041102.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001A8A591F6708011A92D469278B7B7ACCC205FAD6E75B4DF0F6BDD14BC5744EF6F409F4AD19223D",
+          "profile": "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1789807041199.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1775436041102.p12",
+          "storePassword": "0000001A8A591F6708011A92D469278B7B7ACCC205FAD6E75B4DF0F6BDD14BC5744EF6F409F4AD19223D"
+        }
+      },
+      "icons": {
+        "foreground": "unpackage/res/icons/1024x1024.png",
+        "background": "unpackage/res/icons/1024x1024.png"
+      },
+      "splashScreens": {
+        "startWindowIcon": "unpackage/res/icons/1024x1024.png",
+        "startWindowBackground": "#FFFFFF"
+      },
+      "modules": {}
+    }
+  },
+  "locale": "zh-Hans",
+  "launch_path": "__uniappview.html"
+}

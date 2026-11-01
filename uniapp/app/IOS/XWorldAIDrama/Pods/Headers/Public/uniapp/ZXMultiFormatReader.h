@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/ZXMultiFormatReader.h

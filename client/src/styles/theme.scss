@@ -1,0 +1,407 @@
+/* ============================================================
+   星网 XW.COM 设计令牌 — CINEMA STUDIO 电影工作室风
+   影棚黑 + 金色品牌 + 青色强调 + 衬线标题 + 胶片颗粒氛围
+   深色为旗舰主题（store 默认 dark）：影棚黑/金字/聚光灯氛围；
+   浅色为「日景影棚」变体：暖象牙底 + 恒深色侧栏（胶片暗盒）。
+   保留全部 --ad-* 变量名，页面零改动换血。
+   ============================================================ */
+
+/* ---------- 浅色（日景影棚） ---------- */
+:root {
+  /* 品牌主色（金，浅底取深金保证对比） */
+  --ad-brand: #b08a25;
+  --ad-brand-600: #96741a;
+  --ad-brand-700: #7c5f12;
+  --ad-brand-soft: rgba(176, 138, 37, 0.12);
+  --ad-brand-contrast: #221a04;
+  --ad-brand-gradient: linear-gradient(135deg, #d9b95c 0%, #b08a25 50%, #7c5f12 100%);
+
+  /* 金色强调（分镜片段轴等；与品牌同族） */
+  --ad-gold: #b08a25;
+  --ad-gold-soft: rgba(176, 138, 37, 0.18);
+
+  /* 语义色：--ad-primary 指向品牌色，使现有 .btn-ink / .nav-btn.active 自动品牌化 */
+  --ad-primary: var(--ad-brand);
+  --ad-primary-contrast: #221a04;
+  --ad-accent: #0d9488;          /* 片头青，留给「下一步」CTA */
+  --ad-accent-contrast: #ffffff;
+  --ad-success: #0e9f6e;
+  --ad-warning: #b45309;
+  --ad-danger: #dc2626;
+  --ad-brand-soft-2: rgba(13, 148, 136, 0.10);
+  --ad-focus-jump: #c026a5;      /* 任务面板跳转定位高亮（紫红，与品牌金区隔、浅底可读） */
+
+  /* 暖象牙表面 */
+  --ad-bg: #f6f4ee;
+  --ad-bg-soft: #efece3;
+  --ad-bg-elevated: #fffdf8;
+  --ad-bg-inset: #f1eee6;
+  --ad-border: #e6e2d6;
+  --ad-border-strong: #d6d1c1;
+  --ad-text: #211e16;
+  --ad-text-soft: #57534a;
+  --ad-text-muted: #8d8878;
+  --ad-text-strong: #000000;
+
+  /* 侧栏（胶片暗盒：深浅主题恒为深色暖黑） */
+  --ad-sidebar-bg: #14110c;
+  --ad-sidebar-bg-2: #1d1912;
+  --ad-sidebar-text: #cfc9bb;
+  --ad-sidebar-text-muted: #8d8878;
+  --ad-sidebar-text-strong: #f7f3e8;
+  --ad-sidebar-active: rgba(217, 185, 92, 0.16);
+  --ad-sidebar-active-bar: #d9b95c;
+  --ad-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --ad-sidebar-border: rgba(255, 255, 255, 0.07);
+  --ad-sidebar-w: 232px;
+  --ad-sidebar-w-collapsed: 64px;
+
+  /* 顶栏 */
+  --ad-topbar-bg: rgba(255, 253, 248, 0.88);
+  --ad-topbar-h: 56px;
+
+  /* 圆角 */
+  --ad-radius: 12px;
+  --ad-radius-sm: 8px;
+  --ad-radius-md: 12px;
+  --ad-radius-lg: 16px;
+  --ad-radius-pill: 999px;
+
+  /* 字体：衬线显示字体做标题，等宽做时间码 */
+  --ad-font-display: Georgia, 'Songti SC', 'Noto Serif SC', 'STSong', 'SimSun', serif;
+  --ad-font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI',
+    'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+  --ad-font-mono: ui-monospace, SFMono-Regular, 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  /* 阴影（暖色投射） */
+  --ad-shadow-xs: 0 1px 2px rgba(64, 54, 24, 0.05);
+  --ad-shadow-sm: 0 1px 3px rgba(64, 54, 24, 0.07), 0 1px 2px rgba(64, 54, 24, 0.04);
+  --ad-shadow: 0 4px 16px rgba(64, 54, 24, 0.09);
+  --ad-shadow-md: 0 8px 24px rgba(64, 54, 24, 0.11);
+  --ad-shadow-hover: 0 10px 30px rgba(64, 54, 24, 0.15), 0 0 0 1px rgba(176, 138, 37, 0.10);
+  --ad-shadow-lg: 0 20px 48px rgba(64, 54, 24, 0.18);
+  --ad-shadow-up: 0 -4px 16px rgba(64, 54, 24, 0.08);
+
+  /* 间距 */
+  --ad-sp-1: 4px;
+  --ad-sp-2: 8px;
+  --ad-sp-3: 12px;
+  --ad-sp-4: 16px;
+  --ad-sp-5: 20px;
+  --ad-sp-6: 24px;
+  --ad-sp-7: 28px;
+  --ad-sp-8: 32px;
+
+  /* 字号标尺 */
+  --ad-fz-xs: 12px;
+  --ad-fz-sm: 13px;
+  --ad-fz-md: 14px;
+  --ad-fz-lg: 16px;
+  --ad-fz-xl: 18px;
+  --ad-fz-2xl: 22px;
+
+  /* Element Plus 全局主色对齐品牌 */
+  --el-color-primary: var(--ad-brand);
+  --el-color-primary-light-3: #c9a94e;
+  --el-color-primary-light-5: #d7c082;
+  --el-color-primary-light-7: #e6d7b0;
+  --el-color-primary-light-8: #efe3c8;
+  --el-color-primary-light-9: rgba(176, 138, 37, 0.12);
+  --el-color-primary-dark-2: var(--ad-brand-600);
+  --el-bg-color: var(--ad-bg-elevated);
+  --el-bg-color-overlay: var(--ad-bg-elevated);
+  --el-border-color: var(--ad-border);
+  --el-border-color-light: var(--ad-border);
+  --el-border-color-lighter: var(--ad-border);
+  --el-text-color-primary: var(--ad-text);
+  --el-text-color-regular: var(--ad-text-soft);
+  --el-text-color-secondary: var(--ad-text-muted);
+  --el-fill-color-blank: var(--ad-bg-elevated);
+  --el-fill-color-light: var(--ad-bg-soft);
+}
+
+/* ---------- 深色（旗舰：放映厅） ---------- */
+html.dark {
+  --ad-brand: #e0b64e;
+  --ad-brand-600: #cfa33a;
+  --ad-brand-700: #b3871f;
+  --ad-brand-soft: rgba(224, 182, 78, 0.12);
+  --ad-brand-contrast: #1d1503;
+  --ad-brand-gradient: linear-gradient(135deg, #f2d489 0%, #e0b64e 45%, #b3871f 100%);
+
+  --ad-gold: #e0b64e;
+  --ad-gold-soft: rgba(224, 182, 78, 0.20);
+
+  --ad-primary: var(--ad-brand);
+  --ad-primary-contrast: #1d1503;
+  --ad-accent: #2dd4bf;
+  --ad-accent-contrast: #04211c;
+  --ad-success: #34d399;
+  --ad-warning: #fbbf24;
+  --ad-danger: #f87171;
+  --ad-brand-soft-2: rgba(45, 212, 191, 0.12);
+  --ad-focus-jump: #e879f9;      /* 深底下提亮一档 */
+
+  /* 影棚黑，微暖 */
+  --ad-bg: #0a0a0f;
+  --ad-bg-soft: #101018;
+  --ad-bg-elevated: #16161f;
+  --ad-bg-inset: #0d0d14;
+  --ad-border: #26262f;
+  --ad-border-strong: #34343f;
+  --ad-text: #f3f0e8;
+  --ad-text-soft: #b3afa3;
+  --ad-text-muted: #7d7a70;
+  --ad-text-strong: #ffffff;
+
+  --ad-sidebar-bg: #121014;
+  --ad-sidebar-bg-2: #1a171c;
+  --ad-sidebar-text: #cfc9bb;
+  --ad-sidebar-text-muted: #7d7a70;
+  --ad-sidebar-text-strong: #f7f3e8;
+  --ad-sidebar-active: rgba(224, 182, 78, 0.14);
+  --ad-sidebar-active-bar: var(--ad-brand);
+  --ad-sidebar-hover: rgba(255, 255, 255, 0.05);
+  --ad-sidebar-border: rgba(255, 255, 255, 0.06);
+
+  --ad-topbar-bg: rgba(13, 13, 19, 0.82);
+
+  --ad-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --ad-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.40), 0 1px 2px rgba(0, 0, 0, 0.30);
+  --ad-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --ad-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.50);
+  --ad-shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(224, 182, 78, 0.10);
+  --ad-shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.60);
+  --ad-shadow-up: 0 -4px 16px rgba(0, 0, 0, 0.45);
+
+  --el-color-primary: var(--ad-brand);
+  --el-color-primary-light-3: #e8c471;
+  --el-color-primary-light-5: #ecd295;
+  --el-color-primary-light-7: #f2e0ba;
+  --el-color-primary-light-8: #f6e9cf;
+  --el-color-primary-light-9: rgba(224, 182, 78, 0.14);
+  --el-color-primary-dark-2: var(--ad-brand-600);
+  --el-bg-color: var(--ad-bg-elevated);
+  --el-bg-color-overlay: var(--ad-bg-elevated);
+  --el-border-color: var(--ad-border);
+  --el-border-color-light: var(--ad-border);
+  --el-border-color-lighter: var(--ad-border);
+  --el-text-color-primary: var(--ad-text);
+  --el-text-color-regular: var(--ad-text-soft);
+  --el-text-color-secondary: var(--ad-text-muted);
+  --el-fill-color-blank: var(--ad-bg-elevated);
+  --el-fill-color-light: var(--ad-bg-soft);
+}
+
+/* ===== 通用工具类 ===== */
+.ad-page {
+  min-height: 100%;
+  color: var(--ad-text);
+  font-family: var(--ad-font-body);
+  /* 聚光灯氛围：右上金晕 + 左下青晕叠在底色上 */
+  background:
+    radial-gradient(1100px 700px at 88% -12%, var(--ad-brand-soft), transparent 62%),
+    radial-gradient(900px 650px at -8% 108%, var(--ad-brand-soft-2), transparent 58%),
+    var(--ad-bg);
+  background-attachment: fixed;
+}
+.ad-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.ad-card {
+  background: var(--ad-bg-elevated);
+  border: 1px solid var(--ad-border);
+  border-radius: var(--ad-radius);
+  box-shadow: var(--ad-shadow-sm);
+}
+
+/* 标题统一衬线显示字体（电影字幕卡气质） */
+.ad-title-lg,
+.ad-title {
+  font-family: var(--ad-font-display);
+  letter-spacing: 0.01em;
+}
+.ad-title-lg { font-size: 22px; font-weight: 700; color: var(--ad-text-strong); }
+.ad-title { font-size: 16px; font-weight: 600; color: var(--ad-text-strong); }
+.ad-sub { font-size: 13px; color: var(--ad-text-soft); line-height: 1.6; }
+.ad-muted { color: var(--ad-text-muted); }
+.ad-mono { font-family: var(--ad-font-mono); font-variant-numeric: tabular-nums; }
+.ad-flex { display: flex; }
+.ad-flex-center { display: flex; align-items: center; }
+.ad-flex-between { display: flex; align-items: center; justify-content: space-between; }
+.ad-gap-sm { gap: 8px; }
+.ad-gap { gap: 16px; }
+
+/* 页头：衬线大标题 + 副标 */
+.ad-page-head { margin-bottom: 20px; }
+.ad-page-head .ad-title-lg { font-size: 24px; }
+
+/* 品牌主按钮（.btn-ink / .btn-brand 金色礼宾键） */
+.btn-ink,
+.btn-brand {
+  background: var(--ad-brand-gradient) !important;
+  color: var(--ad-brand-contrast) !important;
+  border: none !important;
+  border-radius: var(--ad-radius-sm) !important;
+  font-weight: 700;
+  box-shadow: 0 2px 10px rgba(224, 182, 78, 0.22);
+  transition: filter 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+.btn-ink:hover,
+.btn-brand:hover {
+  filter: brightness(1.06);
+  opacity: 1;
+}
+.btn-ink:active,
+.btn-brand:active { transform: translateY(1px); filter: brightness(0.96); }
+.btn-ink:focus-visible,
+.btn-brand:focus-visible { box-shadow: 0 0 0 3px var(--ad-brand-soft); outline: none; }
+
+.btn-outline {
+  border-radius: var(--ad-radius-sm) !important;
+}
+
+/* 标签/徽章（深浅主题分别保证对比） */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--ad-radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--ad-bg-soft);
+  color: var(--ad-text-soft);
+  border: 1px solid var(--ad-border);
+}
+.chip-gold { background: var(--ad-brand-soft); color: var(--ad-brand); border-color: transparent; }
+.chip-success { background: rgba(52, 211, 153, 0.12); color: var(--ad-success); border-color: transparent; }
+.chip-warning { background: rgba(251, 191, 36, 0.14); color: var(--ad-warning); border-color: transparent; }
+.chip-accent { background: rgba(45, 212, 191, 0.12); color: var(--ad-accent); border-color: transparent; }
+.chip-danger { background: rgba(248, 113, 113, 0.12); color: var(--ad-danger); border-color: transparent; }
+html:not(.dark) .chip-success { color: #0b7c56; }
+html:not(.dark) .chip-warning { color: #92400e; }
+html:not(.dark) .chip-danger { color: #b91c1c; }
+html:not(.dark) .chip-accent { color: #0f766e; }
+html:not(.dark) .chip-gold { color: #7c5f12; }
+
+/* ===== Element Plus 圆角 / 主色对齐 ===== */
+.el-button { border-radius: var(--ad-radius-sm); font-weight: 600; }
+.el-button--primary {
+  --el-button-bg-color: var(--ad-brand);
+  --el-button-border-color: var(--ad-brand);
+  --el-button-hover-bg-color: var(--ad-brand-600);
+  --el-button-hover-border-color: var(--ad-brand-600);
+  --el-button-active-bg-color: var(--ad-brand-700);
+  --el-button-active-border-color: var(--ad-brand-700);
+  /* 金底配深字 */
+  --el-button-text-color: var(--ad-brand-contrast);
+  --el-button-hover-text-color: var(--ad-brand-contrast);
+  --el-button-active-text-color: var(--ad-brand-contrast);
+}
+/* 金色 plain 按钮（浅金底金字） */
+.el-button--primary.is-plain {
+  --el-button-text-color: var(--ad-brand);
+  --el-button-bg-color: var(--ad-brand-soft);
+  --el-button-border-color: transparent;
+  --el-button-hover-text-color: var(--ad-brand);
+  --el-button-hover-bg-color: var(--ad-brand-soft);
+  --el-button-hover-border-color: transparent;
+}
+.el-card { border-radius: var(--ad-radius); }
+/* 全站输入框统一 el-input--large 规格（40px 高、14px 字号）；各页面 <el-input> 已显式声明 size="large"，此处作为兜底 */
+.el-input {
+  --el-input-height: var(--el-component-size-large);
+  --el-input-inner-height: calc(var(--el-component-size-large) - 2px);
+  font-size: 14px;
+}
+.el-input__wrapper, .el-textarea__inner { border-radius: var(--ad-radius-sm) !important; }
+.el-dialog { border-radius: var(--ad-radius-lg) !important; overflow: hidden; }
+/* 对话框内容过高时在 body 内滚动，避免页脚被顶出屏幕（Element Plus 默认不滚动） */
+.el-dialog .el-dialog__body { max-height: calc(100dvh - 240px); overflow-y: auto; }
+/* 弹层滚动穿透：内层滚到顶/底（或滚动落在遮罩、标题栏上）时，浏览器默认把剩余滚动
+   交给祖先容器（scroll chaining），背后的页面会跟着滚；contain 让滚动只消化的弹层内部，
+   不再外溢。lock-scroll 只锁 body overflow，触屏上拦不住这条链。 */
+.el-overlay, .el-dialog .el-dialog__body, .el-drawer__body,
+.el-select-dropdown__wrap, .el-dropdown-menu { overscroll-behavior: contain; }
+.el-dialog__title { font-family: var(--ad-font-display); font-weight: 700; letter-spacing: 0.01em; }
+
+/* ---------- 移动端全局兜底（不影响桌面端） ---------- */
+/* 所有 el-dialog（含各页面固定像素 width）在窄屏一律不超出视口；max-width 与 width 分属性，天然约束内联宽度 */
+@media (max-width: 768px) {
+  .el-dialog {
+    max-width: calc(100vw - 24px);
+    margin-top: 6vh !important;
+  }
+  .el-dialog .el-dialog__body { max-height: calc(100dvh - 200px); }
+  /* 消息框定宽不随内容收缩，遮罩层 flex 垂直居中（修复窄屏过窄、位置过低） */
+  .el-overlay-message-box { display: flex; align-items: center; justify-content: center; }
+  .el-message-box { width: min(420px, 94vw); max-width: min(420px, 94vw); display: block; margin: 0; }
+  .el-message { max-width: calc(100vw - 32px); min-width: 0; }
+  .el-drawer:not(.is-fullscreen) { max-width: 100vw; }
+  /* 容器留白收窄 */
+  .ad-container { padding: 14px; }
+}
+
+/* ===== 滚动条 / 选区 / 焦点 ===== */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--ad-border-strong); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ad-text-muted); }
+::-webkit-scrollbar-track { background: transparent; }
+::selection { background: var(--ad-brand-soft); color: var(--ad-text-strong); }
+
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible,
+.el-button:focus-visible {
+  outline: 2px solid var(--ad-brand);
+  outline-offset: 2px;
+}
+
+/* ===== 电影感动效 ===== */
+/* 路由页面过渡：淡入 + 轻微上浮（配 <transition name="page">） */
+.page-enter-active { transition: opacity 0.22s ease, transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1); }
+.page-leave-active { transition: opacity 0.14s ease; }
+.page-enter-from { opacity: 0; transform: translateY(10px); }
+.page-leave-to { opacity: 0; }
+
+@keyframes ad-fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+/* 入场编排：容器内子元素级联浮现（.ad-stagger 直接套在网格/列表上） */
+.ad-stagger > * { animation: ad-fade-up 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+.ad-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.ad-stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.ad-stagger > *:nth-child(3) { animation-delay: 0.10s; }
+.ad-stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.ad-stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.ad-stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.ad-stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.ad-stagger > *:nth-child(8) { animation-delay: 0.30s; }
+.ad-stagger > *:nth-child(n+9) { animation-delay: 0.34s; }
+@media (prefers-reduced-motion: reduce) {
+  .ad-stagger > *, .page-enter-active, .page-leave-active { animation: none !important; transition: none !important; }
+}
+
+/* 骨架微光（LazyVideo / 图片占位通用） */
+@keyframes ad-shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+.ad-skeleton {
+  background: linear-gradient(100deg,
+    var(--ad-bg-soft) 40%, var(--ad-bg-elevated) 50%, var(--ad-bg-soft) 60%);
+  background-size: 200% 100%;
+  animation: ad-shimmer 1.6s linear infinite;
+}
+
+/* 金色分隔细线（场次牌 / 页头下划） */
+.ad-rule {
+  height: 1px;
+  border: none;
+  background: linear-gradient(90deg, var(--ad-brand-soft), var(--ad-border) 40%, transparent);
+}
+
+/* 时间码等宽数字 */
+.tnum { font-variant-numeric: tabular-nums; }

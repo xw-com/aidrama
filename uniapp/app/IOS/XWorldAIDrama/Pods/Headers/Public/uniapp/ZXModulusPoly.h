@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/pdf417/decoder/ec/ZXModulusPoly.h

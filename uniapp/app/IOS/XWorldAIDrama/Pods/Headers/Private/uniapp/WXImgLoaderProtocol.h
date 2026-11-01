@@ -1,0 +1,1 @@
+../../../../../SDK/inc/weexHeader/WXImgLoaderProtocol.h

@@ -1,0 +1,101 @@
+import { UTSHarmony } from "@dcloudio/uni-app-runtime"
+import { picker, fileIo } from '@kit.CoreFileKit'
+import { BusinessError } from '@kit.BasicServicesKit'
+
+/**
+ * 调起鸿蒙系统文档选择器（DocumentViewPicker），单选一个文档并拷入沙箱。
+ * uni-app 鸿蒙端 JS 层没有 chooseFile/chooseMessageFile（后者是微信小程序专属，
+ * 调用直接抛 not a function →「点了没反应」），只能走 UTS 桥。
+ *
+ * 流程：picker 选出 mediat URI（安全组件授权，免权限）→ fileIo 只读打开 →
+ * copyFileSync 拷进 UIAbilityContext.cacheDir（uni.uploadFile 只认普通沙箱路径，
+ * 且文件名取 basename，保留原名/原后缀才能让上传的 filename 与 content-type 正确）。
+ *
+ * @param suffixes 后缀过滤，如 ['.txt', '.md', '.pdf']；传空数组不过滤
+ * @param success  选完并拷贝成功，参数为沙箱内绝对路径（可直接喂 uni.uploadFile）
+ * @param fail     打开/拷贝失败，参数为 errMsg；用户取消不回调（静默）
+ */
+export function pickDocument(suffixes : Array<string>, success : (filePath : string) => void, fail : (errMsg : string) => void) : void {
+  try {
+    const ctx = UTSHarmony.getUIAbilityContext()
+    if (ctx == null) {
+      fail('pickDocument: no UIAbilityContext')
+      return
+    }
+    const opts = new picker.DocumentSelectOptions()
+    opts.maxSelectNumber = 1
+    if (suffixes.length > 0) {
+      opts.fileSuffixFilters = suffixes
+    }
+    new picker.DocumentViewPicker(ctx).select(opts).then((uris : Array<string>) => {
+      if (uris.length == 0) {
+        return // 用户取消，静默
+      }
+      // URI 末段即文件名（URL 编码），保留原名供上传用
+      let name = decodeURIComponent(uris[0].substring(uris[0].lastIndexOf('/') + 1))
+      if (name.length == 0) {
+        name = `pick_${Date.now()}`
+      }
+      const dest = ctx.cacheDir + '/' + name
+      const src = fileIo.openSync(uris[0], fileIo.OpenMode.READ_ONLY)
+      try {
+        fileIo.copyFileSync(src.fd, dest)
+        success(dest)
+      } catch (e) {
+        fail(`copy failed: ${e}`)
+      } finally {
+        fileIo.closeSync(src)
+      }
+    }).catch((err : BusinessError) => {
+      fail(`${err.code}: ${err.message}`)
+    })
+  } catch (e) {
+    fail(`pickDocument exception: ${e}`)
+  }
+}
+
+/**
+ * 调起鸿蒙系统保存面板（DocumentViewPicker.save），把文本落成用户可见文件（导出剧本场景）。
+ * 与 select 同为安全组件：用户在面板里选目录/改文件名，保存后应用即获该 URI 的写入授权，
+ * 不需要申请任何权限（鸿蒙无公共下载目录，第三方写用户可见文件只有这一条正路）。
+ *
+ * @param filename 默认文件名（用户可在面板中修改）
+ * @param text     文件内容（按 UTF-8 写入）
+ * @param success  写入成功，参数为所选文件 URI
+ * @param fail     失败 errMsg；用户取消保存面板时回调 fail('cancel')（调用方据此与真失败区分）
+ */
+export function saveDocument(filename : string, text : string, success : (uri : string) => void, fail : (errMsg : string) => void) : void {
+  try {
+    const ctx = UTSHarmony.getUIAbilityContext()
+    if (ctx == null) {
+      fail('saveDocument: no UIAbilityContext')
+      return
+    }
+    const opts = new picker.DocumentSaveOptions()
+    opts.newFileNames = [filename]
+    new picker.DocumentViewPicker(ctx).save(opts).then((uris : Array<string>) => {
+      if (uris.length == 0) {
+        fail('cancel') // 用户取消保存面板
+        return
+      }
+      const file = fileIo.openSync(uris[0], fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC)
+      try {
+        fileIo.writeSync(file.fd, text)
+        success(uris[0])
+      } catch (e) {
+        fail(`write failed: ${e}`)
+      } finally {
+        fileIo.closeSync(file)
+      }
+    }).catch((err : BusinessError) => {
+      // 13900042 = 用户取消（部分版本取消走 reject 而非空数组）
+      if (err.code == 13900042) {
+        fail('cancel')
+        return
+      }
+      fail(`${err.code}: ${err.message}`)
+    })
+  } catch (e) {
+    fail(`saveDocument exception: ${e}`)
+  }
+}

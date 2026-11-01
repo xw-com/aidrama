@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="robots" content="noindex,nofollow" />
+<title>微信支付 · 星网 XW.COM</title>
+<link rel="stylesheet" href="/pay.css" />
+</head>
+<body>
+<main class="cashier">
+  <div class="brand">XW.COM <span>星网工作室</span></div>
+
+  <!-- 待授权/待拉起：订单摘要 + 状态 -->
+  <section id="st-prepare" class="card hidden">
+    <div class="label">充值订单</div>
+    <div class="order-no" id="orderNo">—</div>
+    <div class="status-line"><span class="spinner"></span><span id="prepareTip">正在拉起微信支付…</span></div>
+    <div class="hint">请留意微信弹出的支付窗口，验证后完成付款。</div>
+  </section>
+
+  <!-- 非微信环境 -->
+  <section id="st-nowechat" class="card hidden">
+    <div class="emoji">💚</div>
+    <div class="title">请在微信中打开</div>
+    <div class="hint">微信支付需在微信客户端内完成：<br />请使用微信「扫一扫」重新打开本页面。</div>
+  </section>
+
+  <!-- 成功 -->
+  <section id="st-success" class="card hidden">
+    <div class="emoji">✅</div>
+    <div class="title">支付成功</div>
+    <div class="hint">积分将自动到账，本页面可以关闭了。</div>
+  </section>
+
+  <!-- 失败/取消：可重试 -->
+  <section id="st-retry" class="card hidden">
+    <div class="emoji" id="retryEmoji">⚠️</div>
+    <div class="title" id="retryTitle">未能完成支付</div>
+    <div class="hint" id="retryHint">支付已取消，可重新发起。</div>
+    <button type="button" id="btnRetry" class="btn">重新支付</button>
+  </section>
+
+  <!-- 链接无效 / 其他致命错误 -->
+  <section id="st-error" class="card hidden">
+    <div class="emoji">🚫</div>
+    <div class="title">无法发起支付</div>
+    <div class="hint" id="errorHint">支付链接无效或已过期，请回到充值页重新下单。</div>
+  </section>
+
+  <footer class="foot">支付由微信支付提供 · 仅支持人民币付款</footer>
+</main>
+<script src="/pay.js"></script>
+</body>
+</html>

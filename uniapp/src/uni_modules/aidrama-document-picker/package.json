@@ -1,0 +1,48 @@
+{
+  "id": "aidrama-document-picker",
+  "displayName": "系统文档选择（鸿蒙 UTS）",
+  "version": "1.0.0",
+  "description": "调起鸿蒙 DocumentViewPicker 选择/保存文档（系统安全组件，无需申请权限）：pickDocument 选文档拷入沙箱 cache 供 uni.uploadFile（导入剧本 txt/md/pdf）；saveDocument 保存文本到用户所选位置（导出剧本）。uni-app 鸿蒙端 JS 层没有 chooseFile/chooseMessageFile（后者为微信小程序专属），必须走 UTS 桥。",
+  "keywords": [
+    "文件选择",
+    "文档",
+    "鸿蒙",
+    "HarmonyOS"
+  ],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^4.22"
+  },
+  "dcloudext": {
+    "type": "uts-sdk-api",
+    "sale": {
+      "regular": { "price": "0.00" },
+      "sourcecode": { "price": "0.00" }
+    },
+    "contact": {},
+    "declaration": {
+      "ads": "无",
+      "permissions": "无",
+      "npm": ""
+    }
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": { "tcb": "n", "aliyun": "n", "alipay": "n" },
+      "client": {
+        "Vue": { "vue2": "n", "vue3": "y" },
+        "App": {
+          "app-harmony": { "uniVer": "^4.22" },
+          "app-android": "n",
+          "app-ios": "n"
+        },
+        "H5-mobile": { "Safari": "n", "Android Browser": "n", "微信浏览器(Android)": "n", "QQ浏览器(Android)": "n" },
+        "H5-pc": { "Chrome": "n", "IE": "n", "Edge": "n", "Firefox": "n", "Safari": "n" },
+        "小程序": { "微信": "n", "阿里": "n", "百度": "n", "字节": "n", "QQ": "n", "钉钉": "n", "快手": "n", "飞书": "n", "京东": "n" },
+        "快应用": { "华为": "n", "联盟": "n" }
+      }
+    }
+  }
+}

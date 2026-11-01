@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/multi/ZXGenericMultipleBarcodeReader.h

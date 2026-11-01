@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/maxicode/decoder/ZXMaxiCodeDecodedBitStreamParser.h

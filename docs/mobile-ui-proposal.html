@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIDrama · 手机端 UI 方案 — 掌上制片厂</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   AIDrama 手机端 UI 方案 · 提案原型（纯单文件，无依赖）
+   令牌 1:1 取自 client/src/styles/theme.scss（深色旗舰：放映厅）
+   ============================================================ */
+:root{
+  --ink:#0a0a0f; --panel:#101018; --elev:#16161f; --inset:#0d0d14;
+  --line:#26262f; --line-strong:#34343f;
+  --gold:#e0b64e; --gold-600:#cfa33a; --gold-700:#b3871f;
+  --gold-soft:rgba(224,182,78,.13);
+  --gold-grad:linear-gradient(135deg,#f2d489 0%,#e0b64e 45%,#b3871f 100%);
+  --gold-contrast:#1d1503;
+  --teal:#2dd4bf; --teal-soft:rgba(45,212,191,.12);
+  --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+  --tx:#f3f0e8; --tx-soft:#b3afa3; --tx-mut:#7d7a70;
+  --serif:'Noto Serif SC','Songti SC','STSong','SimSun',Georgia,serif;
+  --body:-apple-system,BlinkMacSystemFont,'PingFang SC','Noto Sans SC','Segoe UI','Microsoft YaHei',sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sh-card:0 4px 16px rgba(0,0,0,.45);
+  --sh-pop:0 20px 48px rgba(0,0,0,.6);
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='0.5'/></svg>");
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--body);color:var(--tx);background:#07070b;
+  background-image:
+    radial-gradient(1100px 700px at 86% -10%,rgba(224,182,78,.07),transparent 62%),
+    radial-gradient(900px 650px at -8% 108%,rgba(45,212,191,.05),transparent 58%);
+  -webkit-font-smoothing:antialiased;
+}
+body::after{content:"";position:fixed;inset:0;background:var(--grain);opacity:.045;pointer-events:none;z-index:2000}
+::selection{background:rgba(224,182,78,.3);color:#fff}
+button{font-family:var(--body)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1480px;margin:0 auto;padding:0 36px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- 图标 ---------- */
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- 页眉 ---------- */
+.band{padding:74px 0 46px}
+.kicker{font:700 11px/1 var(--mono);letter-spacing:.34em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:14px}
+.kicker::after{content:"";height:1px;width:120px;background:linear-gradient(90deg,var(--gold-600),transparent)}
+.band h1{font:900 clamp(40px,5.4vw,64px)/1.14 var(--serif);letter-spacing:.02em;margin:18px 0 10px;color:#fff}
+.band h1 em{font-style:normal;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.band .lede{max-width:620px;font:400 15px/1.9 var(--body);color:var(--tx-soft)}
+.metas{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.meta{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);background:rgba(16,16,24,.7);font:500 12px var(--body);color:var(--tx-soft)}
+.meta i{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none}
+
+/* ---------- REEL 段落头 ---------- */
+section{padding:58px 0}
+.reel-head{display:flex;align-items:baseline;gap:18px;margin-bottom:8px}
+.reel-no{font:700 12px/1 var(--mono);letter-spacing:.22em;color:var(--gold)}
+.reel-head h2{font:900 27px/1.2 var(--serif);color:#fff;letter-spacing:.02em;white-space:nowrap}
+.sprock{flex:1;display:flex;gap:9px;align-self:center;min-width:60px;overflow:hidden}
+.sprock i{width:15px;height:10px;border-radius:3px;background:var(--line-strong);opacity:.55;flex:none}
+.reel-sub{font:400 13px/1.8 var(--body);color:var(--tx-mut);max-width:760px;margin:2px 0 30px}
+
+/* ---------- REEL 01 理念 ---------- */
+.principles{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.pr{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:30px 28px;position:relative;overflow:hidden}
+.pr::before{content:"";position:absolute;top:-70px;right:-70px;width:190px;height:190px;border-radius:50%;background:radial-gradient(closest-side,rgba(224,182,78,.09),transparent)}
+.pr .pic{width:46px;height:46px;border-radius:14px;background:var(--gold-soft);border:1px solid rgba(224,182,78,.25);display:grid;place-items:center;color:var(--gold);margin-bottom:18px}
+.pr .pic .ic{width:22px;height:22px}
+.pr h3{font:700 18.5px/1.4 var(--serif);color:#fff;margin-bottom:9px}
+.pr p{font:400 13px/1.9 var(--body);color:var(--tx-soft)}
+.pr .tagline{margin-top:14px;font:500 11px/1 var(--mono);letter-spacing:.1em;color:var(--tx-mut)}
+
+/* ---------- REEL 02 信息架构 ---------- */
+.ia-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:start}
+.ia-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px}
+.ia-card h3{font:700 17px var(--serif);color:#fff;margin-bottom:4px}
+.ia-card .dsn{font-size:12.5px;color:var(--tx-mut);margin-bottom:20px}
+.tabspec{display:flex;align-items:flex-end;padding:14px 16px 12px;background:var(--inset);border:1px solid var(--line);border-radius:20px 20px 16px 16px}
+.tspec{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx-mut);font:500 10px var(--body)}
+.tspec .ic{width:22px;height:22px}
+.tspec.on{color:var(--gold)}
+.tspec-c{flex:1;display:flex;justify-content:center}
+.tspec-c .shut{width:56px;height:56px;margin-top:-34px;border-radius:50%;background:var(--gold-grad);color:var(--gold-contrast);display:grid;place-items:center;box-shadow:0 10px 26px rgba(224,182,78,.35),0 0 0 6px rgba(224,182,78,.1)}
+.tspec-c .shut .ic{width:24px;height:24px}
+.tsnote{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tsnote span{font:500 10.5px var(--mono);color:var(--tx-mut);border:1px dashed var(--line-strong);border-radius:7px;padding:4px 8px}
+.iarow{display:flex;gap:14px;align-items:center;padding:13px 0;border-bottom:1px dashed var(--line)}
+.iarow:last-child{border-bottom:0}
+.iarow .mi{width:38px;height:38px;border-radius:11px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold);flex:none}
+.iarow .mi .ic{width:19px;height:19px}
+.iarow b{display:block;font:600 13.5px var(--body);color:var(--tx)}
+.iarow span{display:block;font:400 11.5px/1.6 var(--body);color:var(--tx-mut);margin-top:2px}
+.iarow .path{margin-left:auto;font:600 10.5px var(--mono);color:var(--gold);background:var(--gold-soft);padding:4px 9px;border-radius:8px;flex:none}
+.lvl{padding:17px 20px;border:1px solid var(--line);background:var(--panel);border-radius:16px}
+.lvl+.lvl{margin-top:10px}
+.lvl .ln{font:700 10px/1 var(--mono);letter-spacing:.18em;color:var(--gold);display:block;margin-bottom:7px}
+.lvl b{font:600 14px var(--body);color:var(--tx)}
+.lvl p{font:400 12px/1.75 var(--body);color:var(--tx-mut);margin-top:5px}
+.lvl.l2{margin-left:22px}
+.lvl.l3{margin-left:44px;border-style:dashed}
+
+/* ---------- 手机壳 ---------- */
+.stage{display:flex;flex-wrap:wrap;gap:40px;justify-content:center}
+.phone{width:390px;height:844px;flex:none;background:#050507;border-radius:58px;padding:11px;position:relative;
+  box-shadow:0 0 0 1px #2b2b34,0 40px 100px rgba(0,0,0,.66),inset 0 0 0 2px rgba(255,255,255,.045)}
+.phone.static{width:356px;height:778px;border-radius:52px}
+.scr{position:relative;width:100%;height:100%;border-radius:47px;overflow:hidden;background:var(--ink);isolation:isolate}
+.phone.static .scr{border-radius:42px}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:108px;height:28px;border-radius:17px;background:#000;z-index:80;box-shadow:inset 0 0 0 1px #101016}
+.sbar{position:absolute;top:0;left:0;right:0;height:50px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 27px 5px;z-index:70;font:600 13.5px/1 var(--body);color:var(--tx);pointer-events:none}
+.sbar .rig{display:flex;gap:6px;align-items:center}
+.sig{display:flex;gap:2px;align-items:flex-end}
+.sig i{width:3px;border-radius:1px;background:var(--tx)}
+.sig i:nth-child(1){height:4.5px}.sig i:nth-child(2){height:6.5px}.sig i:nth-child(3){height:8.5px}.sig i:nth-child(4){height:10.5px}
+.batt{width:23px;height:11.5px;border:1px solid rgba(243,240,232,.5);border-radius:3.5px;position:relative}
+.batt::before{content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:5px;background:rgba(243,240,232,.5);border-radius:1px}
+.batt::after{content:"";position:absolute;inset:1.5px 5px 1.5px 1.5px;background:var(--tx);border-radius:2px}
+.hi{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:116px;height:4.5px;border-radius:3px;background:rgba(243,240,232,.26);z-index:80;pointer-events:none}
+.grainl{position:absolute;inset:0;background:var(--grain);opacity:.05;pointer-events:none;z-index:60}
+
+/* ---------- 视图容器（hero 交互） ---------- */
+.views{position:absolute;inset:0}
+.view{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain;padding:58px 0 118px;z-index:1;
+  background:radial-gradient(360px 240px at 50% -70px,rgba(224,182,78,.075),transparent 70%),var(--ink);
+  opacity:0;transform:translateX(20px);pointer-events:none;
+  transition:opacity .22s ease,transform .26s cubic-bezier(.22,.61,.36,1);scrollbar-width:none}
+.view::-webkit-scrollbar{display:none}
+.view.on{opacity:1;transform:none;pointer-events:auto}
+.view.push{transform:translateX(100%);transition:transform .3s cubic-bezier(.22,.61,.36,1);z-index:55}
+.view.push.on{transform:none}
+.phone.pushed .tabbar{transform:translateY(112%)}
+
+/* ---------- 底部 TabBar（手机内） ---------- */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:65;display:flex;align-items:flex-end;
+  padding:8px 14px 34px;background:linear-gradient(180deg,rgba(13,13,19,.55),rgba(13,13,19,.96) 42%);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid rgba(38,38,47,.9);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0 2px;
+  color:var(--tx-mut);font:500 10px/1 var(--body);letter-spacing:.05em;background:none;border:0;cursor:pointer}
+.tab .ic{width:23px;height:23px}
+.tab.active{color:var(--gold)}
+.tab-c{flex:1;display:flex;justify-content:center}
+.tab-c button{width:55px;height:55px;margin-top:-30px;border-radius:50%;border:0;cursor:pointer;
+  background:var(--gold-grad);color:var(--gold-contrast);display:grid;place-items:center;
+  box-shadow:0 10px 26px rgba(224,182,78,.34),0 0 0 6px rgba(224,182,78,.1),inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .16s cubic-bezier(.22,.61,.36,1)}
+.tab-c button:active{transform:scale(.9)}
+.tab-c .ic{width:24px;height:24px}
+
+/* ---------- 机内通用组件 ---------- */
+.ptop{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 12px}
+.ptitle{font:900 25px/1.25 var(--serif);color:#fff;letter-spacing:.02em}
+.psub{font:400 11.5px/1.7 var(--body);color:var(--tx-mut);margin-top:4px}
+.iconbtn{width:38px;height:38px;border-radius:12px;background:var(--elev);border:1px solid var(--line);display:grid;place-items:center;color:var(--tx-soft);position:relative;cursor:pointer;flex:none}
+.iconbtn .ic{width:18px;height:18px}
+.badge{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;background:var(--gold);color:var(--gold-contrast);font:700 9.5px/16px var(--body);text-align:center}
+.avatar{position:relative;width:38px;height:38px;border-radius:50%;overflow:hidden;flex:none;border:1px solid rgba(224,182,78,.4);display:grid;place-items:center;font:700 15px var(--serif);color:#fff}
+.phone.static .pnav,.phone.static .wtop{padding-top:58px}
+.search{display:flex;align-items:center;gap:8px;height:40px;margin:0 18px 13px;padding:0 14px;border-radius:20px;background:var(--elev);border:1px solid var(--line);color:var(--tx-mut);font-size:13px}
+.search .ic{width:16px;height:16px}
+.chips{display:flex;gap:8px;padding:0 18px 15px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.pchip{flex:none;padding:7px 14px;border-radius:18px;font:500 12px var(--body);color:var(--tx-soft);background:var(--elev);border:1px solid var(--line);cursor:pointer;white-space:nowrap}
+.pchip.on{background:var(--gold-soft);color:var(--gold);border-color:rgba(224,182,78,.35);font-weight:600}
+.sechead{display:flex;align-items:baseline;justify-content:space-between;padding:4px 18px 11px}
+.sechead h5{font:700 15px var(--serif);color:var(--tx);letter-spacing:.02em}
+.sechead .more{font-size:11.5px;color:var(--tx-mut)}
+.card{margin:0 18px 14px;background:var(--elev);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--sh-card)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;font:600 10.5px/1.45 var(--body);background:var(--panel);color:var(--tx-soft);border:1px solid var(--line);white-space:nowrap}
+.chip.gold{background:var(--gold-soft);color:var(--gold);border-color:transparent}
+.chip.teal{background:var(--teal-soft);color:var(--teal);border-color:transparent}
+.chip.ok{background:rgba(52,211,153,.12);color:var(--ok);border-color:transparent}
+.chip.bad{background:rgba(248,113,113,.12);color:var(--bad);border-color:transparent}
+.chip.warn{background:rgba(251,191,36,.14);color:var(--warn);border-color:transparent}
+.chip.glass{background:rgba(5,5,9,.55);border-color:rgba(255,255,255,.16);color:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.mbtn{display:flex;align-items:center;justify-content:center;gap:6px;height:44px;border-radius:13px;border:0;cursor:pointer;
+  font:700 14px var(--body);background:var(--gold-grad);color:var(--gold-contrast);box-shadow:0 4px 14px rgba(224,182,78,.22)}
+.mbtn .ic{width:17px;height:17px}
+.mbtn:active{transform:translateY(1px)}
+.mbtn.soft{background:var(--gold-soft);color:var(--gold);box-shadow:none}
+.mbtn.ghost{background:var(--elev);color:var(--tx-soft);border:1px solid var(--line);box-shadow:none}
+.mbtn.teal{background:var(--teal);color:#04211c;box-shadow:0 4px 14px rgba(45,212,191,.2)}
+.mbtn.dark{background:var(--gold-contrast);color:#f2d489;box-shadow:none}
+.mbtn.sm{height:34px;padding:0 14px;font-size:12.5px;border-radius:11px}
+.mbtn.sm .ic{width:14px;height:14px}
+.bar{height:4px;border-radius:3px;background:var(--line);overflow:hidden;flex:1}
+.bar i{display:block;height:100%;border-radius:3px;background:var(--gold-grad);animation:grow 1.3s .4s cubic-bezier(.22,.61,.36,1) both}
+.bar.teal i{background:var(--teal)}
+@keyframes grow{from{width:0}}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);flex:none;animation:pulse 1.9s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(45,212,191,.5)}70%{box-shadow:0 0 0 7px rgba(45,212,191,0)}100%{box-shadow:0 0 0 0 rgba(45,212,191,0)}}
+.pfootnote{text-align:center;font:500 10.5px var(--body);color:var(--tx-mut);letter-spacing:.08em;padding:6px 0 10px}
+
+/* ---------- 海报占位（纯 CSS 剧照） ---------- */
+.art{position:relative;overflow:hidden;background:#151222}
+.art::after{content:"";position:absolute;inset:0;background:var(--grain);opacity:.08;mix-blend-mode:overlay;pointer-events:none}
+.zi{position:absolute;right:6px;bottom:-8px;font:900 84px/1 var(--serif);color:rgba(255,255,255,.075);letter-spacing:-.02em;pointer-events:none}
+.glow{position:absolute;width:72%;height:72%;border-radius:50%;filter:blur(44px);opacity:.55;pointer-events:none}
+.a1{background:linear-gradient(160deg,#171129 0%,#241539 55%,#3a1d54 100%)} .a1 .glow{background:#7c3aed;right:-12%;top:-8%}
+.a2{background:linear-gradient(160deg,#0d1e26 0%,#123240 60%,#155e63 100%)} .a2 .glow{background:#2dd4bf;left:-14%;bottom:-12%}
+.a3{background:linear-gradient(160deg,#2a0f1a 0%,#401525 60%,#591c2e 100%)} .a3 .glow{background:#e11d48;right:-10%;top:10%}
+.a4{background:linear-gradient(160deg,#1d1709 0%,#33260d 55%,#4a3a14 100%)} .a4 .glow{background:#e0b64e;left:-10%;top:-10%}
+.a5{background:linear-gradient(160deg,#101d18 0%,#153028 60%,#1d4a3c 100%)} .a5 .glow{background:#34d399;right:-12%;bottom:-14%}
+.a6{background:linear-gradient(160deg,#0f1424 0%,#16204a 60%,#233a7a 100%)} .a6 .glow{background:#3b82f6;left:-12%;top:8%}
+
+/* ---------- 视图：展示中心 ---------- */
+.brandrow{display:flex;align-items:center;gap:9px;padding:6px 18px 13px}
+.brandmark{width:31px;height:31px;border-radius:9px;background:var(--gold-grad);display:grid;place-items:center;color:var(--gold-contrast);flex:none;box-shadow:0 3px 10px rgba(224,182,78,.3)}
+.brandmark .ic{width:16px;height:16px}
+.brandname{font:900 17.5px var(--serif);color:#fff;letter-spacing:.04em}
+.brandname em{font-style:normal;color:var(--gold)}
+.hscroll{display:flex;gap:12px;padding:0 18px 18px;overflow-x:auto;scrollbar-width:none}
+.hscroll::-webkit-scrollbar{display:none}
+.hotcard{flex:none;width:126px}
+.hotcard .art{height:168px;border-radius:14px;border:1px solid var(--line)}
+.hotcard .zi{font-size:56px}
+.hotcard .rank{position:absolute;top:8px;left:8px;font:700 10.5px/1 var(--mono);color:var(--gold-contrast);background:var(--gold-grad);border-radius:7px;padding:4px 7px;z-index:2}
+.hotcard h6{font:600 13px var(--serif);color:var(--tx);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hotcard .st{font:500 10.5px var(--body);color:var(--tx-mut);margin-top:3px}
+.vcard{margin:0 18px 18px;border-radius:20px;overflow:hidden;border:1px solid var(--line);position:relative;background:var(--elev);box-shadow:var(--sh-card)}
+.vcard .art{height:326px}
+.vcard .zi{font-size:96px}
+.vplay{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:rgba(10,10,15,.45);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;color:#fff;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.vplay .ic{width:22px;height:22px}
+.vinfo{position:absolute;left:0;right:0;bottom:0;padding:52px 16px 14px;background:linear-gradient(180deg,transparent,rgba(5,5,9,.94) 60%)}
+.vinfo h4{font:700 18.5px/1.3 var(--serif);color:#fff;letter-spacing:.02em}
+.vmeta{display:flex;gap:6px;margin:9px 0 13px;flex-wrap:wrap;align-items:center}
+.vnum{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:500 11px var(--body);color:rgba(255,255,255,.75)}
+.vnum .ic{width:12px;height:12px}
+.vact{display:flex;gap:10px}
+.vact .mbtn{flex:1.2;height:40px;font-size:13.5px}
+.vact .mbtn.ghost{flex:1;color:var(--gold);background:rgba(224,182,78,.1);border-color:rgba(224,182,78,.35)}
+
+/* ---------- 视图：我的项目 ---------- */
+.pcard .art{height:148px}
+.pcard .zi{font-size:62px}
+.pstat{position:absolute;top:10px;right:10px;z-index:2}
+.pbody{padding:13px 15px 15px}
+.pbody h4{font:700 16.5px var(--serif);color:var(--tx);letter-spacing:.02em}
+.pmeta{display:flex;align-items:center;gap:8px;margin:9px 0 0;flex-wrap:wrap}
+.pmeta .dot{color:var(--line-strong)}
+.pmeta span{font:500 11px var(--body);color:var(--tx-mut)}
+.steps{display:flex;margin:13px 0 12px}
+.stp{flex:1;display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.stp .ln{width:100%;height:3px;border-radius:2px;background:var(--line)}
+.stp.done .ln{background:var(--gold-600);opacity:.65}
+.stp.act .ln{background:var(--gold);box-shadow:0 0 9px rgba(224,182,78,.55)}
+.stp span{font:500 10px var(--body);color:var(--tx-mut)}
+.stp.done span,.stp.act span{color:var(--gold)}
+.pfoot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pfoot .hint{font:400 11px var(--body);color:var(--tx-mut)}
+
+/* ---------- 视图：接单中心 ---------- */
+.mstrip{margin:0 18px 14px;padding:12px 14px;border-radius:14px;background:var(--gold-soft);border:1px solid rgba(224,182,78,.25);display:flex;align-items:center;gap:10px;font:500 12px var(--body);color:var(--tx-soft)}
+.mstrip .ic{width:19px;height:19px;color:var(--gold)}
+.mstrip b{font:700 15px var(--mono);color:var(--gold)}
+.ocard{padding:14px 15px}
+.otop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.otop h5{font:700 15px/1.4 var(--serif);color:var(--tx);letter-spacing:.01em}
+.odesc{font:400 11.5px/1.7 var(--body);color:var(--tx-soft);margin:7px 0 10px}
+.ometa{display:flex;align-items:center;gap:8px;font:500 10.5px var(--body);color:var(--tx-mut)}
+.ometa .sp{flex:1}
+.oact{display:flex;gap:8px;margin-top:12px}
+.oact .mbtn{flex:1}
+
+/* ---------- 视图：我的 ---------- */
+.urow{display:flex;align-items:center;gap:12px;padding:10px 18px 16px}
+.uava{width:46px;height:46px;font-size:19px}
+.urow h4{font:700 17px var(--serif);color:#fff}
+.urow .uid{font:500 10.5px var(--mono);color:var(--tx-mut);margin-top:3px;letter-spacing:.06em}
+.bcard{margin:0 18px 16px;border-radius:20px;padding:17px 18px;background:var(--gold-grad);color:var(--gold-contrast);position:relative;overflow:hidden;box-shadow:0 14px 34px rgba(224,182,78,.22)}
+.bcard::after{content:"";position:absolute;inset:0;background:var(--grain);opacity:.1;pointer-events:none}
+.bcard .lb{font:600 11px var(--body);opacity:.72;letter-spacing:.05em}
+.bnum{font:900 33px/1.15 var(--serif);letter-spacing:.01em;margin-top:4px}
+.bnum small{font:700 13px var(--mono);margin-left:5px;opacity:.7}
+.brow{display:flex;gap:14px;margin-top:9px;font:600 11px var(--body);opacity:.8}
+.brow .sp{flex:1}
+.mgroup{margin:0 18px 14px;background:var(--elev);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.mrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left}
+.mrow:last-child{border-bottom:0}
+.mrow:active{background:var(--inset)}
+.mrow .mi{width:34px;height:34px;border-radius:10px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold);flex:none}
+.mrow .mi .ic{width:17px;height:17px}
+.mrow b{font:600 13.5px var(--body);color:var(--tx);flex:1;font-weight:600}
+.mrow .arr{color:var(--tx-mut)}
+.mrow .arr .ic{width:15px;height:15px}
+
+/* ---------- 视图：任务中心 ---------- */
+.pnav{display:flex;align-items:center;gap:11px;padding:4px 18px 13px}
+.pnav h3{font:900 20px var(--serif);color:#fff;flex:1;letter-spacing:.02em}
+.tsum{display:flex;gap:9px;margin:0 18px 15px}
+.tstat{flex:1;padding:11px 6px 10px;border-radius:14px;background:var(--elev);border:1px solid var(--line);text-align:center}
+.tstat b{display:block;font:700 17px var(--mono);color:var(--gold)}
+.tstat.t b{color:var(--teal)}
+.tstat.m b{color:var(--tx-soft)}
+.tstat span{font:500 10px var(--body);color:var(--tx-mut)}
+.tcard{padding:14px 15px}
+.ttop{display:flex;gap:11px}
+.tico{width:40px;height:40px;border-radius:12px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;color:var(--teal);flex:none}
+.tico .ic{width:19px;height:19px}
+.ttop .tt{flex:1;min-width:0}
+.ttop h6{font:600 13.5px/1.45 var(--body);color:var(--tx)}
+.tsub{font:400 11px var(--body);color:var(--tx-mut);margin-top:3px}
+.tprog{display:flex;align-items:center;gap:10px;margin:13px 0 10px}
+.tprog .pct{font:700 12px var(--mono);color:var(--gold);width:38px;text-align:right}
+.tfoot{display:flex;align-items:center;justify-content:space-between}
+.tfoot .rt{font:500 11px var(--mono);color:var(--tx-mut)}
+.terr{font:400 11px/1.6 var(--body);color:var(--bad);margin-top:9px}
+
+/* ---------- 视图：工作台（沉浸） ---------- */
+.wtop{padding:8px 18px 14px;display:flex;gap:12px;align-items:center}
+.wthumb{width:52px;height:52px;border-radius:13px;flex:none;border:1px solid var(--line-strong)}
+.wthumb .zi{font-size:26px;bottom:-4px}
+.wmeta{flex:1;min-width:0}
+.wmeta h3{font:900 18px var(--serif);color:#fff;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wmeta .tags{display:flex;gap:6px;margin-top:6px}
+.wsteps{margin:0 18px 16px;padding:13px 10px;border-radius:16px;background:var(--elev);border:1px solid var(--line);display:flex;gap:6px}
+.wstep{flex:1;text-align:center}
+.wstep .no{width:25px;height:25px;margin:0 auto 7px;border-radius:50%;display:grid;place-items:center;font:700 11px var(--mono);border:1.4px solid var(--line-strong);color:var(--tx-mut);background:var(--inset)}
+.wstep .no .ic{width:13px;height:13px}
+.wstep.done .no{background:var(--gold-soft);border-color:rgba(224,182,78,.4);color:var(--gold)}
+.wstep.act .no{background:var(--gold-grad);border-color:transparent;color:var(--gold-contrast);box-shadow:0 0 12px rgba(224,182,78,.4)}
+.wstep b{font:600 11px var(--body);color:var(--tx-mut);font-weight:600}
+.wstep.act b{color:var(--gold)}
+.eprow{display:flex;align-items:center;gap:11px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.eprow:last-child{border-bottom:0}
+.eprow .no{font:700 10.5px var(--mono);color:var(--gold);background:var(--gold-soft);padding:4px 7px;border-radius:7px;flex:none}
+.eprow .tt{flex:1;min-width:0}
+.eprow .tt b{display:block;font:600 13px var(--body);color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.eprow .tt span{display:block;font:400 10.5px/1.6 var(--body);color:var(--tx-mut);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.eprow .mini{width:74px}
+.aslot{flex:none;width:76px;text-align:center}
+.aslot .art{height:76px;border-radius:14px;border:1px solid var(--line)}
+.aslot .zi{font-size:26px;bottom:-4px}
+.aslot b{display:block;font:600 11px var(--body);color:var(--tx);margin-top:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aslot span{font:500 9.5px var(--body);color:var(--tx-mut)}
+.aslot .stt{position:absolute;top:5px;left:5px;width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(5,5,9,.6)}
+.aslot .stt.gen{background:var(--ok)}
+.aslot .stt.ing{background:var(--warn);animation:pulse 1.9s infinite}
+.aslot .stt.todo{background:var(--line-strong)}
+.wbar{position:absolute;left:0;right:0;bottom:0;z-index:66;padding:13px 18px 30px;display:flex;gap:10px;
+  background:linear-gradient(180deg,rgba(13,13,19,0),rgba(13,13,19,.95) 32%);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.wbar .mbtn.grow{flex:1.6}
+.wbar .mbtn{flex:1}
+
+/* ---------- 视图：分镜编辑器 ---------- */
+.dshot{padding:12px 13px}
+.stop{display:flex;gap:11px}
+.sthumb{width:88px;height:62px;border-radius:10px;flex:none;border:1px solid var(--line-strong)}
+.sthumb .zi{font-size:30px;bottom:-6px}
+.slate{position:absolute;top:5px;left:5px;font:700 9.5px/1 var(--mono);background:rgba(5,5,9,.72);color:var(--gold);padding:3px 6px;border-radius:6px;z-index:2;letter-spacing:.04em}
+.smain{flex:1;min-width:0}
+.srow1{display:flex;align-items:center;gap:6px}
+.srow1 .tc{margin-left:auto;font:700 11px var(--mono);color:var(--gold)}
+.sprompt{font:400 11px/1.65 var(--body);color:var(--tx-soft);margin-top:6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sline{font:400 10.5px/1.6 var(--body);color:var(--tx-mut);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sbot{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);display:flex;align-items:center;gap:8px}
+.sbot .grow{flex:1}
+.sbot .bar{max-width:96px}
+
+/* ---------- 视图：积分中心 ---------- */
+.pkggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 18px 15px}
+.pkg{position:relative;padding:13px 13px 12px;border-radius:15px;background:var(--elev);border:1px solid var(--line);cursor:pointer}
+.pkg.on{border-color:var(--gold);background:linear-gradient(180deg,var(--gold-soft),rgba(224,182,78,.03));box-shadow:0 0 0 3px rgba(224,182,78,.08)}
+.pkg .amt{font:700 17px var(--serif);color:var(--tx)}
+.pkg .amt small{font:500 10.5px var(--body);color:var(--tx-mut);margin-left:3px}
+.pkg .price{margin-top:5px;font:700 13px var(--body);color:var(--gold)}
+.pkg .tag{position:absolute;top:-8px;right:9px;font:600 9.5px/1 var(--body);color:var(--gold-contrast);background:var(--gold-grad);padding:4px 8px;border-radius:7px}
+.payrow{display:flex;gap:10px;margin:0 18px 16px}
+.pay{flex:1;display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:13px;background:var(--elev);border:1px solid var(--line);font:600 12.5px var(--body);color:var(--tx-soft);cursor:pointer}
+.pay.on{border-color:var(--gold);color:var(--gold)}
+.pdot{width:15px;height:15px;border-radius:50%;border:1.4px solid var(--line-strong);display:grid;place-items:center;flex:none}
+.pay.on .pdot{border-color:var(--gold)}
+.pay.on .pdot::after{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.txrow{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.txrow:last-child{border-bottom:0}
+.txrow .mi{width:32px;height:32px;border-radius:10px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;color:var(--tx-soft);flex:none}
+.txrow .mi .ic{width:15px;height:15px}
+.txrow .tt{flex:1;min-width:0}
+.txrow .tt b{display:block;font:600 12.5px var(--body);color:var(--tx)}
+.txrow .tt span{font:400 10.5px var(--body);color:var(--tx-mut)}
+.txrow .val{font:700 12.5px var(--mono)}
+.txrow .val.plus{color:var(--ok)}
+.txrow .val.minus{color:var(--tx-soft)}
+.txrow .val.refund{color:var(--warn)}
+
+/* ---------- 创作面板（底部抽屉） ---------- */
+.mask{position:absolute;inset:0;z-index:75;background:rgba(4,4,8,.62);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .25s}
+.phone.sheet-open .mask{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:76;background:var(--panel);border-radius:26px 26px 0 0;border-top:1px solid var(--line-strong);
+  padding:10px 18px 34px;transform:translateY(105%);transition:transform .34s cubic-bezier(.22,.61,.36,1);box-shadow:0 -20px 48px rgba(0,0,0,.55)}
+.phone.sheet-open .sheet{transform:none}
+.grab{width:38px;height:4.5px;border-radius:3px;background:var(--line-strong);margin:3px auto 15px}
+.sheet h4{font:900 20px var(--serif);color:#fff;letter-spacing:.02em}
+.sheet .sd{font:400 11.5px/1.7 var(--body);color:var(--tx-mut);margin:5px 0 15px}
+.sopt{display:flex;gap:13px;align-items:center;width:100%;padding:13px 14px;border-radius:16px;background:var(--elev);border:1px solid var(--line);margin-bottom:10px;cursor:pointer;text-align:left}
+.sopt:active{transform:scale(.985)}
+.sopt .sic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--gold-soft);color:var(--gold);flex:none;border:1px solid rgba(224,182,78,.22)}
+.sopt .sic .ic{width:21px;height:21px}
+.sopt .sic.tl{background:var(--teal-soft);color:var(--teal);border-color:rgba(45,212,191,.22)}
+.sopt .sic.gy{background:var(--inset);color:var(--tx-soft);border-color:var(--line)}
+.sopt .st{flex:1;min-width:0}
+.sopt b{font:600 14.5px var(--body);color:var(--tx)}
+.sopt span{display:block;font:400 11.5px/1.6 var(--body);color:var(--tx-mut);margin-top:3px}
+.sopt .arr{color:var(--tx-mut)}
+
+/* ---------- REEL 04 演示区 ---------- */
+.demo{display:flex;gap:52px;align-items:flex-start;justify-content:center}
+.demo-side{position:sticky;top:40px;max-width:380px}
+.demo-side h3{font:900 21px/1.4 var(--serif);color:#fff;margin-bottom:8px}
+.demo-side .dd{font:400 13px/1.9 var(--body);color:var(--tx-soft);margin-bottom:20px}
+.pills{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:18px}
+.pill{padding:9px 15px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--tx-soft);font:500 12.5px var(--body);cursor:pointer;transition:.15s}
+.pill:hover{border-color:var(--line-strong);color:var(--tx)}
+.pill.on{background:var(--gold-soft);border-color:rgba(224,182,78,.4);color:var(--gold);font-weight:600}
+.dhint{display:flex;gap:9px;align-items:flex-start;padding:13px 15px;border-radius:14px;background:rgba(45,212,191,.06);border:1px solid rgba(45,212,191,.18)}
+.dhint .ic{width:16px;height:16px;color:var(--teal);margin-top:2px}
+.dhint p{font:400 12px/1.75 var(--body);color:var(--tx-soft)}
+.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(420px,1fr));gap:44px 36px;margin-top:64px;justify-items:center}
+.frame-col{display:flex;flex-direction:column;align-items:center}
+.frame-col .ftag{font:700 11px/1 var(--mono);letter-spacing:.2em;color:var(--gold);margin-bottom:14px}
+.cap{max-width:420px;margin-top:20px}
+.cap h4{font:700 16px var(--serif);color:#fff;margin-bottom:9px;display:flex;align-items:center;gap:9px}
+.cap h4 .k{font:700 10px var(--mono);letter-spacing:.14em;color:var(--gold-contrast);background:var(--gold-grad);padding:4px 8px;border-radius:7px;flex:none}
+.cap li{list-style:none;position:relative;padding-left:16px;font:400 12.5px/1.85 var(--body);color:var(--tx-soft);margin-bottom:5px}
+.cap li::before{content:"";position:absolute;left:2px;top:.72em;width:6px;height:2px;background:var(--gold-600)}
+.cap li b{color:var(--tx);font-weight:600}
+
+/* ---------- REEL 03 设计系统 ---------- */
+.ds-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:22px;margin-top:34px}
+.ds-card{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:26px}
+.ds-card h3{font:700 17px var(--serif);color:#fff;margin-bottom:5px}
+.ds-card .dsn{font-size:12.5px;color:var(--tx-mut);margin-bottom:20px}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:13px 12px}
+.sw .c{height:58px;border-radius:12px;border:1px solid rgba(255,255,255,.09)}
+.sw b{display:block;font:600 11px var(--body);color:var(--tx-soft);margin-top:7px}
+.sw span{font:500 9.5px var(--mono);color:var(--tx-mut)}
+.t-serif{font:900 42px/1.25 var(--serif);color:#fff;letter-spacing:.02em}
+.t-serif em{font-style:normal;background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.t-body{font:400 13.5px/1.9 var(--body);color:var(--tx-soft);margin-top:14px}
+.t-mono{font:700 15px var(--mono);color:var(--gold);letter-spacing:.14em;margin-top:14px}
+.t-lab{font:500 10px var(--mono);letter-spacing:.16em;color:var(--tx-mut);margin-top:20px}
+.comp-col{display:flex;flex-direction:column;gap:11px}
+.comp-col .row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.comp-lab{font:500 10px var(--mono);letter-spacing:.14em;color:var(--tx-mut);margin:9px 0 2px}
+.comp-lab:first-child{margin-top:0}
+.note-list{margin:0;padding:0;list-style:none}
+.note-list li{position:relative;padding:11px 0 11px 26px;border-bottom:1px dashed var(--line);font:400 13px/1.8 var(--body);color:var(--tx-soft)}
+.note-list li:last-child{border-bottom:0}
+.note-list li::before{content:attr(data-n);position:absolute;left:0;top:13px;font:700 11px var(--mono);color:var(--gold)}
+.note-list b{color:var(--tx);font-weight:600}
+
+/* ---------- REEL 05 动效 / REEL 06 落地 ---------- */
+.mo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:18px;margin-top:34px}
+.mo{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+.mo .mv{height:86px;border-radius:13px;background:var(--inset);border:1px solid var(--line);display:grid;place-items:center;margin-bottom:15px;position:relative;overflow:hidden}
+.mo b{font:700 15px var(--serif);color:#fff;display:block}
+.mo p{font:400 12px/1.75 var(--body);color:var(--tx-soft);margin-top:5px}
+.mo .mnote{display:inline-block;margin-top:11px;font:600 10.5px var(--mono);letter-spacing:.06em;color:var(--gold);background:var(--gold-soft);padding:4px 9px;border-radius:7px}
+.mv .demo-shut{width:46px;height:46px;border-radius:50%;background:var(--gold-grad);display:grid;place-items:center;color:var(--gold-contrast);box-shadow:0 0 0 5px rgba(224,182,78,.12);transition:transform .16s}
+.mv .demo-shut:active{transform:scale(.88)}
+.mv .demo-tabs{display:flex;gap:14px;align-items:center}
+.mv .dt{width:44px;height:30px;border-radius:9px;background:var(--elev);border:1px solid var(--line)}
+.mv .dt.on{background:var(--gold-soft);border-color:rgba(224,182,78,.4)}
+.mv .darr{color:var(--tx-mut);font:700 13px var(--mono)}
+.mv .stg{display:flex;flex-direction:column;gap:9px;width:60%}
+.mv .stg i{height:8px;border-radius:4px;background:var(--line-strong)}
+.rev.in .stg i{animation:ad-fade-up .5s cubic-bezier(.22,.61,.36,1) both}
+.rev.in .stg i:nth-child(2){animation-delay:.12s}
+.rev.in .stg i:nth-child(3){animation-delay:.24s}
+.mv .pb{width:64%;height:7px;border-radius:4px;background:var(--line);overflow:hidden}
+.mv .pb i{display:block;width:68%;height:100%;background:var(--teal);border-radius:4px;animation:grow 1.6s .4s cubic-bezier(.22,.61,.36,1) both}
+.mv .pd{position:absolute;top:14px;right:16px;width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 1.9s infinite}
+.land{margin-top:30px}
+.litem{display:flex;gap:20px;padding:18px 4px;border-bottom:1px dashed var(--line)}
+.litem:last-child{border-bottom:0}
+.lno{font:700 13px/1.6 var(--mono);color:var(--gold);flex:none;width:30px}
+.litem b{display:block;font:600 14.5px var(--body);color:var(--tx);margin-bottom:4px}
+.litem p{font:400 12.5px/1.85 var(--body);color:var(--tx-soft);max-width:820px}
+
+footer{padding:56px 0 64px;text-align:center;border-top:1px solid var(--line);margin-top:40px}
+footer .fmark{font:900 15px var(--serif);color:var(--tx);letter-spacing:.1em}
+footer p{font:400 11.5px/1.9 var(--body);color:var(--tx-mut);margin-top:8px}
+footer .fdot{color:var(--gold);margin:0 8px}
+
+/* ---------- 滚动显现 ---------- */
+.rev{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s cubic-bezier(.22,.61,.36,1)}
+.rev.in{opacity:1;transform:none}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1160px){
+  .demo{flex-direction:column;align-items:center}
+  .demo-side{position:static;text-align:center;margin-bottom:6px}
+  .pills{justify-content:center}
+  .dhint{text-align:left}
+  .ia-grid{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .wrap{padding:0 20px}
+  .band{padding:54px 0 36px}
+  .stage{gap:0}
+  .phone,.phone.static{transform:scale(.84);transform-origin:top center;margin-bottom:-130px}
+  .frames{gap:0 20px}
+  .frame-col{margin-bottom:56px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rev{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3.5 10.5 12 3.5l8.5 7"/><path d="M5.5 9.2V20h13V9.2"/><path d="M9.8 20v-5.6h4.4V20"/></symbol>
+  <symbol id="i-clap" viewBox="0 0 24 24"><path d="M4 9.5h16V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19V9.5Z"/><path d="M4.6 8.9 6.2 5l13.3 2.4-.9 1.9"/><path d="m9 8.2 1.4-3.4M13.6 9l1.3-3.2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-case" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="11.5" rx="1.8"/><path d="M9.5 8V6.4A1.4 1.4 0 0 1 10.9 5h2.2a1.4 1.4 0 0 1 1.4 1.4V8"/><path d="M4 12.8h16"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.2" r="3.4"/><path d="M5 20c.8-3.4 3.6-5.2 7-5.2s6.2 1.8 7 5.2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m15.6 15.6 4 4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 4 1.5 5.5 1.5 5.5H5S6.5 14 6.5 10Z"/><path d="M10 18.7a2.2 2.2 0 0 0 4 0"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8.5 5.8v12.4L18.5 12Z"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.5 5.5-6.5 6.5 6.5 6.5"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 5.5 6.5 6.5-6.5 6.5"/></symbol>
+  <symbol id="i-tasks" viewBox="0 0 24 24"><path d="M4 6.5h9M4 12h9M4 17.5h6"/><path d="m14.5 16 2 2 3.8-4.2"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.2"/></symbol>
+  <symbol id="i-invite" viewBox="0 0 24 24"><circle cx="10" cy="8.5" r="3.2"/><path d="M4 19.5c.7-3 3.2-4.7 6-4.7 1.6 0 3 .5 4.1 1.3"/><path d="M18.5 13.5v6M15.5 16.5h6"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="4.5" y="10" width="15" height="9.5" rx="1.2"/><path d="M4.5 10h15M12 10v9.5"/><path d="M12 10c-1.8-.4-4.4-1-4.4-3a1.9 1.9 0 0 1 3.7-.4c.4 1 .7 2.2.7 3.4 0-1.2.3-2.4.7-3.4a1.9 1.9 0 0 1 3.7.4c0 2-2.6 2.6-4.4 3Z"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4.5 8h8.2M17.5 8h2M4.5 16h2M10.5 16h9"/><circle cx="15.2" cy="8" r="2.1"/><circle cx="8.2" cy="16" r="2.1"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2"/><path d="M9.7 9.5a2.4 2.4 0 0 1 4.7.6c0 1.7-2.4 2-2.4 3.5"/><path d="M12 16.8h.01"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 4.5 13.7 9.3 18.5 11l-4.8 1.7L12 17.5l-1.7-4.8L5.5 11l4.8-1.7Z"/><path d="M18.5 16.5v4M16.5 18.5h4"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 4.5v9.5M8.5 10.5 12 14l3.5-3.5"/><path d="M5 17.5v1A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5v-1"/></symbol>
+  <symbol id="i-remake" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="1.6"/><path d="M15.5 5.5H6A1.5 1.5 0 0 0 4.5 7v9.5"/></symbol>
+  <symbol id="i-film" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.6"/><path d="M8.2 5v14M15.8 5v14M4 9.6h4.2M4 14.4h4.2M15.8 9.6H20M15.8 14.4H20"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3.5" y="7" width="12" height="10" rx="1.8"/><path d="m15.5 10.6 4.5-2.4v7.6l-4.5-2.4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.6V12l3 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.5 12.5 4 4 9-9"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 4c3.4 3.9 5.8 6.6 5.8 9.6a5.8 5.8 0 1 1-11.6 0C6.2 10.6 8.6 7.9 12 4Z"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M3.5 7.5A1.5 1.5 0 0 1 5 6h10.5"/><path d="M15.5 13h5v3.4h-5a1.7 1.7 0 0 1 0-3.4Z"/></symbol>
+</svg>
+
+<header class="band wrap">
+  <div class="kicker">XW.COM · AI DRAMA · MOBILE</div>
+  <h1>掌上<em>制片厂</em></h1>
+  <p class="lede">AIDrama 手机端 UI 方案 —— 把整条「剧本 → 资产 → 分镜 → 成片」流水线装进口袋。深色放映厅基调，描金主色与衬线标题与现有 client 端「电影工作室」主题一脉相承，令牌 100% 复用，不另起色板。</p>
+  <div class="metas">
+    <span class="meta"><i></i>v1.0 · 2026-09-07</span>
+    <span class="meta"><i></i>基准 390 × 844 · ≤768 断点激活</span>
+    <span class="meta"><i></i>令牌复用 --ad-* · 深浅主题自动跟随</span>
+    <span class="meta"><i></i>5 Tab · 12 个核心页面</span>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ REEL 01 概念 ============ -->
+<section id="reel1" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 01</span><h2>设计理念</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">手机端不是 PC 的缩略版。创作决策（编排分镜、审剧本）留给桌面，手机承担「盯进度、审细节、随手创作、随时追剧」四个高频动作。</p>
+  <div class="principles">
+    <div class="pr">
+      <div class="pic"><svg class="ic"><use href="#i-clap"/></svg></div>
+      <h3>一部手机就是一个剧组</h3>
+      <p>底部五 Tab 常驻动线：看剧（展示）、管项目、起项目（中央快门键）、接单、查账户。每个创作动作三次点击内可达。</p>
+      <div class="tagline">POCKET STUDIO</div>
+    </div>
+    <div class="pr">
+      <div class="pic"><svg class="ic"><use href="#i-tasks"/></svg></div>
+      <h3>拇指动线优先</h3>
+      <p>高频操作沉底、低频操作收拢；主按钮统一 44px 高度落在拇指热区；二级页一律右滑推入、可手势返回。</p>
+      <div class="tagline">THUMB-FIRST</div>
+    </div>
+    <div class="pr">
+      <div class="pic"><svg class="ic"><use href="#i-drop"/></svg></div>
+      <h3>不是缩小的网页</h3>
+      <p>完整复用「电影工作室」令牌：影棚黑、描金、片头青 CTA、衬线标题、时间码等宽数字。同一部剧，换一块幕布放映。</p>
+      <div class="tagline">SAME FILM, NEW SCREEN</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REEL 02 信息架构 ============ -->
+<section id="reel2" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 02</span><h2>信息架构</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">五 Tab + 中央创作键。游客态保留「展示」并引导登录；沉浸式工作页（工作台 / 分镜 / 剪辑 / 播放）隐藏 TabBar，全屏专注。</p>
+  <div class="ia-grid">
+    <div class="ia-card">
+      <h3>底部导航规格</h3>
+      <div class="dsn">高 82px + safe-area；图标 23px；文字 10px；选中态描金，未选中 --ad-text-muted</div>
+      <div class="tabspec">
+        <div class="tspec on"><svg class="ic"><use href="#i-home"/></svg>展示</div>
+        <div class="tspec"><svg class="ic"><use href="#i-clap"/></svg>项目</div>
+        <div class="tspec-c"><div class="shut"><svg class="ic"><use href="#i-plus"/></svg></div></div>
+        <div class="tspec"><svg class="ic"><use href="#i-case"/></svg>接单</div>
+        <div class="tspec"><svg class="ic"><use href="#i-user"/></svg>我的</div>
+      </div>
+      <div class="tsnote">
+        <span>中央键 55px · 上浮 30px</span><span>金渐变 #F2D489→#B3871F</span><span>按压 scale .9</span><span>游客态隐藏「项目/接单」</span>
+      </div>
+    </div>
+    <div class="ia-card">
+      <h3>Tab 落点</h3>
+      <div class="dsn">与现有路由一一对应，不新增页面类型</div>
+      <div class="iarow"><div class="mi"><svg class="ic"><use href="#i-home"/></svg></div><div><b>展示</b><span>站点门面 · 游客可浏览 · 做同款一键续起</span></div><span class="path">/showcase</span></div>
+      <div class="iarow"><div class="mi"><svg class="ic"><use href="#i-clap"/></svg></div><div><b>项目</b><span>我的项目 · 进度流水线 · 打开工作台</span></div><span class="path">/projects</span></div>
+      <div class="iarow"><div class="mi"><svg class="ic"><use href="#i-plus"/></svg></div><div><b>创作键</b><span>创作面板：AI 编剧 / 导入剧本 / 做同款</span></div><span class="path">sheet</span></div>
+      <div class="iarow"><div class="mi"><svg class="ic"><use href="#i-case"/></svg></div><div><b>接单</b><span>需求大厅 · claim-then-pay · 积分跟操作者</span></div><span class="path">/market</span></div>
+      <div class="iarow"><div class="mi"><svg class="ic"><use href="#i-user"/></svg></div><div><b>我的</b><span>积分 / 任务 / 邀请 / 设置 的汇总入口</span></div><span class="path">hub</span></div>
+    </div>
+  </div>
+  <div class="ds-grid" style="margin-top:22px">
+    <div class="ia-card"><h3>L1 · 常驻</h3><p style="font:400 12.5px/1.8 var(--body);color:var(--tx-soft)">底部五 Tab 全程可见（沉浸页除外）；「我的」页汇总任务中心、积分中心、邀请中心、邀请有礼、个人设置。</p></div>
+    <div class="ia-card l2"><h3>L2 · 二级推入</h3><p style="font:400 12.5px/1.8 var(--body);color:var(--tx-soft)">任务中心、积分中心、邀请中心、项目工作台：自右推入，左上返回，支持边缘右滑手势返回。</p></div>
+    <div class="ia-card l3"><h3>L3 · 沉浸全屏</h3><p style="font:400 12.5px/1.8 var(--body);color:var(--tx-soft)">分镜编辑器、在线视频剪辑、全屏播放窗：隐藏 TabBar（对应现有 immersive meta），独占屏幕，底部操作条 + 安全区。</p></div>
+  </div>
+</section>
+
+<!-- ============ REEL 03 设计系统 ============ -->
+<section id="reel3" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 03</span><h2>设计系统</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">全部令牌取自 client/src/styles/theme.scss 深色旗舰主题（放映厅），变量名不变、只按移动尺度重新编排。</p>
+  <div class="ds-grid">
+    <div class="ia-card">
+      <h3>色板 · 影棚黑与描金</h3>
+      <div class="dsn">主色金仅用于品牌动作与进行态；「下一步」类推进 CTA 固定片头青，与 PC 端约定一致</div>
+      <div class="swatches">
+        <div class="sw"><div class="c" style="background:#0a0a0f"></div><b>影棚黑</b><span>#0A0A0F</span></div>
+        <div class="sw"><div class="c" style="background:#16161f"></div><b>炭黑</b><span>#16161F</span></div>
+        <div class="sw"><div class="c" style="background:linear-gradient(135deg,#f2d489,#e0b64e 45%,#b3871f)"></div><b>描金</b><span>#E0B64E</span></div>
+        <div class="sw"><div class="c" style="background:#b3871f"></div><b>深金</b><span>#B3871F</span></div>
+        <div class="sw"><div class="c" style="background:#2dd4bf"></div><b>片头青</b><span>#2DD4BF</span></div>
+        <div class="sw"><div class="c" style="background:#34d399"></div><b>成功</b><span>#34D399</span></div>
+        <div class="sw"><div class="c" style="background:#fbbf24"></div><b>警示</b><span>#FBBF24</span></div>
+        <div class="sw"><div class="c" style="background:#f87171"></div><b>危险</b><span>#F87171</span></div>
+      </div>
+      <div class="t-lab">文字三级</div>
+      <div class="t-body" style="margin-top:6px"><span style="color:#f3f0e8">纸白 #F3F0E8 主文本</span> · <span style="color:#b3afa3">暖灰 #B3AFA3 次级</span> · <span style="color:#7d7a70">暗棕灰 #7D7A70 辅助</span></div>
+    </div>
+    <div class="ia-card">
+      <h3>字体 · 字幕卡三件套</h3>
+      <div class="dsn">衬线做标题（电影字幕卡气质），正文黑体，时间码/金额一律等宽数字</div>
+      <div class="t-serif">重生之<em>夜</em></div>
+      <div class="t-lab">Noto Serif SC / Songti · Display</div>
+      <div class="t-body">正文 PingFang SC 13–14px，行高 1.7；辅助信息 11–12px；超过两行截断出「展开」。</div>
+      <div class="t-mono">TC 00:04:12:18</div>
+      <div class="t-lab">JetBrains Mono · 时间码 / 积分 / 镜号</div>
+    </div>
+    <div class="ia-card">
+      <h3>组件 · 移动尺度</h3>
+      <div class="dsn">主按钮 44px 高 / 圆角 13；卡片圆角 18；chip 999 胶囊</div>
+      <div class="comp-lab">BUTTON</div>
+      <div class="comp-col">
+        <div class="row">
+          <button class="mbtn" style="flex:1"><svg class="ic"><use href="#i-spark"/></svg>生成视频</button>
+          <button class="mbtn teal" style="flex:1">下一步</button>
+        </div>
+        <div class="row">
+          <button class="mbtn soft sm">做同款</button>
+          <button class="mbtn ghost sm">详情</button>
+          <button class="mbtn dark sm">立即充值</button>
+        </div>
+      </div>
+      <div class="comp-lab">CHIP / 状态</div>
+      <div class="row" style="display:flex;gap:8px;flex-wrap:wrap">
+        <span class="chip teal"><span class="pulse" style="width:6px;height:6px"></span>进行中</span>
+        <span class="chip warn">排队中</span>
+        <span class="chip ok">已完成</span>
+        <span class="chip bad">失败</span>
+        <span class="chip gold">水墨国风</span>
+      </div>
+      <div class="comp-lab">PROGRESS</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="bar"><i style="width:68%"></i></div><span class="mono" style="font:700 12px var(--mono);color:var(--gold)">68%</span></div>
+    </div>
+    <div class="ia-card">
+      <h3>移动规范四条</h3>
+      <div class="dsn">沿用现有约定，零新增心智</div>
+      <ul class="note-list">
+        <li data-n="01"><b>触控热区 ≥ 44px</b>：全部可点元素（含列表行、chip）按 44px 计，视觉小、热区大。</li>
+        <li data-n="02"><b>弹窗宽度 min(原始, 94vw)</b>：现有 el-dialog ≤768 兜底直接继承，移动弹层统一改为底部抽屉。</li>
+        <li data-n="03"><b>安全区</b>：底部操作条 padding 计入 env(safe-area-inset-bottom)，全面屏不被 Home 条压住。</li>
+        <li data-n="04"><b>零 PC 回归</b>：≤768 断点才启用移动布局；桌面端结构与样式不动。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REEL 04 核心界面 ============ -->
+<section id="reel4" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 04</span><h2>核心界面</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">主演示机可交互：点 Tab 或左侧按钮切屏；点中央快门键（或任一「做同款」）唤起创作面板；「我的 → 任务中心」演示二级推入。</p>
+
+  <div class="demo">
+    <div class="demo-side">
+      <h3>交互原型 · 五屏联动</h3>
+      <p class="dd">以下为高保真可点原型，非截图。所有数据为示意，结构与字段对齐现有 API 返回。</p>
+      <div class="pills">
+        <button class="pill on" data-go="showcase">展示中心</button>
+        <button class="pill" data-go="projects">我的项目</button>
+        <button class="pill" data-go="market">接单中心</button>
+        <button class="pill" data-go="mine">我的</button>
+        <button class="pill" data-go="tasks">任务中心 · 推入</button>
+        <button class="pill" data-sheet>创作面板 · 快门</button>
+      </div>
+      <div class="dhint">
+        <svg class="ic"><use href="#i-spark"/></svg>
+        <p>注意「做同款」入口在展示卡片上直接可达 —— 这是游客转化的关键动线：看剧 → 心动 → 开拍。</p>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="phone" id="heroPhone">
+        <div class="scr">
+          <div class="island"></div>
+          <div class="sbar"><span class="mono">9:41</span><div class="rig"><div class="sig"><i></i><i></i><i></i><i></i></div><div class="batt"></div></div></div>
+
+          <div class="views">
+            <!-- 展示中心 -->
+            <div class="view on" data-v="showcase">
+              <div class="brandrow">
+                <div class="brandmark"><svg class="ic"><use href="#i-film"/></svg></div>
+                <span class="brandname">AI<em>Drama</em> 短剧</span>
+                <span style="flex:1"></span>
+                <button class="iconbtn" data-go="tasks"><svg class="ic"><use href="#i-bell"/></svg><span class="badge">2</span></button>
+              </div>
+              <div style="padding:0 18px 4px"><div class="ptitle" style="font-size:23px">展示中心</div><div class="psub">今晚，追一部别人拍的剧</div></div>
+              <div style="height:13px"></div>
+              <div class="search"><svg class="ic"><use href="#i-search"/></svg>搜索剧名、风格、叙事类型…</div>
+              <div class="chips">
+                <span class="pchip on">精选</span><span class="pchip">逆袭</span><span class="pchip">甜宠</span><span class="pchip">悬疑</span><span class="pchip">古装</span><span class="pchip">都市</span><span class="pchip">科幻</span>
+              </div>
+              <div class="sechead"><h5>本周热门</h5><span class="more">查看全部</span></div>
+              <div class="hscroll">
+                <div class="hotcard"><div class="art a1"><span class="glow"></span><span class="zi">镜</span><span class="rank">NO.1</span></div><h6>《镜中双生》</h6><div class="st">甜宠 · 24 集</div></div>
+                <div class="hotcard"><div class="art a3"><span class="glow"></span><span class="zi">雨</span><span class="rank">NO.2</span></div><h6>《雨夜来客》</h6><div class="st">悬疑 · 16 集</div></div>
+                <div class="hotcard"><div class="art a6"><span class="glow"></span><span class="zi">城</span><span class="rank">NO.3</span></div><h6>《都市重生》</h6><div class="st">逆袭 · 32 集</div></div>
+              </div>
+              <div class="sechead"><h5>为你推荐</h5><span class="more">换一批</span></div>
+              <div class="vcard">
+                <div class="art a4"><span class="glow"></span><span class="zi">夜</span></div>
+                <div class="vplay"><svg class="ic"><use href="#i-play"/></svg></div>
+                <div class="vinfo">
+                  <h4>《夜航西飞》</h4>
+                  <div class="vmeta">
+                    <span class="chip glass">水墨国风</span><span class="chip glass">竖屏 · 24 集</span>
+                    <span class="vnum"><svg class="ic"><use href="#i-play"/></svg>128.6万</span>
+                  </div>
+                  <div class="vact">
+                    <button class="mbtn"><svg class="ic"><use href="#i-play"/></svg>免费追剧</button>
+                    <button class="mbtn ghost" data-sheet><svg class="ic"><use href="#i-remake"/></svg>做同款</button>
+                  </div>
+                </div>
+              </div>
+              <div class="vcard">
+                <div class="art a2"><span class="glow"></span><span class="zi">镜</span></div>
+                <div class="vplay"><svg class="ic"><use href="#i-play"/></svg></div>
+                <div class="vinfo">
+                  <h4>《镜中双生》</h4>
+                  <div class="vmeta">
+                    <span class="chip glass">赛博朋克</span><span class="chip glass">竖屏 · 16 集</span>
+                    <span class="vnum"><svg class="ic"><use href="#i-play"/></svg>96.2万</span>
+                  </div>
+                  <div class="vact">
+                    <button class="mbtn"><svg class="ic"><use href="#i-play"/></svg>免费追剧</button>
+                    <button class="mbtn ghost" data-sheet><svg class="ic"><use href="#i-remake"/></svg>做同款</button>
+                  </div>
+                </div>
+              </div>
+              <div class="pfootnote">下拉刷新 · 上滑换一批</div>
+            </div>
+
+            <!-- 我的项目 -->
+            <div class="view" data-v="projects">
+              <div class="ptop">
+                <div><div class="ptitle">我的项目</div><div class="psub">6 部在制作 · 2 个任务进行中</div></div>
+                <div style="display:flex;gap:9px;align-items:center">
+                  <button class="iconbtn" data-go="tasks"><svg class="ic"><use href="#i-bell"/></svg><span class="badge">2</span></button>
+                  <span class="avatar a4"><span class="glow"></span><span class="zi" style="font-size:20px;right:2px;bottom:-3px">沈</span></span>
+                </div>
+              </div>
+              <div class="chips">
+                <span class="pchip on">全部</span><span class="pchip">剧本大纲</span><span class="pchip">资产库</span><span class="pchip">视频合成</span><span class="pchip">已完成</span>
+              </div>
+              <div class="card pcard">
+                <div class="art a4"><span class="glow"></span><span class="zi">夜</span><span class="pstat chip warn">视频合成</span></div>
+                <div class="pbody">
+                  <h4>《夜航西飞》</h4>
+                  <div class="pmeta"><span class="chip gold">水墨国风</span><span class="dot">·</span><span>12 集 · 3 天前</span></div>
+                  <div class="steps">
+                    <div class="stp done"><span class="ln"></span><span>大纲</span></div>
+                    <div class="stp done"><span class="ln"></span><span>资产</span></div>
+                    <div class="stp act"><span class="ln"></span><span>成片</span></div>
+                  </div>
+                  <div class="pfoot"><span class="hint">第 2 集合成中 45%</span><button class="mbtn sm">打开项目</button></div>
+                </div>
+              </div>
+              <div class="card pcard">
+                <div class="art a1"><span class="glow"></span><span class="zi">镜</span><span class="pstat chip gold">剧本大纲</span></div>
+                <div class="pbody">
+                  <h4>《镜中双生》</h4>
+                  <div class="pmeta"><span class="chip gold">赛博朋克</span><span class="dot">·</span><span>16 集 · 昨天</span></div>
+                  <div class="steps">
+                    <div class="stp act"><span class="ln"></span><span>大纲</span></div>
+                    <div class="stp"><span class="ln"></span><span>资产</span></div>
+                    <div class="stp"><span class="ln"></span><span>成片</span></div>
+                  </div>
+                  <div class="pfoot"><span class="hint">第 3 集大纲已生成</span><button class="mbtn sm soft">继续创作</button></div>
+                </div>
+              </div>
+              <div class="card pcard">
+                <div class="art a5"><span class="glow"></span><span class="zi">安</span><span class="pstat chip ok">已完成</span></div>
+                <div class="pbody">
+                  <h4>《长安食肆》</h4>
+                  <div class="pmeta"><span class="chip gold">水墨国风</span><span class="dot">·</span><span>8 集 · 上周</span></div>
+                  <div class="steps">
+                    <div class="stp done"><span class="ln"></span><span>大纲</span></div>
+                    <div class="stp done"><span class="ln"></span><span>资产</span></div>
+                    <div class="stp done"><span class="ln"></span><span>成片</span></div>
+                  </div>
+                  <div class="pfoot"><span class="hint">全 8 集已合成</span><button class="mbtn sm ghost">查看成片</button></div>
+                </div>
+              </div>
+              <div class="pfootnote">点中央快门键，开一部新剧</div>
+            </div>
+
+            <!-- 接单中心 -->
+            <div class="view" data-v="market">
+              <div class="ptop">
+                <div><div class="ptitle">接单中心</div><div class="psub">凭手艺接单 · 积分跟操作者结算</div></div>
+                <button class="iconbtn"><svg class="ic"><use href="#i-set"/></svg></button>
+              </div>
+              <div class="mstrip"><svg class="ic"><use href="#i-coin"/></svg>可用积分&nbsp;<b>12,480</b>&nbsp;· 本月接单 +2,860</div>
+              <div class="chips">
+                <span class="pchip on">推荐</span><span class="pchip">分镜生视频</span><span class="pchip">资产生图</span><span class="pchip">合成全集</span><span class="pchip">加字幕</span>
+              </div>
+              <div class="card ocard">
+                <div class="otop"><h5>《都市重生》 · 第 3 集</h5><span class="chip gold">480 积分</span></div>
+                <div class="odesc">24 镜分镜生视频 · 已提供角色参考音频 · 72 小时内交付</div>
+                <div class="ometa"><span>发布 2 小时前</span><span>·</span><span>已接 3/10</span><span class="sp"></span><span class="mono">SC.01–24</span></div>
+                <div class="oact"><button class="mbtn ghost sm">详情</button><button class="mbtn sm">接单</button></div>
+              </div>
+              <div class="card ocard">
+                <div class="otop"><h5>《雨夜来客》 · 全集合成</h5><span class="chip teal">制作中</span></div>
+                <div class="odesc">16 集视频合成 + 字幕烧录 · 我于昨天接单</div>
+                <div class="tprog"><div class="bar teal"><i style="width:60%"></i></div><span class="pct">60%</span></div>
+                <div class="ometa"><span>截止剩 18 小时</span><span class="sp"></span><span class="mono">EP.09/16</span></div>
+              </div>
+              <div class="card ocard">
+                <div class="otop"><h5>《镜中双生》 · 资产生图</h5><span class="chip gold">260 积分</span></div>
+                <div class="odesc">12 个资产批量生图 · 4K · 风格模板已附 · 48 小时内交付</div>
+                <div class="ometa"><span>发布 昨天</span><span>·</span><span>待接单</span></div>
+                <div class="oact"><button class="mbtn ghost sm">详情</button><button class="mbtn sm">接单</button></div>
+              </div>
+              <div class="pfootnote">接单即冻结酬金 · 验收后到账</div>
+            </div>
+
+            <!-- 我的 -->
+            <div class="view" data-v="mine">
+              <div class="ptop"><div class="ptitle">我的</div></div>
+              <div class="urow">
+                <span class="avatar a4 uava"><span class="glow"></span><span class="zi" style="font-size:24px;right:3px;bottom:-4px">沈</span></span>
+                <div><h4>沈制片</h4><div class="uid">UID 0000-8823-XW</div></div>
+                <span style="flex:1"></span>
+                <button class="iconbtn"><svg class="ic"><use href="#i-set"/></svg></button>
+              </div>
+              <div class="bcard">
+                <div class="lb">当前积分余额</div>
+                <div class="bnum">12,480<small>CREDITS</small></div>
+                <div class="brow"><span>本月消耗 3,240</span><span>充值 +5,000</span><span class="sp"></span><button class="mbtn dark sm">立即充值</button></div>
+              </div>
+              <div class="mgroup">
+                <button class="mrow" data-go="tasks"><span class="mi"><svg class="ic"><use href="#i-tasks"/></svg></span><b>任务中心</b><span class="chip teal">2 运行中</span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+                <button class="mrow"><span class="mi"><svg class="ic"><use href="#i-coin"/></svg></span><b>积分中心</b><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+                <button class="mrow"><span class="mi"><svg class="ic"><use href="#i-invite"/></svg></span><b>邀请中心</b><span class="chip gold">2 待处理</span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+                <button class="mrow"><span class="mi"><svg class="ic"><use href="#i-gift"/></svg></span><b>邀请有礼</b><span class="chip gold">送积分</span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+                <button class="mrow"><span class="mi"><svg class="ic"><use href="#i-set"/></svg></span><b>个人设置</b><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+                <button class="mrow"><span class="mi"><svg class="ic"><use href="#i-help"/></svg></span><b>使用帮助</b><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+              </div>
+              <div class="pfootnote">星网 XW.COM · AIDrama v2.4 · MOBILE</div>
+            </div>
+
+            <!-- 任务中心（二级推入） -->
+            <div class="view push" data-v="tasks">
+              <div class="pnav">
+                <button class="iconbtn" data-go="mine"><svg class="ic"><use href="#i-left"/></svg></button>
+                <h3>任务中心</h3>
+                <span class="chip teal"><span class="pulse"></span>2 进行中</span>
+              </div>
+              <div class="chips">
+                <span class="pchip on">全部</span><span class="pchip">进行中</span><span class="pchip">排队中</span><span class="pchip">已完成</span><span class="pchip">失败</span>
+              </div>
+              <div class="tsum">
+                <div class="tstat"><b>2</b><span>进行中</span></div>
+                <div class="tstat t"><b>1</b><span>排队中</span></div>
+                <div class="tstat m"><b>6</b><span>今日完成</span></div>
+              </div>
+              <div class="card tcard">
+                <div class="ttop">
+                  <span class="tico"><svg class="ic"><use href="#i-video"/></svg></span>
+                  <div class="tt"><h6>片段视频 · 第 3 集 SC.07–SC.12</h6><div class="tsub">《夜航西飞》 · 今天 09:41 提交</div></div>
+                  <span class="chip teal"><span class="pulse"></span>进行中</span>
+                </div>
+                <div class="tprog"><div class="bar"><i style="width:68%"></i></div><span class="pct">68%</span></div>
+                <div class="tfoot"><span class="rt">耗时 02:14</span><span class="rt mono">6 镜 × Seedance</span></div>
+              </div>
+              <div class="card tcard">
+                <div class="ttop">
+                  <span class="tico"><svg class="ic"><use href="#i-video"/></svg></span>
+                  <div class="tt"><h6>成片加字幕 · 第 1 集</h6><div class="tsub">《雨夜来客》 · 今天 09:12 提交</div></div>
+                  <span class="chip warn">排队中</span>
+                </div>
+                <div class="tfoot" style="margin-top:12px"><span class="rt">排位 #1 · 预计 1 分钟</span><span class="rt mono">ASR + 烧录</span></div>
+              </div>
+              <div class="card tcard">
+                <div class="ttop">
+                  <span class="tico"><svg class="ic"><use href="#i-spark"/></svg></span>
+                  <div class="tt"><h6>资产生图 × 12</h6><div class="tsub">《镜中双生》 · 今天 08:47 提交</div></div>
+                  <span class="chip ok">已完成</span>
+                </div>
+                <div class="tfoot" style="margin-top:12px"><span class="rt">耗时 06:32</span><button class="mbtn ghost sm">查看结果</button></div>
+              </div>
+              <div class="card tcard">
+                <div class="ttop">
+                  <span class="tico" style="color:var(--bad)"><svg class="ic"><use href="#i-tasks"/></svg></span>
+                  <div class="tt"><h6>智能校正字幕 · 第 2 集</h6><div class="tsub">《夜航西飞》 · 今天 07:58 提交</div></div>
+                  <span class="chip bad">失败</span>
+                </div>
+                <div class="terr">厂商返回：内容审核未通过 · 已自动退还 60 积分</div>
+                <div class="tfoot" style="margin-top:10px"><span class="rt">—</span><button class="mbtn soft sm">重新提交</button></div>
+              </div>
+              <div class="pfootnote">任务完成自动弹 Toast · 不打断当前操作</div>
+            </div>
+          </div>
+
+          <!-- 创作面板 -->
+          <div class="mask" id="mask"></div>
+          <div class="sheet">
+            <div class="grab"></div>
+            <h4>开始一部新剧</h4>
+            <p class="sd">从一句话创意到成片，都在这只手里。</p>
+            <button class="sopt"><span class="sic"><svg class="ic"><use href="#i-spark"/></svg></span><span class="st"><b>AI 编剧</b><span>输入一句话创意，AI 生成剧名、大纲与分集</span></span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+            <button class="sopt"><span class="sic tl"><svg class="ic"><use href="#i-import"/></svg></span><span class="st"><b>导入已有剧本</b><span>粘贴或上传剧本文件，自动拆分大纲与分集</span></span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+            <button class="sopt"><span class="sic gy"><svg class="ic"><use href="#i-remake"/></svg></span><span class="st"><b>从展示中心做同款</b><span>挑一部热门剧，复用风格模板改成你的故事</span></span><span class="arr"><svg class="ic"><use href="#i-right"/></svg></span></button>
+            <button class="mbtn ghost" id="sheetClose" style="width:100%;margin-top:6px">取消</button>
+          </div>
+
+          <!-- TabBar -->
+          <div class="tabbar">
+            <button class="tab active" data-tab="showcase" data-go="showcase"><svg class="ic"><use href="#i-home"/></svg>展示</button>
+            <button class="tab" data-tab="projects" data-go="projects"><svg class="ic"><use href="#i-clap"/></svg>项目</button>
+            <div class="tab-c"><button data-sheet aria-label="创作"><svg class="ic"><use href="#i-plus"/></svg></button></div>
+            <button class="tab" data-tab="market" data-go="market"><svg class="ic"><use href="#i-case"/></svg>接单</button>
+            <button class="tab" data-tab="mine" data-go="mine"><svg class="ic"><use href="#i-user"/></svg>我的</button>
+          </div>
+
+          <div class="hi"></div>
+          <div class="grainl"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="frames">
+    <!-- FRAME A 工作台 -->
+    <div class="frame-col">
+      <div class="ftag">FRAME A · 沉浸</div>
+      <div class="phone static"><div class="scr">
+        <div class="island"></div>
+        <div class="sbar"><span class="mono">9:41</span><div class="rig"><div class="sig"><i></i><i></i><i></i><i></i></div><div class="batt"></div></div></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 50% -60px,rgba(224,182,78,.07),transparent 70%)"></div>
+        <div class="wtop">
+          <button class="iconbtn"><svg class="ic"><use href="#i-left"/></svg></button>
+          <div class="wthumb art a4"><span class="glow"></span><span class="zi">夜</span></div>
+          <div class="wmeta">
+            <h3>《夜航西飞》</h3>
+            <div class="tags"><span class="chip gold">水墨国风</span><span class="chip">竖屏</span><span class="chip">12 集</span></div>
+          </div>
+          <span class="chip warn">视频合成</span>
+        </div>
+        <div class="wsteps">
+          <div class="wstep done"><div class="no"><svg class="ic"><use href="#i-check"/></svg></div><b>剧本大纲</b></div>
+          <div class="wstep done"><div class="no"><svg class="ic"><use href="#i-check"/></svg></div><b>资产库</b></div>
+          <div class="wstep act"><div class="no">3</div><b>分集成片</b></div>
+        </div>
+        <div class="sechead"><h5>剧本大纲</h5><span class="more">全部 12 集</span></div>
+        <div class="card">
+          <div class="eprow"><span class="no">EP.01</span><div class="tt"><b>雨夜来客</b><span>深夜的货运码头，一艘不该出现的船靠了岸，沈砚捏着一封没有署名的信…</span></div><span class="chip ok">已细化</span></div>
+          <div class="eprow"><span class="no">EP.02</span><div class="tt"><b>镜中人</b><span>老宅阁楼的青铜镜里，映出的却不是他自己的脸。</span></div><span class="chip">概要</span></div>
+        </div>
+        <div class="sechead"><h5>资产库</h5><span class="more">18 项 · 2 生成中</span></div>
+        <div class="hscroll" style="padding-bottom:16px">
+          <div class="aslot"><div class="art a1"><span class="glow"></span><span class="zi">沈</span><span class="stt gen"></span></div><b>沈砚</b><span>主角</span></div>
+          <div class="aslot"><div class="art a2"><span class="glow"></span><span class="zi">宅</span><span class="stt gen"></span></div><b>沈家老宅</b><span>场景</span></div>
+          <div class="aslot"><div class="art a4"><span class="glow"></span><span class="zi">镜</span><span class="stt ing"></span></div><b>青铜镜</b><span>道具 · 68%</span></div>
+          <div class="aslot"><div class="art a3"><span class="glow"></span><span class="zi">雨</span><span class="stt todo"></span></div><b>雨夜码头</b><span>场景 · 未生成</span></div>
+        </div>
+        <div class="sechead"><h5>分集与成片</h5><span class="more">管理</span></div>
+        <div class="card">
+          <div class="eprow"><span class="no">EP.01</span><div class="tt"><b>雨夜来客</b></div><span class="chip ok">已合成</span><span class="chip glass" style="border-color:var(--line)"><svg class="ic" style="width:11px;height:11px"><use href="#i-play"/></svg></span></div>
+          <div class="eprow"><span class="no">EP.02</span><div class="tt"><b>镜中人</b><div class="mini bar teal" style="margin-top:6px"><i style="width:45%"></i></div></div><span class="chip teal">合成中</span></div>
+          <div class="eprow"><span class="no">EP.03</span><div class="tt"><b>未生成</b></div><button class="mbtn soft sm">生成分镜</button></div>
+        </div>
+        <div class="wbar">
+          <button class="mbtn ghost">上一步</button>
+          <button class="mbtn teal grow"><svg class="ic"><use href="#i-right"/></svg>下一步 · 分镜编辑</button>
+        </div>
+        <div class="hi"></div>
+        <div class="grainl"></div>
+      </div></div>
+      <div class="cap">
+        <h4><span class="k">A</span>项目工作台 · 沉浸式</h4>
+        <ul>
+          <li><b>三步流水线</b>压缩为顶部进度牌：大纲 ✓ → 资产 ✓ → 分集成片（进行态描金发光）。</li>
+          <li>资产横滑卡带状态角标：<b>绿=已完成、金脉冲=生成中、灰=未生成</b>，与任务中心实时同步。</li>
+          <li>底部操作条固定「上一步 / 下一步」，<b>推进 CTA 用片头青</b>，与品牌金动作区分。</li>
+          <li>此页隐藏 TabBar（immersive），退出即返回项目列表。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FRAME B 分镜编辑器 -->
+    <div class="frame-col">
+      <div class="ftag">FRAME B · 沉浸</div>
+      <div class="phone static"><div class="scr">
+        <div class="island"></div>
+        <div class="sbar"><span class="mono">9:41</span><div class="rig"><div class="sig"><i></i><i></i><i></i><i></i></div><div class="batt"></div></div></div>
+        <div style="position:absolute;inset:0;background:radial-gradient(300px 200px at 50% -60px,rgba(224,182,78,.07),transparent 70%)"></div>
+        <div class="pnav">
+          <button class="iconbtn"><svg class="ic"><use href="#i-left"/></svg></button>
+          <div style="flex:1"><h3 style="font:900 19px var(--serif);color:#fff">第 3 集 · 分镜</h3><div class="psub">24 镜 · 已生成 18 · 4K</div></div>
+          <span class="chip gold">SC 03</span>
+        </div>
+        <div class="chips" style="padding-top:0"><span class="pchip on">全部</span><span class="pchip">已生成</span><span class="pchip">生成中</span><span class="pchip">未生成</span><span class="pchip">有台词</span></div>
+        <div class="card dshot">
+          <div class="stop">
+            <div class="sthumb art a2"><span class="glow"></span><span class="zi">雨</span><span class="slate">SC.07</span></div>
+            <div class="smain">
+              <div class="srow1"><span class="chip teal">特写</span><span class="chip">推镜</span><span class="tc">4.0s</span></div>
+              <div class="sprompt">雨夜，沈砚推门而入，水汽在灯下浮动，他抬头望向阁楼方向的铜镜…</div>
+              <div class="sline">台词「你终于回来了。」 · 沈砚</div>
+            </div>
+          </div>
+          <div class="sbot"><span class="chip ok">已完成</span><span class="grow"></span><button class="mbtn ghost sm"><svg class="ic"><use href="#i-play"/></svg>预览</button><button class="mbtn soft sm">重新生成</button></div>
+        </div>
+        <div class="card dshot">
+          <div class="stop">
+            <div class="sthumb art a1"><span class="glow"></span><span class="zi">镜</span><span class="slate">SC.08</span></div>
+            <div class="smain">
+              <div class="srow1"><span class="chip gold">中景</span><span class="chip">固定</span><span class="tc">3.5s</span></div>
+              <div class="sprompt">镜面泛起涟漪，另一个「沈砚」缓缓抬眼，嘴角带着不属于他的笑…</div>
+              <div class="sline">台词「你才是不速之客。」 · 镜中人</div>
+            </div>
+          </div>
+          <div class="sbot"><span class="chip teal"><span class="pulse"></span>生成中</span><div class="bar" style="max-width:110px"><i style="width:68%"></i></div><span class="grow"></span><span class="rt mono" style="font:500 10.5px var(--mono);color:var(--tx-mut)">02:14</span></div>
+        </div>
+        <div class="card dshot">
+          <div class="stop">
+            <div class="sthumb art a3"><span class="glow"></span><span class="zi">夜</span><span class="slate">SC.09</span></div>
+            <div class="smain">
+              <div class="srow1"><span class="chip">远景</span><span class="chip">摇镜</span><span class="tc">5.0s</span></div>
+              <div class="sprompt">镜头拉开：老宅孤立在雨幕里，唯一亮着的阁楼窗忽然熄灭…</div>
+              <div class="sline">无台词 · 环境音：雨声渐弱</div>
+            </div>
+          </div>
+          <div class="sbot"><span class="chip">未生成</span><span class="grow"></span><button class="mbtn sm">生成视频 · 80 积分</button></div>
+        </div>
+        <div class="wbar">
+          <button class="mbtn ghost"><svg class="ic"><use href="#i-plus"/></svg>加分镜</button>
+          <button class="mbtn grow">批量生成 · 6 镜 480 积分</button>
+        </div>
+        <div class="hi"></div>
+        <div class="grainl"></div>
+      </div></div>
+      <div class="cap">
+        <h4><span class="k">B</span>分镜编辑器 · 竖排镜列表</h4>
+        <ul>
+          <li>每镜一卡：<b>场记板镜号 + 画面帧 + 景别/运镜 chip + 时间码</b>，双行提示词截断可展开。</li>
+          <li>三态齐观：<b>已完成（可预览/重生成）、生成中（进度条+脉冲）、未生成（一键生成含价格）</b>。</li>
+          <li>底部「批量生成」直接标注积分预估，点击后进统一「模型 + 价格」确认页，不直接扣费。</li>
+          <li>表单类编辑（改提示词/台词）引导回桌面端，手机只做「审 + 触发」。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FRAME C 任务中心 -->
+    <div class="frame-col">
+      <div class="ftag">FRAME C · 二级</div>
+      <div class="phone static"><div class="scr">
+        <div class="island"></div>
+        <div class="sbar"><span class="mono">9:41</span><div class="rig"><div class="sig"><i></i><i></i><i></i><i></i></div><div class="batt"></div></div></div>
+        <div class="pnav">
+          <button class="iconbtn"><svg class="ic"><use href="#i-left"/></svg></button>
+          <h3>任务中心</h3>
+          <span class="chip teal"><span class="pulse"></span>2 进行中</span>
+        </div>
+        <div class="tsum">
+          <div class="tstat"><b>2</b><span>进行中</span></div>
+          <div class="tstat t"><b>1</b><span>排队中</span></div>
+          <div class="tstat m"><b>6</b><span>今日完成</span></div>
+        </div>
+        <div class="chips" style="padding-top:0"><span class="pchip on">全部</span><span class="pchip">进行中</span><span class="pchip">排队中</span><span class="pchip">已完成</span><span class="pchip">失败</span></div>
+        <div class="card tcard">
+          <div class="ttop">
+            <span class="tico"><svg class="ic"><use href="#i-video"/></svg></span>
+            <div class="tt"><h6>片段视频 · 第 3 集 SC.07–SC.12</h6><div class="tsub">《夜航西飞》 · 今天 09:41 提交</div></div>
+            <span class="chip teal"><span class="pulse"></span>进行中</span>
+          </div>
+          <div class="tprog"><div class="bar"><i style="width:68%"></i></div><span class="pct">68%</span></div>
+          <div class="tfoot"><span class="rt">耗时 02:14</span><span class="rt mono">6 镜 × Seedance</span></div>
+        </div>
+        <div class="card tcard">
+          <div class="ttop">
+            <span class="tico"><svg class="ic"><use href="#i-video"/></svg></span>
+            <div class="tt"><h6>成片加字幕 · 第 1 集</h6><div class="tsub">《雨夜来客》 · 今天 09:12 提交</div></div>
+            <span class="chip warn">排队中</span>
+          </div>
+          <div class="tfoot" style="margin-top:12px"><span class="rt">排位 #1 · 预计 1 分钟</span><span class="rt mono">ASR + 烧录</span></div>
+        </div>
+        <div class="card tcard">
+          <div class="ttop">
+            <span class="tico"><svg class="ic"><use href="#i-spark"/></svg></span>
+            <div class="tt"><h6>资产生图 × 12</h6><div class="tsub">《镜中双生》 · 今天 08:47 提交</div></div>
+            <span class="chip ok">已完成</span>
+          </div>
+          <div class="tfoot" style="margin-top:12px"><span class="rt">耗时 06:32</span><button class="mbtn ghost sm">查看结果</button></div>
+        </div>
+        <div class="card tcard">
+          <div class="ttop">
+            <span class="tico" style="color:var(--bad)"><svg class="ic"><use href="#i-tasks"/></svg></span>
+            <div class="tt"><h6>智能校正字幕 · 第 2 集</h6><div class="tsub">《夜航西飞》 · 今天 07:58 提交</div></div>
+            <span class="chip bad">失败</span>
+          </div>
+          <div class="terr">厂商返回：内容审核未通过 · 已自动退还 60 积分</div>
+          <div class="tfoot" style="margin-top:10px"><span class="rt">—</span><button class="mbtn soft sm">重新提交</button></div>
+        </div>
+        <div class="hi"></div>
+        <div class="grainl"></div>
+      </div></div>
+      <div class="cap">
+        <h4><span class="k">C</span>任务中心 · 全部 AI 任务</h4>
+        <ul>
+          <li>顶部三枚计数牌 + 状态筛选；<b>失败卡直接给原因与退款金额</b>，一键重提。</li>
+          <li>任务类型沿用现有枚举（剧本拆分 / 资产生图 / 片段视频 / 合成全集 / 加字幕 / 剪辑导出…）。</li>
+          <li>进行态金渐变进度条 + 青色脉冲点；排队态给排位与预计等待，不显示假进度。</li>
+          <li>复用现有前端轮询与 Toast 播报（30s 任务播报语义不变）。</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FRAME D 积分中心 -->
+    <div class="frame-col">
+      <div class="ftag">FRAME D · 二级</div>
+      <div class="phone static"><div class="scr">
+        <div class="island"></div>
+        <div class="sbar"><span class="mono">9:41</span><div class="rig"><div class="sig"><i></i><i></i><i></i><i></i></div><div class="batt"></div></div></div>
+        <div class="pnav">
+          <button class="iconbtn"><svg class="ic"><use href="#i-left"/></svg></button>
+          <h3>积分中心</h3>
+          <button class="iconbtn"><svg class="ic"><use href="#i-clock"/></svg></button>
+        </div>
+        <div class="bcard" style="margin-top:2px">
+          <div class="lb">当前积分余额</div>
+          <div class="bnum">12,480<small>CREDITS</small></div>
+          <div class="brow"><span>消耗 3,240</span><span>充值 +5,000</span><span>退还 +120</span></div>
+        </div>
+        <div class="sechead"><h5>充值套餐</h5><span class="more">积分永不过期</span></div>
+        <div class="pkggrid">
+          <div class="pkg"><span class="amt">1,000<small>积分</small></span><div class="price">¥ 99</div></div>
+          <div class="pkg on"><span class="tag">送 500</span><span class="amt">5,000<small>积分</small></span><div class="price">¥ 449</div></div>
+          <div class="pkg"><span class="amt">10,000<small>积分</small></span><div class="price">¥ 899</div></div>
+          <div class="pkg"><span class="tag">超值</span><span class="amt">30,000<small>积分</small></span><div class="price">¥ 2,499</div></div>
+        </div>
+        <div class="payrow">
+          <div class="pay on"><span class="pdot"></span>微信支付</div>
+          <div class="pay"><span class="pdot"></span>支付宝</div>
+        </div>
+        <div class="sechead"><h5>积分流水</h5><span class="more">全部</span></div>
+        <div class="card">
+          <div class="txrow"><span class="mi"><svg class="ic"><use href="#i-video"/></svg></span><div class="tt"><b>片段视频 × 6</b><span>今天 14:20 · 《夜航西飞》</span></div><span class="val minus">−480</span></div>
+          <div class="txrow"><span class="mi"><svg class="ic"><use href="#i-wallet"/></svg></span><div class="tt"><b>充值套餐</b><span>昨天 21:03 · 微信支付</span></div><span class="val plus">+5,000</span></div>
+          <div class="txrow"><span class="mi"><svg class="ic"><use href="#i-tasks"/></svg></span><div class="tt"><b>任务退还</b><span>昨天 18:47 · 字幕校正失败</span></div><span class="val refund">+120</span></div>
+        </div>
+        <div class="wbar"><button class="mbtn grow">立即充值 · ¥ 449</button></div>
+        <div class="hi"></div>
+        <div class="grainl"></div>
+      </div></div>
+      <div class="cap">
+        <h4><span class="k">D</span>积分中心 · 余额与充值</h4>
+        <ul>
+          <li><b>金渐变余额卡</b>是全页唯一强色块 —— 积分即通货，视觉权重最高。</li>
+          <li>套餐 2×4 网格，选中态描金；<b>赠送标签用金渐变角标</b>，价格用衬线强调。</li>
+          <li>流水三色：<b>消耗灰、充值绿、退还金</b>；文案对齐现有 credits.type 枚举。</li>
+          <li>支付方式沿用微信 JSAPI / H5 双模式与收银台链路，不新增支付形态。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REEL 05 动效 ============ -->
+<section id="reel5" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 05</span><h2>动效与手势</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">动效只花在四处高影响时刻，其余一律克制；全部可在现有 CSS 令牌体系内实现，prefers-reduced-motion 全量豁免。</p>
+  <div class="mo-grid">
+    <div class="mo">
+      <div class="mv"><div class="demo-shut"><svg class="ic" style="width:20px;height:20px"><use href="#i-plus"/></svg></div></div>
+      <b>快门键</b>
+      <p>中央创作键按压回缩 + 金晕收拢，抬手弹回；像按下一次放映机的快门。</p>
+      <span class="mnote">scale .9 · 160ms</span>
+    </div>
+    <div class="mo">
+      <div class="mv"><div class="demo-tabs"><span class="dt on"></span><span class="darr">→</span><span class="dt"></span></div></div>
+      <b>Tab 切换</b>
+      <p>新页自右 20px 淡入上浮，与 PC 端 page 过渡同一套曲线；二级页整屏推入。</p>
+      <span class="mnote">220ms · cubic-bezier(.22,.61,.36,1)</span>
+    </div>
+    <div class="mo">
+      <div class="mv"><div class="stg"><i></i><i></i><i></i></div></div>
+      <b>级联入场</b>
+      <p>列表/网格首次进入视口时按 40ms 步进浮现（复用 .ad-stagger 语义）。</p>
+      <span class="mnote">40ms 步进 · 每页一次</span>
+    </div>
+    <div class="mo">
+      <div class="mv"><span class="pd"></span><div class="pb"><i></i></div></div>
+      <b>进行中任务</b>
+      <p>金渐变进度条生长 + 青色脉冲点呼吸；骨架屏用现有 shimmer 微光。</p>
+      <span class="mnote">pulse 1.9s · shimmer 1.6s</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REEL 06 落地 ============ -->
+<section id="reel6" class="rev">
+  <div class="reel-head"><span class="reel-no">REEL 06</span><h2>落地路径</h2><div class="sprock"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+  <p class="reel-sub">不新建工程：在现有 client 内以「≤768 断点 + 移动组件」落地，桌面端零回归。预计 5 个工作日完成主体。</p>
+  <div class="land">
+    <div class="litem"><span class="lno">01</span><div><b>令牌零新增</b><p>全部复用 theme.scss 的 --ad-* 变量；本方案中的移动组件只新增布局类（.m-btn/.tabbar 等），色值一律引用令牌，深浅主题自动跟随。</p></div></div>
+    <div class="litem"><span class="lno">02</span><div><b>DefaultLayout 增 MobileTabBar</b><p>≤768 渲染五槽 TabBar（含中央创作键），路由 meta.tab 标注归属；沉浸式页（工作台 / 分镜 / 剪辑 / 分享播放）沿用现有 immersive meta 隐藏导航。</p></div></div>
+    <div class="litem"><span class="lno">03</span><div><b>创作面板统一入口</b><p>AI 编剧 / 导入剧本 / 做同款三路汇入现有 ScriptWriter 与项目创建流；「模型 + 价格」确认页与 useCostAction 对象 API 不变，modelConfigId 端到端透传。</p></div></div>
+    <div class="litem"><span class="lno">04</span><div><b>i18n 与文案</b><p>新增 mobile.* 键族覆盖 9 语言；路由只传键、params 永远尾参；叶子键直达字符串，避免对象键静默回退。</p></div></div>
+    <div class="litem"><span class="lno">05</span><div><b>媒体与安全护栏</b><p>视频一律走全屏播放窗（复用 miniclient VideoPlayerPopup 交互范式）；/files 时效签名不变；弹层宽度 min(原始,94vw)；底部操作条计入 safe-area。</p></div></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fmark">掌上制片厂 · POCKET STUDIO</div>
+  <p>本页即原型 —— 单文件 HTML/CSS/JS，无构建依赖，可直接交付评审<span class="fdot">·</span>星网 XW.COM · AIDrama<span class="fdot">·</span>2026-09</p>
+</footer>
+
+<script>
+(function(){
+  var phone = document.getElementById('heroPhone');
+  var mask = document.getElementById('mask');
+  var pills = document.querySelectorAll('.pill[data-go]');
+
+  function go(name){
+    var views = phone.querySelectorAll('.view');
+    for (var i=0;i<views.length;i++){
+      views[i].classList.toggle('on', views[i].getAttribute('data-v')===name);
+    }
+    var tabs = phone.querySelectorAll('[data-tab]');
+    for (var j=0;j<tabs.length;j++){
+      var t = tabs[j];
+      t.classList.toggle('active', t.getAttribute('data-tab')===name);
+    }
+    phone.classList.toggle('pushed', name==='tasks');
+    for (var k=0;k<pills.length;k++){
+      pills[k].classList.toggle('on', pills[k].getAttribute('data-go')===name);
+    }
+    var v = phone.querySelector('.view.on');
+    if (v) v.scrollTop = 0;
+  }
+
+  function openSheet(){ phone.classList.add('sheet-open'); }
+  function closeSheet(){ phone.classList.remove('sheet-open'); }
+
+  var gos = document.querySelectorAll('[data-go]');
+  for (var m=0;m<gos.length;m++){
+    gos[m].addEventListener('click', function(){ go(this.getAttribute('data-go')); });
+  }
+  var sheets = document.querySelectorAll('[data-sheet]');
+  for (var n=0;n<sheets.length;n++){
+    sheets[n].addEventListener('click', openSheet);
+  }
+  mask.addEventListener('click', closeSheet);
+  document.getElementById('sheetClose').addEventListener('click', closeSheet);
+
+  // 滚动显现
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:.08});
+  var revs = document.querySelectorAll('.rev');
+  for (var r=0;r<revs.length;r++){ io.observe(revs[r]); }
+})();
+</script>
+</body>
+</html>

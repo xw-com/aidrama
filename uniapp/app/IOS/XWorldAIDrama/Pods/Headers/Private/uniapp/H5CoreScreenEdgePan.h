@@ -1,0 +1,1 @@
+../../../../../SDK/inc/H5CoreScreenEdgePan.h

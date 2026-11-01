@@ -1,0 +1,70 @@
+PODS:
+  - uniapp/Audio (5.26.0)
+  - uniapp/CameraGallery (5.26.0)
+  - uniapp/Canvas (5.26.0)
+  - uniapp/Contacts (5.26.0)
+  - uniapp/Core (5.26.0)
+  - uniapp/File (5.26.0)
+  - uniapp/Fingerprint (5.26.0)
+  - uniapp/Geolocation (5.26.0)
+  - uniapp/Geolocation-Tencent (5.26.0):
+    - uniapp/Core
+    - uniapp/Geolocation
+  - uniapp/IBeacon (5.26.0)
+  - uniapp/Log (5.26.0)
+  - uniapp/Messaging (5.26.0)
+  - uniapp/Oauth (5.26.0)
+  - uniapp/Oauth-Apple (5.26.0):
+    - uniapp/Oauth
+  - uniapp/Oauth-Google (5.26.0):
+    - uniapp/Oauth
+  - uniapp/Oauth-Univerify (5.26.0):
+    - uniapp/Oauth
+  - uniapp/Oauth-Wechat (5.26.0):
+    - uniapp/Oauth
+  - uniapp/Orientation (5.26.0)
+  - uniapp/Payment (5.26.0)
+  - uniapp/Proximity (5.26.0)
+  - uniapp/Push (5.26.0)
+  - uniapp/Sqlite (5.26.0)
+  - uniapp/Video (5.26.0)
+  - uniapp/XMLHttpRequest (5.26.0)
+  - uniapp/Zip (5.26.0)
+
+DEPENDENCIES:
+  - uniapp/Audio (from `..`)
+  - uniapp/CameraGallery (from `..`)
+  - uniapp/Canvas (from `..`)
+  - uniapp/Contacts (from `..`)
+  - uniapp/Core (from `..`)
+  - uniapp/File (from `..`)
+  - uniapp/Fingerprint (from `..`)
+  - uniapp/Geolocation (from `..`)
+  - uniapp/Geolocation-Tencent (from `..`)
+  - uniapp/IBeacon (from `..`)
+  - uniapp/Log (from `..`)
+  - uniapp/Messaging (from `..`)
+  - uniapp/Oauth (from `..`)
+  - uniapp/Oauth-Apple (from `..`)
+  - uniapp/Oauth-Google (from `..`)
+  - uniapp/Oauth-Univerify (from `..`)
+  - uniapp/Oauth-Wechat (from `..`)
+  - uniapp/Orientation (from `..`)
+  - uniapp/Payment (from `..`)
+  - uniapp/Proximity (from `..`)
+  - uniapp/Push (from `..`)
+  - uniapp/Sqlite (from `..`)
+  - uniapp/Video (from `..`)
+  - uniapp/XMLHttpRequest (from `..`)
+  - uniapp/Zip (from `..`)
+
+EXTERNAL SOURCES:
+  uniapp:
+    :path: ".."
+
+SPEC CHECKSUMS:
+  uniapp: 231c3baaa1974b3ebe60c3a19f1061ed0b57ee44
+
+PODFILE CHECKSUM: 22c314c9f45dd06a08953228e9188617b4e319a3
+
+COCOAPODS: 1.16.2

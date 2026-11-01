@@ -1,0 +1,71 @@
+/* ============================================================
+   AIDrama uniapp · 全局 SCSS 变量（自动注入每个组件）
+   令牌 1:1 对应 client/src/styles/theme.scss 深色旗舰（放映厅），
+   运行时 CSS 变量见 styles/ad.scss。此处只放编译期可用的
+   scss 变量与 mixin，避免运行时变量缺席（如 cover-view）场景。
+   ============================================================ */
+
+/* 品牌金 */
+$ad-brand: #e0b64e;
+$ad-brand-600: #cfa33a;
+$ad-brand-700: #b3871f;
+$ad-brand-contrast: #1d1503;
+
+/* 表面（放映厅） */
+$ad-ink: #0a0a0f;
+$ad-panel: #101018;
+$ad-elev: #16161f;
+$ad-inset: #0d0d14;
+$ad-line: #26262f;
+$ad-line-strong: #34343f;
+
+/* 片头青（推进 CTA） */
+$ad-accent: #2dd4bf;
+
+/* 语义色 */
+$ad-success: #34d399;
+$ad-warning: #fbbf24;
+$ad-danger: #f87171;
+
+/* 文本三级 */
+$ad-text: #f3f0e8;
+$ad-text-soft: #b3afa3;
+$ad-text-mut: #7d7a70;
+
+/* 字体栈 */
+$ad-font-serif: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', Georgia, serif;
+$ad-font-body: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+$ad-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+/* 布局常量 */
+$ad-tabbar-h: 62px;   /* TabBar 本体高（另加 safe-area，组件内处理） */
+$ad-radius: 18px;     /* 卡片 */
+$ad-radius-btn: 13px; /* 主按钮 */
+
+/* ---- mixins ---- */
+
+/* 底部安全区 padding（全面屏 Home 条） */
+@mixin safe-bottom($extra: 0px) {
+  padding-bottom: calc(#{$extra} + constant(safe-area-inset-bottom));
+  padding-bottom: calc(#{$extra} + env(safe-area-inset-bottom));
+}
+
+/* 顶部安全区（状态栏，沉浸页自绘导航时用） */
+@mixin safe-top($extra: 0px) {
+  padding-top: calc(#{$extra} + var(--status-bar-height));
+}
+
+/* 多行截断 */
+@mixin line-clamp($n: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $n;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 单行截断 */
+@mixin ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' &&
+        (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'));
+      document.write(
+        '<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' +
+        (coverSupport ? ', viewport-fit=cover' : '') + '" />'
+      );
+    </script>
+    <title></title>
+    <!-- 主题色，浏览器地址栏 / PWA -->
+    <meta name="theme-color" content="#0a0a0f" />
+    <!-- 深浅色均由应用自管（theme store），声明后浏览器不做「自动深色」算法反色
+         （华为/Android 真机会把暗色输入框等组件改得深浅不一甚至隐没，桌面无法复现） -->
+    <meta name="color-scheme" content="dark light" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

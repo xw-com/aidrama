@@ -1,0 +1,40 @@
+# systemd 单元 · AIDrama 服务端
+#
+# 进程管理二选一：PM2（deploy/ecosystem.config.js）或 systemd（本文件），不要同时用。
+# 安装：
+#   sudo cp deploy/aidrama.service /etc/systemd/system/aidrama.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now aidrama
+# 查看日志：
+#   journalctl -u aidrama -f          # 实时
+#   journalctl -u aidrama --since today
+#
+# 同样必须单实例：服务端有常驻扫描线程 + 进程内 job 队列，多实例会重复执行/重复扣费。
+
+[Unit]
+Description=AIDrama server (Node.js + Express)
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+# 按实际部署路径调整；dotenv 从 WorkingDirectory 读 server/.env
+WorkingDirectory=/usr/share/nginx/xworld-gz/AIDrama/server
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node src/index.js
+Restart=always
+RestartSec=5
+User=www-data
+Group=www-data
+# 优雅停止：给进行中的 job 收尾时间
+KillSignal=SIGINT
+TimeoutStopSec=15
+# 输出进 journald（logger 直接打 stdout）
+StandardOutput=journal
+StandardError=journal
+# 安全加固（可选，按需放宽）
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

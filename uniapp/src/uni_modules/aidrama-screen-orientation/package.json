@@ -1,0 +1,48 @@
+{
+  "id": "aidrama-screen-orientation",
+  "displayName": "屏幕方向控制（鸿蒙 UTS）",
+  "version": "1.0.0",
+  "description": "调用鸿蒙 window.setPreferredOrientation 控制应用横竖屏（视频全屏场景）。写法参照 DCloud 官方 uni-screenBrightness 插件（UTSHarmony.getWindowStage → getMainWindowSync）。",
+  "keywords": [
+    "屏幕方向",
+    "横竖屏",
+    "鸿蒙",
+    "HarmonyOS"
+  ],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^4.22"
+  },
+  "dcloudext": {
+    "type": "uts-sdk-api",
+    "sale": {
+      "regular": { "price": "0.00" },
+      "sourcecode": { "price": "0.00" }
+    },
+    "contact": {},
+    "declaration": {
+      "ads": "无",
+      "permissions": "无",
+      "npm": ""
+    }
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": { "tcb": "n", "aliyun": "n", "alipay": "n" },
+      "client": {
+        "Vue": { "vue2": "n", "vue3": "y" },
+        "App": {
+          "app-harmony": { "uniVer": "^4.22" },
+          "app-android": "n",
+          "app-ios": "n"
+        },
+        "H5-mobile": { "Safari": "n", "Android Browser": "n", "微信浏览器(Android)": "n", "QQ浏览器(Android)": "n" },
+        "H5-pc": { "Chrome": "n", "IE": "n", "Edge": "n", "Firefox": "n", "Safari": "n" },
+        "小程序": { "微信": "n", "阿里": "n", "百度": "n", "字节跳动": "n", "QQ": "n", "钉钉": "n", "快手": "n", "飞书": "n", "京东": "n" },
+        "快应用": { "华为": "n", "联盟": "n" }
+      }
+    }
+  }
+}

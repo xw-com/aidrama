@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/datamatrix/encoder/ZXDataMatrixTextEncoder.h

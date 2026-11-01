@@ -1,0 +1,73 @@
+{
+  "name": "xw-client-desktop",
+  "productName": "XWorld AI短剧工坊",
+  "version": "1.0.0",
+  "private": true,
+  "description": "XWorld AI短剧工坊 桌面客户端壳（Windows/macOS，Electron）",
+  "author": "XWorld",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "sync": "node prepare-dist.js",
+    "start": "electron .",
+    "dist:mac": "npm run sync && electron-builder --mac",
+    "dist:win": "npm run sync && electron-builder --win",
+    "dist": "npm run sync && electron-builder --mac --win"
+  },
+  "devDependencies": {
+    "electron": "^44.4.1",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.9"
+  },
+  "build": {
+    "appId": "com.xworld.aidrama.client",
+    "productName": "XWorld AI短剧工坊",
+    "publish": {
+      "provider": "generic",
+      "url": "https://dl.example.com/aidrama-desktop/"
+    },
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "package.json",
+      "dist/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "config.json",
+        "to": "config.json"
+      }
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.productivity",
+      "darkModeSupport": true,
+      "icon": "build/icon.png",
+      "target": [
+        { "target": "dmg", "arch": ["x64", "arm64"] },
+        { "target": "zip", "arch": ["x64", "arm64"] }
+      ]
+    },
+    "dmg": {
+      "title": "${productName} ${version}"
+    },
+    "win": {
+      "icon": "build/icon.png",
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "XWorld AI短剧工坊"
+    }
+  }
+}

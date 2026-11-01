@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/common/detector/ZXWhiteRectangleDetector.h

@@ -1,0 +1,1 @@
+../../../../../SDK/inc/weexHeader/WXSDKInstance+Bridge.h

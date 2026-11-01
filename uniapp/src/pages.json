@@ -1,0 +1,155 @@
+{
+  // AIDrama 掌上制片厂 · 页面注册表
+  // 首页必须是展示中心（游客可浏览）。Tab 页不用原生 tabBar（中央凸起创作键需自绘），
+  // 由 components/TabBar.vue 在四个 Tab 页内渲染，沉浸页不渲染。
+  "pages": [
+    {
+      "path": "pages/showcase/index",
+      "style": { "navigationBarTitleText": "展示中心", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/showcase/detail",
+      "style": { "navigationBarTitleText": "剧集详情", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/projects/index",
+      "style": { "navigationBarTitleText": "我的项目", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/projects/edit",
+      "style": { "navigationBarTitleText": "新建项目" }
+    },
+    {
+      "path": "pages/market/index",
+      "style": { "navigationBarTitleText": "接单中心", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/market/detail",
+      "style": { "navigationBarTitleText": "订单详情", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/mine/index",
+      "style": { "navigationBarTitleText": "我的", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/tasks/index",
+      "style": { "navigationBarTitleText": "任务中心", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/credits/index",
+      "style": { "navigationBarTitleText": "积分中心", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/invitations/index",
+      "style": { "navigationBarTitleText": "邀请中心", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/settings/index",
+      "style": { "navigationBarTitleText": "个人设置" }
+    },
+    {
+      "path": "pages/settings/private-models",
+      "style": { "navigationBarTitleText": "私有模型" }
+    },
+    {
+      "path": "pages/settings/private-model-edit",
+      "style": { "navigationBarTitleText": "编辑私有模型" }
+    },
+    {
+      "path": "pages/tutorial/index",
+      "style": { "navigationBarTitleText": "新手教程" }
+    },
+    {
+      "path": "pages/agreement/index",
+      "style": { "navigationBarTitleText": "用户协议与隐私政策" }
+    },
+    {
+      "path": "pages/login/index",
+      "style": { "navigationBarTitleText": "登录" }
+    },
+    {
+      "path": "pages/login/register",
+      "style": { "navigationBarTitleText": "注册" }
+    },
+    {
+      "path": "pages/login/forgot",
+      "style": { "navigationBarTitleText": "重置密码" }
+    },
+    {
+      "path": "pages/create/writer",
+      "style": { "navigationBarTitleText": "AI 编剧", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/workspace/index",
+      "style": { "navigationBarTitleText": "项目工作台", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/workspace/outline",
+      "style": { "navigationBarTitleText": "剧本大纲", "enablePullDownRefresh": true, "onReachBottomDistance": 120 }
+    },
+    {
+      "path": "pages/workspace/assets",
+      "style": { "navigationBarTitleText": "资产库", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/workspace/char-create",
+      "style": { "navigationBarTitleText": "自定义角色" }
+    },
+    {
+      "path": "pages/workspace/asset-edit",
+      "style": { "navigationBarTitleText": "编辑资产" }
+    },
+    {
+      "path": "pages/workspace/segment-edit",
+      "style": { "navigationBarTitleText": "编辑分镜" }
+    },
+    {
+      "path": "pages/workspace/subtitle-edit",
+      "style": { "navigationBarTitleText": "字幕编辑" }
+    },
+    {
+      "path": "pages/workspace/showcase-publish",
+      "style": { "navigationBarTitleText": "发布到展示中心" }
+    },
+    {
+      "path": "pages/workspace/outline-import",
+      "style": { "navigationBarTitleText": "导入剧本" }
+    },
+    {
+      "path": "pages/market/create",
+      "style": { "navigationBarTitleText": "发布任务单" }
+    },
+    {
+      "path": "pages/workspace/episodes",
+      "style": { "navigationBarTitleText": "分集与成片", "enablePullDownRefresh": true, "onReachBottomDistance": 120 }
+    },
+    {
+      "path": "pages/workspace/storyboard",
+      "style": { "navigationBarTitleText": "分镜编辑", "enablePullDownRefresh": true }
+    },
+    {
+      "path": "pages/workspace/clip",
+      "style": { "navigationBarTitleText": "在线剪辑", "disableScroll": true }
+    },
+    {
+      "path": "pages/play/share",
+      "style": { "navigationStyle": "custom", "backgroundColor": "#05070c", "disableScroll": true }
+    },
+    {
+      "path": "pages/pay/mini",
+      "style": { "navigationBarTitleText": "微信支付", "navigationStyle": "default", "navigationBarBackgroundColor": "#0a0a0f", "navigationBarTextStyle": "white", "backgroundColor": "#0a0a0f" }
+    }
+],
+  "globalStyle": {
+    "navigationStyle": "custom",
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "XWorld",
+    "navigationBarBackgroundColor": "#0a0a0f",
+    "backgroundColor": "#0a0a0f",
+    "backgroundTextStyle": "light",
+    "app-plus": {
+      "scrollIndicator": "none",
+      "bounce": "none"
+    }
+  }
+}

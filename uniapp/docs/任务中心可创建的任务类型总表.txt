@@ -1,0 +1,37 @@
+任务中心可创建的任务类型总表
+📝 剧本创作（scriptDraft.routes.js）
+任务类型	触发入口	说明
+script_outline	POST /scripts/:id/outline	剧本大纲生成（LLM 文本）
+episode_split	POST /scripts/:id/episodes/split	剧本分集拆分
+episode_detail	POST /scripts/:id/episodes/:eid/detail	单集详情扩写
+📦 资产管理（asset.routes.js / characterOption.routes.js）
+任务类型	触发入口	说明
+asset_extract	POST /projects/:id/extract、POST /projects/:id/episodes/:eid/extract	从剧本/单集提取角色·场景·道具资产（两个入口共用）
+asset_image	POST /assets/:aid/generate-image、POST /assets/:aid/costumes/:cid/generate-image、.../generate-image-by-requirement、POST /projects/:id/characters/custom	资产示例图/服装图/按需求服装图/角色自定义外观图（4 个入口共用）
+asset_prompt	POST /assets/:aid/generate-prompt	资产出图提示词生成
+char_option_image	POST /admin/character-options/:group/:key/generate-image（admin）	角色自定义选项示例图生成
+char_option_image_batch	POST /admin/character-options/generate-missing（admin）	批量补齐缺失选项示例图
+🎬 分镜制作（storyboard.routes.js）
+任务类型	触发入口	说明
+storyboard_script	POST /episodes/:eid/generate-storyboard	生成分镜脚本
+segment_prompt	POST /segments/:sid/generate-prompt	单镜提示词生成/重生成
+segment_generate	POST /segments/:sid/generate	片段生成：视频 + 抽首帧关键帧/尾帧备用
+segment_video	POST /segments/:sid/generate-video	分镜视频生成/重生成（首尾帧延续上一镜）
+segment_erase_subtitle	POST /segments/:sid/erase-subtitle	分镜视频去字幕（参考视频通道提交多模态模型，产物替换原片）
+segment_video_batch	POST /episodes/:eid/segments/generate-video-batch	批量分镜视频（串行，feature=segment_video_batch 延续上一镜尾帧）
+segment_video_batch_concurrent	POST /episodes/:eid/segments/generate-video-batch-concurrent	批量分镜视频（并发版）
+🎞️ 成片处理（video.routes.js / cover.service.js）
+任务类型	触发入口	说明
+video_synthesis	POST /episodes/:eid/compose	合成全集成片（ffmpeg 装配，分辨率 6 档可选、factor 计费）
+video_subtitle	POST /videos/:jobId/subtitle、POST /videos/:jobId/subtitle/burn	字幕 ASR 提取落档 / 烧录字幕进成片（两个入口共用）
+subtitle_correct	POST /videos/:jobId/subtitle/correct	字幕智能校正（LLM 对照剧本小改）
+video_edit	POST /videos/:jobId/edit	在线剪辑器纯剪辑导出（成片卡/分镜 seg-<id> 共用）
+project_cover	编辑弹窗「AI 生成封面」（cover.service.js:171 startCoverJob）	AI 生成项目封面，854×480 PNG 归一后写回
+🎨 风格库（artstyle.routes.js）
+任务类型	触发入口	说明
+art_style_image	admin 风格编辑「生成/重新生成示例图」（artstyle.routes.js:137）	AI 生 4K 风格示例图，落 images/1.webp + preview.webp
+补充说明
+
+按模态归类：LLM 文本类 6 种（outline/split/detail/extract/prompt×2）、图像类 5 种、视频生成类 6 种、ffmpeg 处理类 3 种（synthesis/burn/edit 含 ASR）、admin 专属 3 种（char_option_image×2、art_style_image）。
+均走统一「模型+价格确认页」→ createJob → 异步 runner → 前端轮询链路，meta.feature 携带计费 feature 键。
+voice.routes.js（试听/情绪列表等）为同步接口，不产生任务。

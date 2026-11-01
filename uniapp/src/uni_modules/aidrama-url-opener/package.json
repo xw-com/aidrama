@@ -1,0 +1,49 @@
+{
+  "id": "aidrama-url-opener",
+  "displayName": "系统浏览器打开外链（鸿蒙 UTS）",
+  "version": "1.0.0",
+  "description": "调起鸿蒙系统浏览器打开外部 http(s) 链接（私有模型「官网注册」等外跳场景）。uni-app 鸿蒙端 JS 层没有 plus.runtime.openURL（APP-PLUS 专属，编译即裁剪，点了没反应），必须走 UTS 桥。startAbility + entity.system.browsable 显式限定浏览器类应用，无需申请权限。",
+  "keywords": [
+    "外链",
+    "浏览器",
+    "openURL",
+    "鸿蒙",
+    "HarmonyOS"
+  ],
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^4.22"
+  },
+  "dcloudext": {
+    "type": "uts-sdk-api",
+    "sale": {
+      "regular": { "price": "0.00" },
+      "sourcecode": { "price": "0.00" }
+    },
+    "contact": {},
+    "declaration": {
+      "ads": "无",
+      "permissions": "无",
+      "npm": ""
+    }
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": { "tcb": "n", "aliyun": "n", "alipay": "n" },
+      "client": {
+        "Vue": { "vue2": "n", "vue3": "y" },
+        "App": {
+          "app-harmony": { "uniVer": "^4.22" },
+          "app-android": "n",
+          "app-ios": "n"
+        },
+        "H5-mobile": { "Safari": "n", "Android Browser": "n", "微信浏览器(Android)": "n", "QQ浏览器(Android)": "n" },
+        "H5-pc": { "Chrome": "n", "IE": "n", "Edge": "n", "Firefox": "n", "Safari": "n" },
+        "小程序": { "微信": "n", "阿里": "n", "百度": "n", "字节": "n", "QQ": "n", "钉钉": "n", "快手": "n", "飞书": "n", "京东": "n" },
+        "快应用": { "华为": "n", "联盟": "n" }
+      }
+    }
+  }
+}

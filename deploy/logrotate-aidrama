@@ -1,0 +1,23 @@
+# logrotate 配置 · AIDrama
+#
+# 安装（路径按实际部署调整）：
+#   sudo cp deploy/logrotate-aidrama /etc/logrotate.d/aidrama
+# 验证（不真轮转，只演练）：
+#   sudo logrotate -d /etc/logrotate.d/aidrama
+#
+# 说明：
+# - server/logs/YYYY-MM-DD/ 下的 AI 提交/返回留档 JSON 按日期目录自管理（代码写入时按天建目录），
+#   不归 logrotate 管；这里只轮转 stdout 类 .log（开发启动日志等）与 PM2 进程日志。
+# - PM2 / systemd 的进程 stdout 落于下方所列路径；copytruncate 允许进程继续持有文件句柄，
+#   无需给进程发信号（服务端不自写文件日志，主要日志在 journald / ~/.pm2/logs）。
+
+/usr/share/nginx/xworld-gz/AIDrama/server/logs/*.log /root/.pm2/logs/aidrama-*.log {
+    daily
+    rotate 14
+    compress
+    delaycompress
+    copytruncate
+    missingok
+    notifempty
+    dateext
+}

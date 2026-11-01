@@ -1,0 +1,1 @@
+../../../../../SDK/inc/SDWebImage/Core/UIImage+GIF.h

@@ -1,0 +1,1 @@
+../../../../../SDK/inc/SDWebImage/Core/SDImageTransformer.h

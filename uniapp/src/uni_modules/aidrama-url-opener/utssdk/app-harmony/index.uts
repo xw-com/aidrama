@@ -1,0 +1,34 @@
+import { UTSHarmony } from "@dcloudio/uni-app-runtime"
+import { Want } from '@kit.AbilityKit'
+import { BusinessError } from '@kit.BasicServicesKit'
+
+/**
+ * 用系统浏览器打开外部链接（仅鸿蒙端）。
+ * uni-app 鸿蒙端没有 plus.runtime.openURL（它是 APP-PLUS 专属 API，
+ * 鸿蒙编译时连 #ifdef APP-PLUS 分支一起裁剪，「官网注册」点了没反应），只能走 UTS 桥。
+ *
+ * Want 用 viewData + entity.system.browsable：显式限定浏览器类应用，
+ * 比 openLink 少一层 App Linking 域名匹配语义，任意 http(s) 链接都成立。
+ *
+ * @param url  完整链接（含 http/https；调用侧负责补协议）
+ * @param fail 打开失败回调，参数为 errMsg；成功无回调（结果交系统浏览器）
+ */
+export function openBrowserUrl(url : string, fail : (errMsg : string) => void) : void {
+  try {
+    const ctx = UTSHarmony.getUIAbilityContext()
+    if (ctx == null) {
+      fail('openBrowserUrl: no UIAbilityContext')
+      return
+    }
+    const want : Want = {
+      action: 'ohos.want.action.viewData',
+      entities: ['entity.system.browsable'],
+      uri: url,
+    }
+    ctx.startAbility(want).catch((err : BusinessError) => {
+      fail(`${err.code}: ${err.message}`)
+    })
+  } catch (e) {
+    fail(`openBrowserUrl exception: ${e}`)
+  }
+}

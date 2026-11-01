@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/core/ZXRGBLuminanceSource.h

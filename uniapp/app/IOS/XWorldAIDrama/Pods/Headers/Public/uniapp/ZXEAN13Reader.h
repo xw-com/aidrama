@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/oned/ZXEAN13Reader.h

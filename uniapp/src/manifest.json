@@ -1,0 +1,173 @@
+{
+    "name" : "XWorld-AI短剧工坊",
+    "appid" : "__UNI__000B765",
+    "description" : "XWorld 掌上制片厂 · 一部手机就是一个剧组",
+    "versionName" : "1.0.0",
+    "versionCode" : "100",
+    "transformPx" : false,
+    "locale" : "zh-Hans",
+    "app-plus" : {
+        // 暗黑模式：声明后 getSystemInfoSync 才返回 theme、onThemeChange 才生效（iOS 13+/Android 10+，需云打包或自定义基座）
+        "darkmode" : true,
+        "themeLocation" : "theme.json",
+        "usingComponents" : true,
+        "nvueStyleCompiler" : "uni-app",
+        "compilerVersion" : 3,
+        "splashscreen" : {
+            "alwaysShowBeforeRender" : true,
+            "waiting" : true,
+            "autoclose" : true,
+            "delay" : 0
+        },
+        "modules" : {
+            "VideoPlayer" : {},
+            "OAuth" : {}
+        },
+        "distribute" : {
+            "android" : {
+                // minSdk 23(Android 6.0)；targetSdk 35 满足 Google Play 2025+ 上架要求
+                "minSdkVersion" : 23,
+                "targetSdkVersion" : 35,
+                // OAuth scheme 回调（RFC 8252）：系统浏览器授权后经 aidrama:// 唤回 App，与 api/oauth.js 的 APP_SCHEME 一致
+                "schemes" : "aidrama",
+                "abiFilters" : [ "armeabi-v7a", "arm64-v8a" ],
+                "screenOrientation" : [ "portrait-primary" ],
+                "permissions" : [
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\"/>",
+                    // 选图/选视频（相册）：Android 13+ 细分媒体权限，Android 12 及以下走 READ_EXTERNAL_STORAGE
+                    "<uses-permission android:name=\"android.permission.READ_MEDIA_IMAGES\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_MEDIA_VIDEO\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" android:maxSdkVersion=\"32\"/>",
+                    // 选图/拍视频时如来源选「相机」
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>"
+                ]
+            },
+            "ios" : {
+                // App Store 审核要求：凡代码可能触发的系统能力都必须给出用途说明
+                "privacyDescription" : {
+                    "NSCameraUsageDescription" : "用于拍摄照片/视频并上传为创作素材",
+                    "NSPhotoLibraryUsageDescription" : "用于从相册选择图片/视频并上传为创作素材",
+                    "NSPhotoLibraryAddUsageDescription" : "用于将生成的视频/图片保存到相册"
+                },
+                "idfa" : false,
+                // 剧本导出：plus.io 写 Documents 后在系统「文件」App 可见（App Store 允许的文件共享声明）
+                "UIFileSharingEnabled" : true,
+                // OAuth scheme 回调（RFC 8252）：与 android.schemes / api/oauth.js 的 APP_SCHEME 一致
+                "urltypes" : "aidrama",
+                // App Store Connect：从 2027 年春季起最低部署版本要求为 iOS 15.0
+                "deploymentTarget" : "15.0",
+                "dSYMs" : true
+            },
+            "sdkConfigs" : {
+                // OAuth 登录鉴权（modules.OAuth 已声明）：按钮显隐由 oauthLogin.js 按平台给出，
+                // 服务端换取见 POST /api/auth/oauth/:provider
+                "oauth" : {
+                    // 苹果登录（仅 iOS）：无需参数，但 Apple Developer 后台该 App ID 必须勾选
+                    // Sign In with Apple capability；标准基座不支持，需自定义基座/云打包
+                    "apple" : {},
+                    // Google 登录（仅 Android）：Google Cloud Console OAuth 客户端 ID（Android 型，
+                    // 包名+SHA1 须与本 App 打包证书一致）；无 GMS 设备（国行多数）点登录会失败给提示
+                    "google" : {
+                        "clientid" : "TODO-REPLACE-WITH-GOOGLE-ANDROID-CLIENT-ID.apps.googleusercontent.com"
+                    }
+                }
+            },
+            "icons" : {
+                "android" : {
+                    "hdpi" : "unpackage/res/icons/72x72.png",
+                    "xhdpi" : "unpackage/res/icons/96x96.png",
+                    "xxhdpi" : "unpackage/res/icons/144x144.png",
+                    "xxxhdpi" : "unpackage/res/icons/192x192.png"
+                },
+                "ios" : {
+                    "appstore" : "unpackage/res/icons/1024x1024.png",
+                    "ipad" : {
+                        "app" : "unpackage/res/icons/76x76.png",
+                        "app@2x" : "unpackage/res/icons/152x152.png",
+                        "notification" : "unpackage/res/icons/20x20.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "proapp@2x" : "unpackage/res/icons/167x167.png",
+                        "settings" : "unpackage/res/icons/29x29.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "spotlight" : "unpackage/res/icons/40x40.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png"
+                    },
+                    "iphone" : {
+                        "app@2x" : "unpackage/res/icons/120x120.png",
+                        "app@3x" : "unpackage/res/icons/180x180.png",
+                        "notification@2x" : "unpackage/res/icons/40x40.png",
+                        "notification@3x" : "unpackage/res/icons/60x60.png",
+                        "settings@2x" : "unpackage/res/icons/58x58.png",
+                        "settings@3x" : "unpackage/res/icons/87x87.png",
+                        "spotlight@2x" : "unpackage/res/icons/80x80.png",
+                        "spotlight@3x" : "unpackage/res/icons/120x120.png"
+                    }
+                }
+            }
+        }
+    },
+    // 鸿蒙(HarmonyOS NEXT)：bundleName 须与 AGC 证书/签名 profile 申请时填的包名逐字一致
+    "app-harmony" : {
+        // 暗黑模式（HBuilderX 5.0+ 支持；onThemeChange 需 4.71+）。pages.json 未引用 @变量，不会自动改界面
+        "darkmode" : true,
+        "themeLocation" : "theme.json",
+        "bundleName" : "com.example.aidrama",
+        "useragent" : {
+            "value" : "",
+            "concatenate" : true
+        },
+        "distribute" : {
+            "bundleName" : "com.example.aidrama",
+            "signingConfigs" : {
+                "default" : {
+                    "certpath" : "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1790996443017.cer",
+                    "keyAlias" : "debugKey",
+                    "keyPassword" : "0000001A8A591F6708011A92D469278B7B7ACCC205FAD6E75B4DF0F6BDD14BC5744EF6F409F4AD19223D",
+                    "profile" : "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1791436407629.p7b",
+                    "signAlg" : "SHA256withECDSA",
+                    "storeFile" : "/Users/fuwenke/Library/Application Support/HBuilder X/extensions/launcher/agc-certs/1775436041102.p12",
+                    "storePassword" : "0000001A8A591F6708011A92D469278B7B7ACCC205FAD6E75B4DF0F6BDD14BC5744EF6F409F4AD19223D"
+                }
+            },
+            "icons" : {
+                "foreground" : "unpackage/res/icons/1024x1024.png",
+                "background" : "unpackage/res/icons/1024x1024.png"
+            },
+            "splashScreens" : {
+                "startWindowIcon" : "unpackage/res/icons/1024x1024.png",
+                "startWindowBackground" : "#FFFFFF"
+            },
+            "modules" : {}
+        }
+    },
+    "mp-weixin" : {
+        // 占位 appid：接入时替换为真实小程序 AppID（企业主体）
+        "appid" : "wxb390de9ec7b24f46",
+        // 开启后 wx.onThemeChange 可用（stores/theme.js 系统跟随依赖）；未配 theme.json，微信不会自改界面
+        "darkmode" : true,
+        // 组件按需注入：启动时只注入当前页声明的组件（微信代码质量扫描项）
+        "lazyCodeLoading" : "requiredComponents",
+        "setting" : {
+            "urlCheck" : false,
+            "es6" : true,
+            "postcss" : true,
+            "minified" : true
+        },
+        "usingComponents" : true
+    },
+    "h5" : {
+        "title" : "XWorld 掌上制片厂",
+        "template" : "index.html",
+        "router" : {
+            "mode" : "history",
+            "base" : "/h5/"
+        },
+        // OAuth：H5/小程序/鸿蒙的 redirect_uri 是 {origin}/pages/login/callback，App 是 aidrama://oauth/callback，均需在 xworld 侧登记
+        "devServer" : {
+            "port" : 5175,
+            "https" : false
+        }
+    },
+    "vueVersion" : "3"
+}

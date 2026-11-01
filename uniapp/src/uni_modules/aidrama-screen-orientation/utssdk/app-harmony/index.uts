@@ -1,0 +1,50 @@
+import { UTSHarmony } from "@dcloudio/uni-app-runtime"
+import window from '@ohos.window'
+import { BusinessError } from '@kit.BasicServicesKit'
+
+/**
+ * 设置应用窗口显示方向（仅鸿蒙端）。
+ * uni-app 鸿蒙端的 JS 层没有任何方向 API（plus.navigator 只读），
+ * 视频全屏旋转由 DCloud 运行时原生代码控制，这里提供运行期覆盖入口。
+ *
+ * 注意：
+ * - UTSHarmony 从 @dcloudio/uni-app-runtime 导入（它公开 re-export 了 uni-mp-sdk 的
+ *   UTSHarmony）；@dcloudio/uni-app-framework 是运行时的内部依赖，外部模块解析不到。
+ * - 除主窗口外还对「顶层窗口」设置：本 SDK 没有 window.getAllWindows，
+ *   而原生视频全屏疑似用独立子窗口盖在主窗口上——getTopWindow 能拿到当前最上层的窗口。
+ *
+ * @param orientation 'portrait' 竖屏 | 'landscape' 横屏
+ * @returns true 表示已发起调用（异步生效）；false 表示获取窗口失败
+ */
+export function setScreenOrientation(orientation : string) : boolean {
+  try {
+    const target : window.Orientation = orientation == 'landscape'
+      ? window.Orientation.LANDSCAPE
+      : window.Orientation.PORTRAIT
+    // 主窗口立即设置（同步路径，覆盖最常见场景）
+    const windowStage = UTSHarmony.getWindowStage()
+    if (windowStage != null) {
+      const mainWindow = windowStage.getMainWindowSync()
+      mainWindow.setPreferredOrientation(target, (err : BusinessError) => {
+        if (err && err.code) {
+          console.error(`setScreenOrientation main fail, code: ${err.code}, message: ${err.message}`)
+        }
+      })
+    }
+    // 顶层窗口（若原生全屏开了独立子窗口，只有对它设置才能生效）
+    const ctx = UTSHarmony.getUIAbilityContext()
+    window.getTopWindow(ctx).then((topWin : window.Window) => {
+      topWin.setPreferredOrientation(target, (err : BusinessError) => {
+        if (err && err.code) {
+          console.error(`setScreenOrientation top fail, code: ${err.code}, message: ${err.message}`)
+        }
+      })
+    }).catch((err : BusinessError) => {
+      console.error(`setScreenOrientation getTopWindow fail, code: ${err.code}, message: ${err.message}`)
+    })
+    return true
+  } catch (e) {
+    console.error(`setScreenOrientation exception: ${e}`)
+    return false
+  }
+}

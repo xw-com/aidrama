@@ -1,0 +1,1 @@
+../../../../../SDK/inc/ZXingObjC/qrcode/detector/ZXQRCodeFinderPatternInfo.h
