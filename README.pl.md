@@ -188,3 +188,97 @@ System kont jest **wbudowany w projekt**: rejestracja / logowanie / zmiana hasł
 Powiązane zmienne `.env`: `JWT_SECRET`, `ADMIN_JWT_SECRET`, `CAPTCHA_TICKET_SECRET`, `ADMIN_INIT_USERNAME`, `ADMIN_INIT_PASSWORD` (wszystkie opisane w komentarzach `server/.env.example`).
 
 ---
+
+## 💚 WeChat Pay (V3 · Native przez kod QR / JSAPI)
+
+Prawdziwy WeChat Pay: **sterowany konfiguracją, domyślnie wyłączony** (puste `WECHAT_PAY_*` w `.env` oznaczają brak włączenia; frontend automatycznie ukrywa wejście do doładowań). `WECHAT_APP_ID` pozostaje tylko jako wartość zapasowa dla płatności AppID.
+
+Włącz płatności Native/JSAPI na [platformie merchantów WeChat](https://pay.weixin.qq.com/), uzyskaj numer merchant i klucz APIv3 oraz pobierz certyfikat API merchantu (`apiclient_key.pem` + numer seryjny certyfikatu). **Numer merchant i AppID muszą być powiązane na platformie merchantów** (w przeciwnym razie utworzenie zamówienia zwróci `APPID_MCHID_NOT_MATCH`). Konfiguracja:
+```bash
+WECHAT_PAY_METHOD=native       # native=płatność kodem QR | jsapi=płatność wewnątrz oficjalnego konta (na PC kasa H5)
+WECHAT_PAY_APP_ID=             # AppID powiązany z numerem merchant (puste → fallback na WECHAT_APP_ID)
+WECHAT_PAY_MCH_ID=<twój numer merchant>
+WECHAT_PAY_API_V3_KEY=         # 32-znakowy klucz APIv3
+WECHAT_PAY_SERIAL_NO=          # numer seryjny certyfikatu API merchantu
+WECHAT_PAY_PRIVATE_KEY_PATH=cert/apiclient_key.pem   # ścieżka do apiclient_key.pem na dysku (albo następna linia — jedno z dwóch)
+WECHAT_PAY_PRIVATE_KEY=        # albo wprost tekst PEM inline
+WECHAT_PAY_NOTIFY_URL=         # puste → używane jest ${PUBLIC_BASE_URL}/api/recharge/wechat/notify
+```
+- Przebieg: w centrum kredytów wybierz „WeChat Pay" → backend tworzy zamówienie (Native zwraca `code_url` do wyrysowania kodu QR / JSAPI otwiera płatność) → użytkownik płaci → asynchroniczne wywołanie zwrotne WeChat na `/api/recharge/wechat/notify` (odszyfrowanie i weryfikacja AES-256-GCM, idempotentne zaksięgowanie).
+- Callback musi być **adresem HTTPS osiągalnym z internetu** (na czas developmentu można użyć tunelu).
+
+> Kroki uruchomienia (powiązanie AppID na platformie merchantów, umieszczenie certyfikatu lokalnie na serwerze, regresja na prawdziwym zamówieniu za jednego grosza) — zob. **[deploy/DEPLOY.md](deploy/DEPLOY.md) ⑦ Kroki uruchomienia WeChat Pay**.
+> Baza danych: numer transakcji zamówienia płatności zapisywany jest w `recharge_orders.transaction_id`; kolumna jest uzupełniana idempotentnie przez `ensureColumns` przy starcie, bez wpływu na stare bazy.
+
+---
+
+## 🧪 Kroki weryfikacji end-to-end
+
+0. Panel administracyjny `/admin` (admin/admin123) → **Konfiguracja modeli** → skonfiguruj wszystkie cztery typy: tekst/obrazy/wideo/TTS (inaczej kroki AI będą niedostępne)
+1. Zarejestruj się/zaloguj na froncie → nowy projekt → w „Zarysie scenariusza" wklej/wgraj scenariusz → **podział scenariusza przez AI** (pobiera kredyty)
+2. „Biblioteka zasobów" → **ekstrakcja zasobów przez AI** → **wygeneruj obrazy zasobów** dla postaci/scen
+3. „Wideo odcinków" → **wygeneruj skrypt** → przejdź do **edytora storyboardu**
+4. W edytorze zaznacz klip → **wygeneruj od razu** (klip wideo; pierwszy kadr automatycznie jako okładka podglądu)
+5. **Złóż pełny odcinek** (ffmpeg skleja pełny mp4 odcinka)
+6. W „Centrum kredytów" sprawdź historię operacji i doładuj konto; w panelu zmień cennik / zbanuj / zresetuj hasło / zobacz logi logowań; przełącz motyw jasny/ciemny/auto
+
+---
+
+## 📡 Główne API (prefiks `/api`, uwierzytelnianie JWT, jednolity `{code,message,data}`)
+
+```
+POST /auth/register | /auth/login                              # rejestracja lokalna (wymagany ticket captchy) / logowanie (publiczne, limit częstotliwości)
+POST /auth/password                                            # zmiana hasła (stan zalogowany)
+POST /auth/oauth/refresh                                       # ciche odświeżenie (refresh_token wymieniany na nowy access_token, publiczne)
+POST /auth/oauth/:provider                                     # wymiana logowania zewnętrznego na lokalną sesję (apple/google/weixin/huawei, opcjonalnie)
+GET /auth/me   POST /auth/sync                                 # profil użytkownika
+POST /captcha/challenge | /captcha/verify                      # captcha z wybieraniem tekstu
+GET/POST/PUT/DELETE /projects          GET /projects/:id
+POST /projects/:id/script/import       POST /projects/:id/script/parse
+POST /projects/:id/extract             GET /projects/:id/assets  POST /assets/:id/generate-image
+POST /episodes/:id/generate-storyboard GET /episodes/:id/segments
+POST /segments/:id/generate            PUT /segments/:id
+POST /episodes/:id/compose             GET /episodes/:id/video
+GET /jobs                                                              # centrum zadań asynchronicznych (frontend odpytuje)
+GET /model-configs                     POST /model-configs/import  GET /model-configs/export   # strona odczytu konfiguracji globalnych + import/eksport (zarządzane w panelu administracyjnym)
+GET /credits/balance | /credits/transactions
+GET /recharge/packages  POST /recharge/create  GET /recharge/orders/:id
+POST /recharge/wechat/notify                                   # callback WeChat Pay (bez uwierzytelniania, weryfikacja podpisu + idempotencja)
+GET /showcase/*                                                # galeria (publikacja/przeglądanie/zrób podobne)
+GET /market/*                                                  # centrum zleceń (zlecenia/escrow/odbiór)
+GET /pricing
+```
+Każdy endpoint AI ma odpowiadający mu `…/estimate` do szacowania kredytów; endpointy administracyjne (`/admin/*`: użytkownicy/płatności/zadania/logi/utrzymanie itd.) używają osobnego tokenu panelu (`admt_`).
+
+---
+
+## 🛠 Stack technologiczny
+
+**Serwer**: Express · Sequelize (podwójny dialect mysql/sqlite) · JWT · bcrypt · multer · axios · fluent-ffmpeg · sharp
+**Web**: Vue 3 · Vite · Vue Router · Pinia · Element Plus · vue-i18n · axios (powłoka desktopowa: Electron + electron-updater)
+**Mobilnie**: uni-app (App / powłoka mini-programa / H5)
+
+## 📝 Uwagi
+
+- Ten projekt dostarcza bazę z „funkcjonalnością działającą end-to-end": wszystkie API i strony naprawdę działają i da się je uruchomić; UI odwzorowuje strukturę i stany makiet referencyjnych.
+- Zewnętrzni dostawcy (obrazy/wideo/TTS) wymagają skonfigurowania prawdziwych kluczy w **panelu administracyjnym**, aby end-to-end powstawały prawdziwe materiały; ffmpeg służy wyłącznie do sklejania klipów wideo.
+- Po zmianie modeli Sequelize w SQLite usuń `server/data/*.db` i zainicjuj ponownie (w produkcji zalecane są migracje).
+
+---
+
+## 📄 Licencja open source
+
+Projekt jest open source na licencji [AGPL-3.0](LICENSE).
+
+- ✅ **Nauka własna, badania, użycie niekomercyjne**: bezpłatne; udostępnianie zmodyfikowanej wersji jako usługi sieciowej wymaga spełnienia obowiązków open source AGPL-3.0
+- 💼 **Wdrożenia komercyjne / usługi SaaS / dostawy prywatne**: wymagana licencja komercyjna (zwalnia z obowiązków open source AGPL-3.0); licencja komercyjna: <kevin@xw.com>
+
+---
+
+## 📮 Kontakt
+
+- 📧 E-mail: <kevin@xw.com>
+- 🌐 Demo online: <https://aiwork.xw.com>
+- 💬 Grupa WeChat „星网AI剧场开源交流" (otwarta społeczność 星网 AI Theater):
+
+  ![Kod QR grupy WeChat „星网AI剧场开源交流"](docs/wechat-group-qr.jpg)
