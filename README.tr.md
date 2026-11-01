@@ -86,7 +86,7 @@ npm run dev                   # http://localhost:3000, tablolar otomatik oluştu
 - **İlk çalıştırmada başlangıç yöneticisi otomatik oluşturulur** (konsola bir ipucu yazdırılır):
   - varsayılan hesap **`admin / admin123`**, yönetim paneli `/admin` girişi için
   - `ADMIN_INIT_USERNAME` / `ADMIN_INIT_PASSWORD` ortam değişkenleriyle geçersiz kılınabilir; yönetici zaten varsa bu adım atlanır
-  - ⚠️ Canıya çıkmadan önce varsayılan şifreyi hemen değiştirin (`node scripts/setAdminPassword.js`, veya aşağıdaki yönetim paneli bölümüne bakın)
+  - ⚠️ Canlıya çıkmadan önce varsayılan şifreyi hemen değiştirin (`node scripts/setAdminPassword.js`, veya aşağıdaki yönetim paneli bölümüne bakın)
 
 ### 2. İstemciyi başlatma
 
@@ -119,7 +119,7 @@ Yönetim paneli **ayrı giriş, ayrı oturum, ayrı token** kullanır (`admt_` �
 
 | Modül | Amaç |
 |---|---|
-| **Model yapılandırması** | **metin / görsel / video / TTS olmak üzere dört tür LLM entegrasyonu** (bir sonraki bölüme bakın; canıya çıkmadan önce zorunludur) |
+| **Model yapılandırması** | **metin / görsel / video / TTS olmak üzere dört tür LLM entegrasyonu** (bir sonraki bölüme bakın; canlıya çıkmadan önce zorunludur) |
 | Model sağlayıcıları | sağlayıcı ve model kataloğu (yeni yapılandırma eklerken preset kaynağı; popüler sağlayıcılar seed ile birlikte gelir) |
 | Sanatsal stiller / karakter seçenekleri / ses kitaplığı | üretim malzemesi sözlükleri (ön yüzdeki seçenekler buradan yapılandırılır) |
 | Fiyatlandırma | her AI adımının kredi birim fiyatı (yukarıdaki tabloya bakın) |
@@ -158,7 +158,7 @@ Desteklenen protokoller:
 
 ## 🚢 Üretim dağıtımı
 
-Eksiksiz runbook için bkz. **[deploy/DEPLOY.md](deploy/DEPLOY.md)** (nginx yayına alma kontrol listesi, PM2/systemd tek örnek, yedekleme/geri yükleme, WeChat Pay canıya alma, uyumluluk yapılacakları). En düşük ortam gereksinimleri:
+Eksiksiz runbook için bkz. **[deploy/DEPLOY.md](deploy/DEPLOY.md)** (nginx yayına alma kontrol listesi, PM2/systemd tek örnek, yedekleme/geri yükleme, WeChat Pay canlıya alma, uyumluluk yapılacakları). En düşük ortam gereksinimleri:
 
 ```bash
 NODE_ENV=production            # ayarlanmazsa JWT geliştirme yedek anahtarı devreye girer: güvenlik riski
@@ -204,10 +204,10 @@ WECHAT_PAY_PRIVATE_KEY_PATH=cert/apiclient_key.pem   # apiclient_key.pem'in disk
 WECHAT_PAY_PRIVATE_KEY=        # veya PEM metnini doğrudan satır içi verin
 WECHAT_PAY_NOTIFY_URL=         # boşsa ${PUBLIC_BASE_URL}/api/recharge/wechat/notify kullanılır
 ```
-- Akış: kredi merkezinde "WeChat Pay" seçin → arka uç tek tip sipariş oluşturur (Native `code_url` döndürür ve QR kod çizilir / JSAPI ödemeyi başlatır) → kullanıcı öder → WeChat'in eşzamansız geri çağrısı `/api/recharge/wechat/notify` adresine gelir (AES-256-GCM şifre çözümü ve doğrulama, idempotent hesaplaşma).
+- Akış: kredi merkezinde "WeChat Pay" seçin → arka uç tek tip sipariş oluşturur (Native `code_url` döndürür ve QR kod çizilir / JSAPI ödemeyi başlatır) → kullanıcı öder → WeChat'in eşzamansız geri çağrısı `/api/recharge/wechat/notify` adresine gelir (AES-256-GCM şifre çözümü ve doğrulama, idempotent hesaba geçirme).
 - Geri çağrı **internetten erişilebilir bir HTTPS adresi** olmalıdır (geliştirme sırasında iç ağ tüneli kullanılabilir).
 
-> Canıya alma adımları (merchant platformunda AppID eşleme, sertifikayı sunucuya yerleştirme, bir kuruşluk gerçek siparişle regresyon testi) için bkz. **[deploy/DEPLOY.md](deploy/DEPLOY.md) ⑦ WeChat Pay canıya alma adımları**.
+> Canlıya alma adımları (merchant platformunda AppID eşleme, sertifikayı sunucuya yerleştirme, bir kuruşluk gerçek siparişle regresyon testi) için bkz. **[deploy/DEPLOY.md](deploy/DEPLOY.md) ⑦ WeChat Pay canlıya alma adımları**.
 > Veritabanı: ödeme siparişinin işlem numarası `recharge_orders.transaction_id` alanına yazılır; başlangıçta `ensureColumns` ile idempotent şekilde tamamlanır, eski veritabanlarını etkilemez.
 
 ---
